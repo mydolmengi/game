@@ -29,77 +29,71 @@ body{
 }
 
 .game{
-
     position:relative;
-
     width:100%;
     max-width:900px;
 }
 
 .bg{
-
-    idth:100%;
-
-    height:auto;
-
+    width:100%;
     display:block;
 }
 
-/* 숲 */
+/* 🌳 숲 */
 
 .forest{
-
     position:absolute;
 
-    left:4%;
-    top:43%;
+    left:0%;
+    top:15%;
 
-    width:26%;
-    height:14%;
+    width:33%;
+    height:50%;
 
     cursor:pointer;
+
+    background:rgba(0,255,0,0.35);
+
+    border:3px solid lime;
 }
 
-/* 집 */
+/* 🏠 집 */
 
 .house{
-
     position:absolute;
 
-    left:37%;
-    top:42%;
+    left:33%;
+    top:15%;
 
-    width:26%;
-    height:14%;
+    width:34%;
+    height:50%;
 
     cursor:pointer;
+
+    background:rgba(255,0,0,0.35);
+
+    border:3px solid red;
 }
 
-/* 동굴 */
+/* 🕳️ 동굴 */
 
 .cave{
-
     position:absolute;
 
-    right:4%;
-    top:43%;
+    right:0%;
+    top:15%;
 
-    width:26%;
-    height:14%;
+    width:33%;
+    height:50%;
 
     cursor:pointer;
+
+    background:rgba(0,0,255,0.35);
+
+    border:3px solid blue;
 }
 
-/* 클릭 효과 */
-
-.forest:hover,
-.house:hover,
-.cave:hover{
-
-    transform:scale(1.05);
-}
-
-/* 하단 RPG 박스 */
+/* 하단 대화창 */
 
 .choice-box{
 
@@ -121,38 +115,27 @@ body{
 
     border-radius:30px;
 
-    padding:25px;
+    padding:18px;
 
     text-align:center;
 
-    font-size:38px;
+    font-size:28px;
 
     color:#5b3719;
 
     box-shadow:
         0 8px 20px rgba(0,0,0,0.2);
 }
-@media (max-width: 600px){
 
-    .title{
-        font-size:30px;
-    }
+@media (max-width:600px){
 
-    .story{
-        font-size:18px;
-        line-height:1.8;
-    }
-
-    .story-box{
-        padding:25px 20px;
-    }
-
-    .start-btn{
-        padding:12px 30px;
-        font-size:18px;
+    .choice-box{
+        font-size:20px;
+        padding:12px;
     }
 
 }
+
 </style>
 </head>
 <body>
@@ -164,22 +147,22 @@ body{
     class="bg"
     alt="갈림길">
 
-    <!-- 숲 -->
     <div
     class="forest"
-    onclick="location.href='forest.html'">
+    onclick="location.href='forest.html'"
+    title="숲">
     </div>
 
-    <!-- 집 -->
     <div
     class="house"
-    onclick="location.href='house.html'">
+    onclick="location.href='house.html'"
+    title="집">
     </div>
 
-    <!-- 동굴 -->
     <div
     class="cave"
-    onclick="location.href='cave.html'">
+    onclick="location.href='cave.html'"
+    title="동굴">
     </div>
 
     <div class="choice-box">
