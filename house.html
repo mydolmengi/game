@@ -7,7 +7,6 @@
 <title>집</title>
 
 <style>
-
 @font-face {
     font-family: 'GmarketSans';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
@@ -36,280 +35,194 @@ body{
     display:block;
 }
 
-/* 문 클릭 영역 (디버그용) */
-
+/* 문 클릭 영역 */
 .door{
-
     position:absolute;
-
     left:42%;
     top:38%;
-
     width:16%;
     height:25%;
-
     cursor:pointer;
 
     background:rgba(0,255,0,0.3);
-
     border:3px solid lime;
 }
 
 /* 돌아가기 버튼 */
-
 .back-btn{
-
     position:absolute;
-
     bottom:3%;
-
     left:50%;
-
     transform:translateX(-50%);
 
     background:#f9e9c8;
-
     border:6px solid #c89b5d;
-
     border-radius:30px;
-
     padding:14px 35px;
-
     font-size:20px;
-
     color:#5b3719;
-
     cursor:pointer;
-
-    box-shadow:
-    0 8px 20px rgba(0,0,0,0.2);
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
-/* 팝업 */
-
+/* 팝업 배경 */
 .popup{
-
     position:fixed;
-
     inset:0;
-
     background:rgba(0,0,0,0.6);
-
     display:none;
-
     justify-content:center;
-
     align-items:center;
+    z-index:100;
 }
 
+/* 팝업 박스 */
 .popup-box{
-
+    position:relative;
     width:85%;
-
     max-width:500px;
-
     background:#f9e9c8;
-
     border:6px solid #c89b5d;
-
     border-radius:30px;
-
     padding:25px;
-
     text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
 
-    box-shadow:
-    0 10px 30px rgba(0,0,0,0.25);
+/* 닫기 버튼 */
+.close-btn{
+    position:absolute;
+    top:15px;
+    right:15px;
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    background:#ff9fd2;
+    color:white;
+    font-size:22px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
 .popup-title{
-
     font-size:24px;
-
     color:#5b3719;
-
     line-height:1.8;
-
     margin-bottom:20px;
 }
 
 input{
-
     width:100%;
-
     padding:14px;
-
     border-radius:15px;
-
     border:2px solid #c89b5d;
-
     font-size:20px;
-
     text-align:center;
-
     margin-bottom:15px;
+    outline:none;
 }
 
 .popup-btn{
-
     background:#ff9fd2;
-
     border:none;
-
     border-radius:20px;
-
     padding:12px 25px;
-
     font-size:18px;
-
     cursor:pointer;
 }
 
 .message{
-
     margin-top:15px;
-
     color:#5b3719;
-
     font-size:20px;
-
     line-height:1.8;
 }
-
 </style>
 </head>
 <body>
 
 <div class="game">
+    <img src="images/house.png" class="bg" alt="집">
 
-<img
-src="images/house.png"
-class="bg">
+    <div class="door" onclick="openPopup()" title="문"></div>
 
-<div
-class="door"
-onclick="openPopup()">
+    <button class="back-btn" onclick="location.href='room1.html'">
+        ↩ 돌아가기
+    </button>
 </div>
 
-<button
-class="back-btn"
-onclick="location.href='room1.html'">
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <button class="close-btn" onclick="closePopup()">✕</button>
 
-↩ 돌아가기
+        <div class="popup-title">
+            비밀번호를 입력하시오<br>
+            (신중하게...)
+        </div>
 
-</button>
+        <input type="password" id="pw" placeholder="비밀번호 입력">
 
-</div>
+        <button class="popup-btn" onclick="checkPassword()">
+            확인
+        </button>
 
-<div
-class="popup"
-id="popup">
-
-<div class="popup-box">
-
-<div class="popup-title">
-
-비밀번호를 입력하시오<br>
-(신중하게...)
-
-</div>
-
-<input
-type="password"
-id="pw">
-
-<button
-class="popup-btn"
-onclick="checkPassword()">
-
-확인
-
-</button>
-
-<div
-class="message"
-id="message">
-</div>
-
-</div>
-
+        <div class="message" id="message"></div>
+    </div>
 </div>
 
 <script>
-
 let failCount = 0;
 
 function openPopup(){
-
     document.getElementById("popup").style.display = "flex";
-
     document.getElementById("pw").value = "";
-
     document.getElementById("message").innerHTML = "";
 }
 
+function closePopup(){
+    document.getElementById("popup").style.display = "none";
+}
+
 function checkPassword(){
-
-    const pw =
-    document.getElementById("pw").value;
-
-    const msg =
-    document.getElementById("message");
+    const pw = document.getElementById("pw").value;
+    const msg = document.getElementById("message");
 
     if(pw === "0627"){
-
         location.href = "house_inside.html";
-
         return;
     }
 
     failCount++;
 
-    if(failCount >= 3){
-
+    if(failCount >= 2){
         msg.innerHTML = `
-        흥! 신중하라고 했징!<br><br>
-
-        <button
-        class="popup-btn"
-        onclick="resetTry()">
-
-        네.... 신중하게 하겠움당
-
-        </button>
+            흥! 신중하라고 했징!<br><br>
+            <button class="popup-btn" onclick="resetTry()">
+                네.... 신중하게 하겠움당
+            </button>
         `;
-
         return;
     }
 
     msg.innerHTML = `
-    갈!!!!!!!!<br>
-    남의 집 몰래 들어가지마세욧!<br><br>
-
-    <button
-    class="popup-btn"
-    onclick="retry()">
-
-    다시 시도하기
-
-    </button>
+        갈!!!!!!!!<br>
+        남의 집 몰래 들어가지마세욧!<br><br>
+        <button class="popup-btn" onclick="retry()">
+            다시 시도하기
+        </button>
     `;
 }
 
 function retry(){
-
     document.getElementById("pw").value = "";
-
     document.getElementById("message").innerHTML = "";
 }
 
 function resetTry(){
-
     failCount = 0;
-
     retry();
 }
-
 </script>
 
 </body>
