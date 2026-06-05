@@ -4,40 +4,166 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>숲 입구</title>
+<title>갈림길</title>
 
 <style>
 
-body{
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
 
-    background:#e9ffe8;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    font-family:'GmarketSans', sans-serif;
+}
+
+.game{
+
+    position:relative;
+
+    width:100%;
+    max-width:900px;
+}
+
+.bg{
+
+    width:100%;
+    display:block;
+}
+
+/* 숲 */
+
+.forest{
+
+    position:absolute;
+
+    left:4%;
+    top:43%;
+
+    width:26%;
+    height:14%;
+
+    cursor:pointer;
+}
+
+/* 집 */
+
+.house{
+
+    position:absolute;
+
+    left:37%;
+    top:42%;
+
+    width:26%;
+    height:14%;
+
+    cursor:pointer;
+}
+
+/* 동굴 */
+
+.cave{
+
+    position:absolute;
+
+    right:4%;
+    top:43%;
+
+    width:26%;
+    height:14%;
+
+    cursor:pointer;
+}
+
+/* 클릭 효과 */
+
+.forest:hover,
+.house:hover,
+.cave:hover{
+
+    transform:scale(1.05);
+}
+
+/* 하단 RPG 박스 */
+
+.choice-box{
+
+    position:absolute;
+
+    bottom:3%;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:80%;
+
+    max-width:650px;
+
+    background:#f9e9c8;
+
+    border:6px solid #c89b5d;
+
+    border-radius:30px;
+
+    padding:25px;
 
     text-align:center;
 
-    font-family:'Malgun Gothic', sans-serif;
+    font-size:38px;
 
-    padding-top:100px;
-}
+    color:#5b3719;
 
-h1{
-
-    font-size:50px;
-}
-
-p{
-
-    font-size:28px;
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.2);
 }
 
 </style>
 </head>
 <body>
 
-<h1>🌳 숲 입구</h1>
+<div class="game">
 
-<p>
-첫 번째 미션이 시작되었다.
-</p>
+    <img
+    src="images/room1.png"
+    class="bg"
+    alt="갈림길">
+
+    <!-- 숲 -->
+    <div
+    class="forest"
+    onclick="location.href='forest.html'">
+    </div>
+
+    <!-- 집 -->
+    <div
+    class="house"
+    onclick="location.href='house.html'">
+    </div>
+
+    <!-- 동굴 -->
+    <div
+    class="cave"
+    onclick="location.href='cave.html'">
+    </div>
+
+    <div class="choice-box">
+        🌿 어디로 갈까? 🌿
+    </div>
+
+</div>
 
 </body>
 </html>
