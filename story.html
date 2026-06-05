@@ -2,38 +2,231 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>스토리</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>애기미를 구해라!</title>
 
 <style>
 
-body{
-    background:#ffd6e7;
-    text-align:center;
-    font-size:28px;
-    padding:50px;
-    line-height:1.8;
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
 }
 
-button{
-    padding:20px 40px;
-    font-size:24px;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+
+    background:linear-gradient(
+        to bottom,
+        #9ddcff,
+        #eaf9ff
+    );
+
+    height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-family:'GmarketSans', sans-serif;
+}
+
+/* 구름 */
+
+.cloud{
+    position:absolute;
+    background:white;
+    border-radius:100px;
+    opacity:0.8;
+}
+
+.cloud::before{
+    content:"";
+    position:absolute;
+    width:70px;
+    height:70px;
+    background:white;
+    border-radius:50%;
+    top:-30px;
+    left:25px;
+}
+
+.cloud::after{
+    content:"";
+    position:absolute;
+    width:90px;
+    height:90px;
+    background:white;
+    border-radius:50%;
+    top:-40px;
+    right:20px;
+}
+
+.cloud1{
+    width:180px;
+    height:60px;
+    top:12%;
+    animation:moveCloud 35s linear infinite;
+}
+
+.cloud2{
+    width:240px;
+    height:70px;
+    top:32%;
+    animation:moveCloud 45s linear infinite;
+}
+
+.cloud3{
+    width:150px;
+    height:50px;
+    top:72%;
+    animation:moveCloud 30s linear infinite;
+}
+
+@keyframes moveCloud{
+
+    from{
+        left:-300px;
+    }
+
+    to{
+        left:120%;
+    }
+}
+
+/* 스토리 카드 */
+
+.story-box{
+
+    position:relative;
+
+    z-index:10;
+
+    width:88%;
+
+    max-width:750px;
+
+    background:rgba(255,255,255,0.93);
+
+    border-radius:35px;
+
+    padding:55px 40px;
+
+    text-align:center;
+
+    box-shadow:
+    0 15px 40px rgba(0,0,0,0.12);
+}
+
+/* 제목 */
+
+.title{
+
+    font-size:46px;
+
+    color:#ff5ea8;
+
+    margin-bottom:35px;
+
+    letter-spacing:2px;
+}
+
+/* 본문 */
+
+.story{
+
+    font-size:28px;
+
+    line-height:2;
+
+    color:#444;
+}
+
+/* 버튼 */
+
+.start-btn{
+
+    margin-top:45px;
+
+    background:linear-gradient(
+        180deg,
+        #ff9fd2,
+        #ff6fb5
+    );
+
+    color:white;
+
+    border:none;
+
+    border-radius:999px;
+
+    padding:22px 70px;
+
+    font-size:28px;
+
+    font-family:'GmarketSans';
+
+    cursor:pointer;
+
+    box-shadow:
+    0 8px 20px rgba(255,105,180,0.4);
+
+    transition:0.2s;
+}
+
+.start-btn:hover{
+
+    transform:scale(1.05);
+}
+
+.start-btn:active{
+
+    transform:scale(0.96);
 }
 
 </style>
 </head>
 <body>
 
-평화롭던 왕국.<br><br>
+<div class="cloud cloud1"></div>
+<div class="cloud cloud2"></div>
+<div class="cloud cloud3"></div>
 
-어느 날 애기미가<br>
-정체불명의 마왕에게 납치되었다.<br><br>
+<div class="story-box">
 
-당신은 용사가 되어<br>
-애기미를 구하러 떠나야 한다.<br><br><br>
+    <div class="title">
+        ✨ 이야기 ✨
+    </div>
 
-<button onclick="location.href='room1.html'">
-모험 시작
-</button>
+    <div class="story">
+
+        평화롭던 왕국.<br><br>
+
+        어느 날 애기미가<br>
+        정체불명의 마왕에게 납치되었다.<br><br>
+
+        당신은 용사가 되어<br>
+        애기미를 구하러 떠나야 한다.
+
+    </div>
+
+    <button
+    class="start-btn"
+    onclick="location.href='room1.html'">
+
+        💖 구하러 가자!
+
+    </button>
+
+</div>
 
 </body>
 </html>
