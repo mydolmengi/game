@@ -44,7 +44,8 @@ body{
     height:25%;
     cursor:pointer;
 
-
+    background:rgba(0,255,0,0.3);
+    border:3px solid lime;
 }
 
 /* 돌아가기 버튼 */
@@ -64,7 +65,27 @@ body{
     box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
-/* 팝업 배경 */
+/* 바로 들어가기 버튼 */
+.enter-btn{
+    position:absolute;
+    left:42%;
+    top:38%;
+    width:16%;
+    height:25%;
+    display:none;
+    cursor:pointer;
+
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:18px;
+    font-size:16px;
+    color:#5b3719;
+    font-family:'GmarketSans', sans-serif;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    z-index:5;
+}
+
+/* 팝업 */
 .popup{
     position:fixed;
     inset:0;
@@ -75,7 +96,6 @@ body{
     z-index:100;
 }
 
-/* 팝업 박스 */
 .popup-box{
     position:relative;
     width:85%;
@@ -137,49 +157,6 @@ input{
     font-size:20px;
     line-height:1.8;
 }
-    @media (max-width: 600px){
-
-​
-
-    .title{
-
-        font-size:30px;
-
-    }
-
-​
-
-    .story{
-
-        font-size:18px;
-
-        line-height:1.8;
-
-    }
-
-​
-
-    .story-box{
-
-        padding:25px 20px;
-
-    }
-
-​
-
-    .start-btn{
-
-        padding:12px 30px;
-
-        font-size:18px;
-
-    }
-
-​
-
-}
-
-​
 </style>
 </head>
 <body>
@@ -188,6 +165,10 @@ input{
     <img src="images/house.png" class="bg" alt="집">
 
     <div class="door" onclick="openPopup()" title="문"></div>
+
+    <button class="enter-btn" id="enterBtn" onclick="location.href='house_inside.html'">
+        바로 들어가기
+    </button>
 
     <button class="back-btn" onclick="location.href='room1.html'">
         ↩ 돌아가기
@@ -216,6 +197,12 @@ input{
 <script>
 let failCount = 0;
 
+window.onload = function () {
+    if (localStorage.getItem("houseOpened") === "true") {
+        document.getElementById("enterBtn").style.display = "block";
+    }
+};
+
 function openPopup(){
     document.getElementById("popup").style.display = "flex";
     document.getElementById("pw").value = "";
@@ -231,13 +218,14 @@ function checkPassword(){
     const msg = document.getElementById("message");
 
     if(pw === "0627"){
+        localStorage.setItem("houseOpened", "true");
         location.href = "house_inside.html";
         return;
     }
 
     failCount++;
 
-    if(failCount >= 2){
+    if(failCount >= 3){
         msg.innerHTML = `
             흥! 신중하라고 했징!<br><br>
             <button class="popup-btn" onclick="resetTry()">
