@@ -1,1 +1,518 @@
-<h1>🌳 숲</h1>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>숲</title>
+
+<style>
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    font-family:'GmarketSans', sans-serif;
+}
+
+.game{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    margin:auto;
+}
+
+.bg{
+    width:100%;
+    display:block;
+}
+
+/* 공통 아이템 */
+.collectible{
+    position:absolute;
+    cursor:pointer;
+    user-select:none;
+    z-index:6;
+    transform:translate(-50%, -50%);
+    transition:transform 0.15s ease;
+}
+
+.collectible:hover{
+    transform:translate(-50%, -50%) scale(1.06);
+}
+
+.collectible img{
+    width:100%;
+    height:auto;
+    display:block;
+    pointer-events:none;
+}
+
+/* 황금 사과 */
+.apple-item{
+    left:19%;
+    top:10%;
+    width:11%;
+}
+
+/* 도끼 */
+.axe-item{
+    left:49%;
+    top:60%;
+    width:12%;
+}
+
+/* 꽃 */
+.flower-item{
+    left:16%;
+    top:82%;
+    width:7%;
+    background:none;
+    border:none;
+    padding:0;
+}
+
+/* 동물 클릭 영역 */
+.deer-left,
+.deer-right{
+    position:absolute;
+    cursor:pointer;
+    z-index:5;
+    background:rgba(255,255,255,0);
+}
+
+/* 왼쪽 동물 */
+.deer-left{
+    left:41%;
+    top:30%;
+    width:11%;
+    height:18%;
+}
+
+/* 오른쪽 사슴 */
+.deer-right{
+    left:58%;
+    top:28%;
+    width:18%;
+    height:22%;
+}
+
+/* 돌아가기 버튼 */
+.back-btn{
+    position:absolute;
+    bottom:3%;
+    left:50%;
+    transform:translateX(-50%);
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:12px 35px;
+    font-size:20px;
+    color:#5b3719;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    z-index:7;
+}
+
+/* 팝업 */
+.popup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.65);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:100;
+}
+
+.popup-box{
+    position:relative;
+    width:88%;
+    max-width:520px;
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:22px 18px 20px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+
+.close-btn{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    background:#ff9fd2;
+    color:white;
+    font-size:22px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.popup-visual{
+    width:100%;
+    height:180px;
+    margin-top:10px;
+    margin-bottom:14px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+
+.popup-media{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+}
+
+.popup-title{
+    font-size:24px;
+    color:#5b3719;
+    line-height:1.6;
+    margin-bottom:14px;
+}
+
+.popup-body{
+    font-size:20px;
+    color:#5b3719;
+    line-height:1.8;
+    margin-bottom:16px;
+    white-space:normal;
+}
+
+.popup-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.choice-btn{
+    background:#f9e9c8;
+    border:4px solid #c89b5d;
+    border-radius:22px;
+    padding:12px 16px;
+    font-size:18px;
+    color:#5b3719;
+    cursor:pointer;
+    font-family:'GmarketSans', sans-serif;
+    box-shadow:0 6px 14px rgba(0,0,0,0.12);
+}
+
+.choice-btn:active{
+    transform:scale(0.98);
+}
+</style>
+</head>
+<body>
+
+<div class="game">
+    <img src="images/forest_bg.png" class="bg" alt="숲 배경">
+
+    <!-- 황금 사과 -->
+    <div class="collectible apple-item" id="appleItem" onclick="collectGoldenApple()">
+        <img src="images/golden_apple.png" alt="황금 사과">
+    </div>
+
+    <!-- 도끼 -->
+    <div class="collectible axe-item" id="axeItem" onclick="collectAxe()">
+        <img src="images/axe.png" alt="도끼">
+    </div>
+
+    <!-- 꽃 -->
+    <div class="collectible flower-item" id="flowerItem" onclick="collectFlower()">
+        <img id="flowerImg" alt="꽃">
+    </div>
+
+    <!-- 왼쪽 동물 -->
+    <div class="deer-left" onclick="talkLeftAnimal()"></div>
+
+    <!-- 오른쪽 사슴 -->
+    <div class="deer-right" onclick="talkRightDeer()"></div>
+
+    <button class="back-btn" onclick="location.href='room1.html'">
+        ↩ 돌아가기
+    </button>
+</div>
+
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <button class="close-btn" onclick="closePopup()">✕</button>
+
+        <div class="popup-visual" id="popupVisual"></div>
+
+        <div class="popup-title" id="popupTitle"></div>
+        <div class="popup-body" id="popupBody"></div>
+
+        <div class="popup-actions" id="popupActions"></div>
+    </div>
+</div>
+
+<script>
+const BG_SRC = "images/forest_bg.png";
+const AXE_SRC = "images/axe.png";
+const APPLE_SRC = "images/golden_apple.png";
+
+const FLOWER_SVG = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fffbe6"/>
+      <stop offset="100%" stop-color="#ffd54a"/>
+    </radialGradient>
+  </defs>
+  <g>
+    <ellipse cx="256" cy="108" rx="38" ry="82" fill="#ff8bb6"/>
+    <ellipse cx="256" cy="404" rx="38" ry="82" fill="#ff8bb6"/>
+    <ellipse cx="108" cy="256" rx="82" ry="38" fill="#ff8bb6"/>
+    <ellipse cx="404" cy="256" rx="82" ry="38" fill="#ff8bb6"/>
+
+    <ellipse cx="150" cy="150" rx="40" ry="78" fill="#ff8bb6" transform="rotate(-45 150 150)"/>
+    <ellipse cx="362" cy="150" rx="40" ry="78" fill="#ff8bb6" transform="rotate(45 362 150)"/>
+    <ellipse cx="150" cy="362" rx="40" ry="78" fill="#ff8bb6" transform="rotate(45 150 362)"/>
+    <ellipse cx="362" cy="362" rx="40" ry="78" fill="#ff8bb6" transform="rotate(-45 362 362)"/>
+
+    <circle cx="256" cy="256" r="74" fill="url(#g)"/>
+    <circle cx="256" cy="256" r="46" fill="#ffcc33"/>
+    <rect x="244" y="290" width="24" height="154" rx="12" fill="#55a955"/>
+    <ellipse cx="218" cy="356" rx="34" ry="16" fill="#55a955" transform="rotate(-28 218 356)"/>
+  </g>
+</svg>
+`)}`;
+
+const popup = document.getElementById("popup");
+const popupVisual = document.getElementById("popupVisual");
+const popupTitle = document.getElementById("popupTitle");
+const popupBody = document.getElementById("popupBody");
+const popupActions = document.getElementById("popupActions");
+
+const appleItem = document.getElementById("appleItem");
+const axeItem = document.getElementById("axeItem");
+const flowerItem = document.getElementById("flowerItem");
+const flowerImg = document.getElementById("flowerImg");
+
+function hasItem(key){
+    return localStorage.getItem(key) === "true";
+}
+
+function setItem(key){
+    localStorage.setItem(key, "true");
+}
+
+function removeItem(key){
+    localStorage.removeItem(key);
+}
+
+function showPopup({ imageSrc = "", imageFit = "contain", imagePosition = "center center", title = "", body = "", actions = "" }){
+    if(imageSrc){
+        popupVisual.innerHTML = `<img src="${imageSrc}" class="popup-media" style="object-fit:${imageFit}; object-position:${imagePosition};" alt="">`;
+    }else{
+        popupVisual.innerHTML = "";
+    }
+
+    popupTitle.innerHTML = title;
+    popupBody.innerHTML = body;
+    popupActions.innerHTML = actions;
+    popup.style.display = "flex";
+}
+
+function closePopup(){
+    popup.style.display = "none";
+}
+
+function syncCollectedItems(){
+    if(hasItem("goldenApple")){
+        appleItem.style.display = "none";
+    }
+    if(hasItem("axe")){
+        axeItem.style.display = "none";
+    }
+    if(hasItem("flower")){
+        flowerItem.style.display = "none";
+    }
+}
+
+function collectGoldenApple(){
+    if(hasItem("goldenApple")) return;
+
+    setItem("goldenApple");
+    syncCollectedItems();
+
+    showPopup({
+        imageSrc: APPLE_SRC,
+        title: "황금 사과",
+        body: "황금 사과를 얻었다.<br>뭔가 아주 중요한 것 같다",
+        actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    });
+}
+
+function collectAxe(){
+    if(hasItem("axe")) return;
+
+    setItem("axe");
+    syncCollectedItems();
+
+    showPopup({
+        imageSrc: AXE_SRC,
+        title: "도끼",
+        body: "도끼를 얻었다.<br>아주 단단한걸~",
+        actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    });
+}
+
+function collectFlower(){
+    if(hasItem("flower")) return;
+
+    setItem("flower");
+    syncCollectedItems();
+
+    showPopup({
+        imageSrc: FLOWER_SVG,
+        title: "꽃",
+        body: "꽃을 얻었다.<br>사과하장",
+        actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    });
+}
+
+function talkLeftAnimal(){
+    const lied = hasItem("forest_deer_lied");
+    const gifted = hasItem("forest_deer_gifted");
+
+    if(lied && !gifted){
+        showLeftAnimalAngry();
+        return;
+    }
+
+    if(gifted){
+        showLeftAnimalQuestion();
+        return;
+    }
+
+    showLeftAnimalIntro();
+}
+
+function showLeftAnimalIntro(){
+    showPopup({
+        imageSrc: BG_SRC,
+        imageFit: "cover",
+        imagePosition: "42% 42%",
+        title: "동물",
+        body: "너 뭐야?!",
+        actions: `<button class="choice-btn" onclick="showLeftAnimalQuestion()">다음</button>`
+    });
+}
+
+function showLeftAnimalQuestion(){
+    showPopup({
+        imageSrc: BG_SRC,
+        imageFit: "cover",
+        imagePosition: "42% 42%",
+        title: "동물",
+        body: "여긴 아무나 들어올 수 없는 곳인데...<br>여기 어떻게 왔어?",
+        actions: `
+            <button class="choice-btn" onclick="sayTruth()">사실대로 말하기</button>
+            <button class="choice-btn" onclick="sayLie()">거짓말하기</button>
+        `
+    });
+}
+
+function sayTruth(){
+    showPopup({
+        imageSrc: BG_SRC,
+        imageFit: "cover",
+        imagePosition: "42% 42%",
+        title: "동물",
+        body: "홀리, 당근 알쥥~ 아주 중요한 날이라고 했던 것 같은데!",
+        actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    });
+}
+
+function sayLie(){
+    setItem("forest_deer_lied");
+
+    showPopup({
+        imageSrc: BG_SRC,
+        imageFit: "cover",
+        imagePosition: "42% 42%",
+        title: "동물",
+        body: "아아아ㅏ아아아악!!!!!!!! 이 구라쟁이! 아주 싹이 노랗구나!",
+        actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    });
+}
+
+function showLeftAnimalAngry(){
+    showPopup({
+        imageSrc: BG_SRC,
+        imageFit: "cover",
+        imagePosition: "42% 42%",
+        title: "동물",
+        body: "이 거짓말쟁이!",
+        actions: `<button class="choice-btn" onclick="offerFlower()">선물주기</button>`
+    });
+}
+
+function offerFlower(){
+    if(!hasItem("flower")){
+        showPopup({
+            imageSrc: FLOWER_SVG,
+            title: "꽃",
+            body: "꽃 아이템이 없어...<br>먼저 꽃을 찾아와야 해!",
+            actions: `<button class="choice-btn" onclick="showLeftAnimalAngry()">확인</button>`
+        });
+        return;
+    }
+
+    removeItem("flower");
+    setItem("forest_deer_gifted");
+    syncCollectedItems();
+
+    showPopup({
+        imageSrc: FLOWER_SVG,
+        title: "꽃 선물",
+        body: "흠...흠.. 뭘 이런걸다.....",
+        actions: `<button class="choice-btn" onclick="showLeftAnimalQuestion()">확인</button>`
+    });
+}
+
+function talkRightDeer(){
+    showPopup({
+        imageSrc: BG_SRC,
+        imageFit: "cover",
+        imagePosition: "66% 42%",
+        title: "사슴",
+        body: "....옛날부터 전해져 오던 말이 있었지./",
+        actions: `<button class="choice-btn" onclick="rightDeerNext()">다음</button>`
+    });
+}
+
+function rightDeerNext(){
+    showPopup({
+        imageSrc: BG_SRC,
+        imageFit: "cover",
+        imagePosition: "66% 42%",
+        title: "사슴",
+        body: "그건 보이는게 다가 아니라는거지!<br><br>주인공이 말한다.<br>무슨 말을 하는거야......<br><br><b>잘 기억하도록</b>",
+        actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    flowerImg.src = FLOWER_SVG;
+    syncCollectedItems();
+});
+</script>
+
+</body>
+</html>
