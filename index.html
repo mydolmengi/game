@@ -7,6 +7,10 @@
 <title>애기미를 구해라!</title>
 
 <style>
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
 
 *{
     margin:0;
@@ -15,106 +19,97 @@
 }
 
 body{
-
     background:#ffd6e7;
-
     display:flex;
-
     justify-content:center;
-
     align-items:center;
-
     min-height:100vh;
+    font-family:'GmarketSans', sans-serif;
 }
 
 .cover-container{
-
     position:relative;
-
     width:100%;
-
     max-width:700px;
 }
 
 .cover{
-
     width:100%;
-
     display:block;
-
     border-radius:20px;
 }
 
 .start-btn{
-
     position:absolute;
-
-    bottom:80px;
-
+    bottom:105px;
     left:50%;
-
     transform:translateX(-50%);
-
-    background:linear-gradient(
-        180deg,
-        #ff9fd2,
-        #ff6fb5
-    );
-
+    background:linear-gradient(180deg, #ff9fd2, #ff6fb5);
     color:white;
-
     border:4px solid white;
-
     border-radius:999px;
-
-    padding:10px 30px;
-
-    font-size:18px;
-
+    padding:12px 35px;
+    font-size:20px;
     font-weight:bold;
-
     cursor:pointer;
-
-    box-shadow:
-    0 0 25px rgba(255,105,180,0.8);
-
+    box-shadow:0 0 20px rgba(255,105,180,0.8);
     transition:0.2s;
 }
 
 .start-btn:hover{
-
-    transform:
-    translateX(-50%)
-    scale(1.05);
+    transform:translateX(-50%) scale(1.05);
 }
 
 .start-btn:active{
-
-    transform:
-    translateX(-50%)
-    scale(0.95);
+    transform:translateX(-50%) scale(0.95);
 }
 
+.reset-btn{
+    position:absolute;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#f9e9c8;
+    color:#5b3719;
+    border:4px solid #c89b5d;
+    border-radius:999px;
+    padding:10px 30px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 6px 15px rgba(0,0,0,0.15);
+    transition:0.2s;
+}
+
+.reset-btn:hover{
+    transform:translateX(-50%) scale(1.05);
+}
+
+.reset-btn:active{
+    transform:translateX(-50%) scale(0.95);
+}
 </style>
 </head>
 <body>
 
 <div class="cover-container">
+    <img src="images/cover.png" class="cover" alt="애기미를 구해라!">
 
-    <img
-    src="images/cover.png"
-    class="cover"
-    alt="애기미를 구해라!">
-
-    <button
-    class="start-btn"
-    onclick="location.href='story.html'">
-
-    💖 시작하기
-
+    <button class="start-btn" onclick="location.href='story.html'">
+        💖 시작하기
     </button>
 
+    <button class="reset-btn" onclick="resetGame()">
+        초기화
+    </button>
 </div>
+
+<script>
+function resetGame(){
+    localStorage.clear();
+    alert("게임 진행 상태를 초기화했어!");
+}
+</script>
 
 </body>
 </html>
