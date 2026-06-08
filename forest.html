@@ -432,9 +432,9 @@ function talkLeftAnimal(){
 
 function showLeftAnimalIntro(){
     showPopup({
-        imageSrc: BG_SRC,
-        imageFit: "cover",
-        imagePosition: "42% 42%",
+       imageSrc: "images/babydeer.png",
+    imageFit: "contain",
+    imagePosition: "center center",
         title: "동물",
         body: "너 뭐야?!",
         actions: `<button class="choice-btn" onclick="showLeftAnimalQuestion()">다음</button>`
@@ -443,9 +443,9 @@ function showLeftAnimalIntro(){
 
 function showLeftAnimalQuestion(){
     showPopup({
-        imageSrc: BG_SRC,
-        imageFit: "cover",
-        imagePosition: "42% 42%",
+        imageSrc: "images/babydeer.png",
+    imageFit: "contain",
+    imagePosition: "center center",
         title: "동물",
         body: "여긴 아무나 들어올 수 없는 곳인데...<br>여기 어떻게 왔어?",
         actions: `
@@ -457,9 +457,9 @@ function showLeftAnimalQuestion(){
 
 function sayTruth(){
     showPopup({
-        imageSrc: BG_SRC,
-        imageFit: "cover",
-        imagePosition: "42% 42%",
+       imageSrc: "images/babydeer.png",
+    imageFit: "contain",
+    imagePosition: "center center",
         title: "동물",
         body: "홀리, 당근 알쥥~ 아주 중요한 날이라고 했던 것 같은데!",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
@@ -470,9 +470,9 @@ function sayLie(){
     setItem("forest_deer_lied");
 
     showPopup({
-        imageSrc: BG_SRC,
-        imageFit: "cover",
-        imagePosition: "42% 42%",
+      imageSrc: "images/babydeer.png",
+    imageFit: "contain",
+    imagePosition: "center center",
         title: "동물",
         body: "아아아ㅏ아아아악!!!!!!!! 이 구라쟁이! 아주 싹이 노랗구나!",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
@@ -481,9 +481,9 @@ function sayLie(){
 
 function showLeftAnimalAngry(){
     showPopup({
-        imageSrc: BG_SRC,
-        imageFit: "cover",
-        imagePosition: "42% 42%",
+       imageSrc: "images/babydeer.png",
+    imageFit: "contain",
+    imagePosition: "center center",
         title: "동물",
         body: "이 거짓말쟁이!",
         actions: `<button class="choice-btn" onclick="offerFlower()">선물주기</button>`
@@ -515,9 +515,9 @@ function offerFlower(){
 
 function talkRightDeer(){
     showPopup({
-        imageSrc: BG_SRC,
-        imageFit: "cover",
-        imagePosition: "66% 42%",
+       imageSrc: "images/deer.png",
+    imageFit: "contain",
+    imagePosition: "center center",
         title: "사슴",
         body: "....옛날부터 전해져 오던 말이 있었지./",
         actions: `<button class="choice-btn" onclick="rightDeerNext()">다음</button>`
@@ -526,9 +526,9 @@ function talkRightDeer(){
 
 function rightDeerNext(){
     showPopup({
-        imageSrc: BG_SRC,
-        imageFit: "cover",
-        imagePosition: "66% 42%",
+        imageSrc: "images/deer.png",
+    imageFit: "contain",
+    imagePosition: "center center",
         title: "사슴",
         body: "그건 보이는게 다가 아니라는거지!<br><br>주인공이 말한다.<br>무슨 말을 하는거야......<br><br><b>잘 기억하도록</b>",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
