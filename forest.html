@@ -263,7 +263,8 @@ body{
     </div>
 
     <!-- 왼쪽 동물 -->
-    <div class="deer-left" onclick="talkLeftAnimal()"></div>
+    <div class="deer-left" onclick="talkLeftAnimal()">
+ </div>
 
     <!-- 오른쪽 사슴 -->
     <div class="deer-right" onclick="talkRightDeer()"></div>
@@ -406,8 +407,8 @@ function collectFlower(){
 
     showPopup({
         imageSrc: FLOWER_SVG,
-        title: "꽃",
-        body: "꽃을 얻었다.<br>사과하장",
+        title: "사과의 꽃",
+        body: "꽃을 얻었다.<br>사과할때 유용",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
     });
 }
@@ -448,8 +449,8 @@ function showLeftAnimalQuestion(){
         title: "동물",
         body: "여긴 아무나 들어올 수 없는 곳인데...<br>여기 어떻게 왔어?",
         actions: `
-            <button class="choice-btn" onclick="sayTruth()">사실대로 말하기</button>
-            <button class="choice-btn" onclick="sayLie()">거짓말하기</button>
+            <button class="choice-btn" onclick="sayTruth()">사실대로 말하기-나 공주를 구해야하는데 혹시 집 비밀번호 알아?</button>
+            <button class="choice-btn" onclick="sayLie()">거짓말하기-혹시 나 저 집 주인인데 혹시 집 비번알아?</button>
         `
     });
 }
