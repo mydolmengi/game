@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>숲</title>
 
 <style>
@@ -214,32 +213,6 @@ body{
 .choice-btn:active{
     transform:scale(0.98);
 }
-
-  @media (max-width: 600px){
-
-    .title{
-        font-size:30px;
-    }
-
-    .story{
-        font-size:18px;
-        line-height:1.8;
-    }
-
-    .story-box{
-        padding:25px 20px;
-    }
-
-    .start-btn{
-        padding:12px 30px;
-        font-size:18px;
-    }
-
-}
-
-​
-
-
 </style>
 </head>
 <body>
@@ -259,12 +232,11 @@ body{
 
     <!-- 꽃 -->
     <div class="collectible flower-item" id="flowerItem" onclick="collectFlower()">
-        <mg src="images/flower.png" alt="꽃">
+        <img src="images/flower.png" alt="꽃" id="flowerImg">
     </div>
 
     <!-- 왼쪽 동물 -->
-    <div class="deer-left" onclick="talkLeftAnimal()">
- </div>
+    <div class="deer-left" onclick="talkLeftAnimal()"></div>
 
     <!-- 오른쪽 사슴 -->
     <div class="deer-right" onclick="talkRightDeer()"></div>
@@ -287,37 +259,14 @@ body{
     </div>
 </div>
 
+<script src="js/inventory.js"></script>
 <script>
 const BG_SRC = "images/forest_bg.png";
 const AXE_SRC = "images/axe.png";
 const APPLE_SRC = "images/golden_apple.png";
-
-const FLOWER_SVG ="images/flower.png";
-
-  <defs>
-    <radialGradient id="g" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#fffbe6"/>
-      <stop offset="100%" stop-color="#ffd54a"/>
-    </radialGradient>
-  </defs>
-  <g>
-    <ellipse cx="256" cy="108" rx="38" ry="82" fill="#ff8bb6"/>
-    <ellipse cx="256" cy="404" rx="38" ry="82" fill="#ff8bb6"/>
-    <ellipse cx="108" cy="256" rx="82" ry="38" fill="#ff8bb6"/>
-    <ellipse cx="404" cy="256" rx="82" ry="38" fill="#ff8bb6"/>
-
-    <ellipse cx="150" cy="150" rx="40" ry="78" fill="#ff8bb6" transform="rotate(-45 150 150)"/>
-    <ellipse cx="362" cy="150" rx="40" ry="78" fill="#ff8bb6" transform="rotate(45 362 150)"/>
-    <ellipse cx="150" cy="362" rx="40" ry="78" fill="#ff8bb6" transform="rotate(45 150 362)"/>
-    <ellipse cx="362" cy="362" rx="40" ry="78" fill="#ff8bb6" transform="rotate(-45 362 362)"/>
-
-    <circle cx="256" cy="256" r="74" fill="url(#g)"/>
-    <circle cx="256" cy="256" r="46" fill="#ffcc33"/>
-    <rect x="244" y="290" width="24" height="154" rx="12" fill="#55a955"/>
-    <ellipse cx="218" cy="356" rx="34" ry="16" fill="#55a955" transform="rotate(-28 218 356)"/>
-  </g>
-</svg>
-`)}`;
+const FLOWER_SRC = "images/flower.png";
+const LEFT_DEER_SRC = "images/babydeer.png";
+const RIGHT_DEER_SRC = "images/deer.png";
 
 const popup = document.getElementById("popup");
 const popupVisual = document.getElementById("popupVisual");
@@ -328,17 +277,16 @@ const popupActions = document.getElementById("popupActions");
 const appleItem = document.getElementById("appleItem");
 const axeItem = document.getElementById("axeItem");
 const flowerItem = document.getElementById("flowerItem");
-const flowerImg = document.getElementById("flowerImg");
 
-function hasItem(key){
+function hasFlag(key){
     return localStorage.getItem(key) === "true";
 }
 
-function setItem(key){
+function setFlag(key){
     localStorage.setItem(key, "true");
 }
 
-function removeItem(key){
+function removeFlag(key){
     localStorage.removeItem(key);
 }
 
@@ -360,21 +308,15 @@ function closePopup(){
 }
 
 function syncCollectedItems(){
-    if(hasItem("goldenApple")){
-        appleItem.style.display = "none";
-    }
-    if(hasItem("axe")){
-        axeItem.style.display = "none";
-    }
-    if(hasItem("flower")){
-        flowerItem.style.display = "none";
-    }
+    if(hasItem("goldenApple")) appleItem.style.display = "none";
+    if(hasItem("axe")) axeItem.style.display = "none";
+    if(hasItem("flower")) flowerItem.style.display = "none";
 }
 
 function collectGoldenApple(){
     if(hasItem("goldenApple")) return;
 
-    setItem("goldenApple");
+    addItem("goldenApple");
     syncCollectedItems();
 
     showPopup({
@@ -388,7 +330,7 @@ function collectGoldenApple(){
 function collectAxe(){
     if(hasItem("axe")) return;
 
-    setItem("axe");
+    addItem("axe");
     syncCollectedItems();
 
     showPopup({
@@ -402,20 +344,21 @@ function collectAxe(){
 function collectFlower(){
     if(hasItem("flower")) return;
 
-    setItem("flower");
+    addItem("flower");
     syncCollectedItems();
 
     showPopup({
-        imageSrc: FLOWER_SVG,
-        title: "사과의 꽃",
-        body: "꽃을 얻었다.<br>사과할때 유용",
+        imageSrc: FLOWER_SRC,
+        title: "꽃",
+        body: "꽃을 얻었다.<br>사과하장",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
     });
 }
 
+/* 왼쪽 동물 */
 function talkLeftAnimal(){
-    const lied = hasItem("forest_deer_lied");
-    const gifted = hasItem("forest_deer_gifted");
+    const lied = hasFlag("forest_deer_lied");
+    const gifted = hasFlag("forest_deer_gifted");
 
     if(lied && !gifted){
         showLeftAnimalAngry();
@@ -432,9 +375,9 @@ function talkLeftAnimal(){
 
 function showLeftAnimalIntro(){
     showPopup({
-       imageSrc: "images/babydeer.png",
-    imageFit: "contain",
-    imagePosition: "center center",
+        imageSrc: LEFT_DEER_SRC,
+        imageFit: "contain",
+        imagePosition: "center center",
         title: "동물",
         body: "너 뭐야?!",
         actions: `<button class="choice-btn" onclick="showLeftAnimalQuestion()">다음</button>`
@@ -443,23 +386,23 @@ function showLeftAnimalIntro(){
 
 function showLeftAnimalQuestion(){
     showPopup({
-        imageSrc: "images/babydeer.png",
-    imageFit: "contain",
-    imagePosition: "center center",
+        imageSrc: LEFT_DEER_SRC,
+        imageFit: "contain",
+        imagePosition: "center center",
         title: "동물",
         body: "여긴 아무나 들어올 수 없는 곳인데...<br>여기 어떻게 왔어?",
         actions: `
-            <button class="choice-btn" onclick="sayTruth()">사실대로 말하기-나 공주를 구해야하는데 혹시 집 비밀번호 알아?</button>
-            <button class="choice-btn" onclick="sayLie()">거짓말하기-혹시 나 저 집 주인인데 혹시 집 비번알아?</button>
+            <button class="choice-btn" onclick="sayTruth()">사실대로 말하기</button>
+            <button class="choice-btn" onclick="sayLie()">거짓말하기</button>
         `
     });
 }
 
 function sayTruth(){
     showPopup({
-       imageSrc: "images/babydeer.png",
-    imageFit: "contain",
-    imagePosition: "center center",
+        imageSrc: LEFT_DEER_SRC,
+        imageFit: "contain",
+        imagePosition: "center center",
         title: "동물",
         body: "홀리, 당근 알쥥~ 아주 중요한 날이라고 했던 것 같은데!",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
@@ -467,12 +410,12 @@ function sayTruth(){
 }
 
 function sayLie(){
-    setItem("forest_deer_lied");
+    setFlag("forest_deer_lied");
 
     showPopup({
-      imageSrc: "images/babydeer.png",
-    imageFit: "contain",
-    imagePosition: "center center",
+        imageSrc: LEFT_DEER_SRC,
+        imageFit: "contain",
+        imagePosition: "center center",
         title: "동물",
         body: "아아아ㅏ아아아악!!!!!!!! 이 구라쟁이! 아주 싹이 노랗구나!",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
@@ -481,9 +424,9 @@ function sayLie(){
 
 function showLeftAnimalAngry(){
     showPopup({
-       imageSrc: "images/babydeer.png",
-    imageFit: "contain",
-    imagePosition: "center center",
+        imageSrc: LEFT_DEER_SRC,
+        imageFit: "contain",
+        imagePosition: "center center",
         title: "동물",
         body: "이 거짓말쟁이!",
         actions: `<button class="choice-btn" onclick="offerFlower()">선물주기</button>`
@@ -493,7 +436,7 @@ function showLeftAnimalAngry(){
 function offerFlower(){
     if(!hasItem("flower")){
         showPopup({
-            imageSrc: FLOWER_SVG,
+            imageSrc: FLOWER_SRC,
             title: "꽃",
             body: "꽃 아이템이 없어...<br>먼저 꽃을 찾아와야 해!",
             actions: `<button class="choice-btn" onclick="showLeftAnimalAngry()">확인</button>`
@@ -502,22 +445,25 @@ function offerFlower(){
     }
 
     removeItem("flower");
-    setItem("forest_deer_gifted");
+    setFlag("forest_deer_gifted");
     syncCollectedItems();
 
     showPopup({
-        imageSrc: FLOWER_SVG,
-        title: "꽃 선물",
+        imageSrc: LEFT_DEER_SRC,
+        imageFit: "contain",
+        imagePosition: "center center",
+        title: "동물",
         body: "흠...흠.. 뭘 이런걸다.....",
         actions: `<button class="choice-btn" onclick="showLeftAnimalQuestion()">확인</button>`
     });
 }
 
+/* 오른쪽 사슴 */
 function talkRightDeer(){
     showPopup({
-       imageSrc: "images/deer.png",
-    imageFit: "contain",
-    imagePosition: "center center",
+        imageSrc: RIGHT_DEER_SRC,
+        imageFit: "contain",
+        imagePosition: "center center",
         title: "사슴",
         body: "....옛날부터 전해져 오던 말이 있었지./",
         actions: `<button class="choice-btn" onclick="rightDeerNext()">다음</button>`
@@ -526,9 +472,9 @@ function talkRightDeer(){
 
 function rightDeerNext(){
     showPopup({
-        imageSrc: "images/deer.png",
-    imageFit: "contain",
-    imagePosition: "center center",
+        imageSrc: RIGHT_DEER_SRC,
+        imageFit: "contain",
+        imagePosition: "center center",
         title: "사슴",
         body: "그건 보이는게 다가 아니라는거지!<br><br>주인공이 말한다.<br>무슨 말을 하는거야......<br><br><b>잘 기억하도록</b>",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
@@ -536,7 +482,6 @@ function rightDeerNext(){
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    flowerImg.src = FLOWER_SVG;
     syncCollectedItems();
 });
 </script>
