@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인벤토리</title>
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="inventory-page">
+
+    <div class="inventory-box">
+
+        <h2>🎒 인벤토리</h2>
+
+        <div id="inventoryItems"></div>
+
+        <button class="choice-btn"
+        onclick="location.href='room1.html'">
+        게임으로 돌아가기
+        </button>
+
+    </div>
+
+</div>
+
+<script src="js/inventory.js"></script>
+
+<script>
+
+function renderInventory(){
+
+    const list =
+    document.getElementById("inventoryItems");
+
+    const items =
+    getInventory();
+
+    if(items.length === 0){
+
+        list.innerHTML =
+        "<div class='inventory-item'>비어있음</div>";
+
+        return;
+    }
+
+    const data = {
+        goldenApple:{
+            name:"🍎 황금 사과",
+            text:"황금 사과를 얻었다.<br>뭔가 아주 중요한 것 같다"
+        },
+        axe:{
+            name:"🪓 도끼",
+            text:"도끼를 얻었다.<br>아주 단단한걸~"
+        },
+        flower:{
+            name:"🌸 꽃",
+            text:"꽃을 얻었다.<br>사과하장"
+        }
+    };
+
+    list.innerHTML = items.map(item => {
+        return `
+        <div class="inventory-item"
+        onclick="useItem('${item}')">
+
+            ${data[item]?.name || item}
+
+        </div>
+        `;
+    }).join("");
+}
+
+/* 아이템 클릭 시 사용 + 삭제 */
+function useItem(item){
+
+    const data = {
+        goldenApple:"황금 사과를 얻었다.<br>뭔가 아주 중요한 것 같다",
+        axe:"도끼를 얻었다.<br>아주 단단한걸~",
+        flower:"꽃을 얻었다.<br>사과하장"
+    };
+
+    alert(data[item] || "사용됨");
+
+    removeItem(item);
+
+    renderInventory();
+}
+
+window.addEventListener("DOMContentLoaded",renderInventory);
+
+</script>
+
+</body>
+</html>
