@@ -21,3 +21,13 @@ function removeItem(item){
 function hasItem(item){
     return getInventory().includes(item);
 }
+
+function goBack(){
+    const lastPage = localStorage.getItem("lastPage");
+
+    if(lastPage && lastPage !== "inventory.html"){
+        location.href = lastPage;
+    }else{
+        location.href = "room1.html";
+    }
+}
