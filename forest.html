@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/style.css">
 
 <style>
-/* (네 기존 CSS 그대로 유지한다고 가정) */
+/* 기존 스타일 그대로 사용 */
 </style>
 
 </head>
@@ -19,7 +19,7 @@
 
     <img src="images/forest_bg.png" class="bg">
 
-    <!-- 🍎 황금사과 -->
+    <!-- 🍎 사과 -->
     <div class="collectible apple-item" onclick="collectGoldenApple()">
         <img src="images/golden_apple.png">
     </div>
@@ -34,7 +34,7 @@
         <img src="images/flower.png">
     </div>
 
-    <!-- 🦌 왼쪽 동물 -->
+    <!-- 🦌 왼쪽 사슴 -->
     <div class="deer-left" onclick="talkLeftAnimal()"></div>
 
     <!-- 🦌 오른쪽 사슴 -->
@@ -45,7 +45,7 @@
         ↩ 돌아가기
     </button>
 
-    <!-- 🎒 인벤토리 (하나만 유지) -->
+    <!-- 🎒 인벤토리 -->
     <button class="inventory-btn"
     onclick="location.href='inventory.html'">
     🎒
@@ -75,7 +75,19 @@
 <script>
 
 /* =====================
-   상태 체크
+   현재 위치 저장
+===================== */
+window.addEventListener("DOMContentLoaded", () => {
+
+    syncCollectedItems();
+    renderInventory();
+
+    // ✅ 현재 페이지 저장
+    localStorage.setItem("lastPage", "forest.html");
+});
+
+/* =====================
+   상태
 ===================== */
 
 function hasFlag(key){
@@ -116,7 +128,7 @@ function collectGoldenApple(){
     showPopup(
         "images/golden_apple.png",
         "황금 사과",
-        "황금 사과를 얻었다.<br>뭔가 아주 중요한 것 같다",
+        "황금 사과를 얻었다.<br>중요한 것 같다",
         `<button onclick="closePopup()">확인</button>`
     );
 }
@@ -127,7 +139,7 @@ function collectAxe(){
     showPopup(
         "images/axe.png",
         "도끼",
-        "도끼를 얻었다.<br>아주 단단한걸~",
+        "도끼를 얻었다.",
         `<button onclick="closePopup()">확인</button>`
     );
 }
@@ -138,13 +150,13 @@ function collectFlower(){
     showPopup(
         "images/flower.png",
         "꽃",
-        "꽃을 얻었다.<br>사과하장",
+        "꽃을 얻었다.",
         `<button onclick="closePopup()">확인</button>`
     );
 }
 
 /* =====================
-   🦌 왼쪽 사슴
+   🦌 사슴 (왼쪽)
 ===================== */
 
 function talkLeftAnimal(){
@@ -178,10 +190,10 @@ function showLeftQuestion(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
-        "여긴 아무나 들어올 수 없는 곳인데...<br>여기 어떻게 왔어?",
+        "여긴 아무나 들어올 수 없는 곳인데...<br>어떻게 왔어?",
         `
-        <button onclick="truth()">사실대로 말하기</button>
-        <button onclick="lie()">거짓말하기</button>
+        <button onclick="truth()">사실대로</button>
+        <button onclick="lie()">거짓말</button>
         `
     );
 }
@@ -190,7 +202,7 @@ function truth(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
-        "홀리, 당근 알쥥~ 중요한 날이라 했던 것 같은데!",
+        "중요한 날이었을 거야!",
         `<button onclick="closePopup()">확인</button>`
     );
 }
@@ -201,7 +213,7 @@ function lie(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
-        "아아아ㅏ아아악! 이 구라쟁이!",
+        "구라쟁이!",
         `<button onclick="closePopup()">확인</button>`
     );
 }
@@ -233,7 +245,7 @@ function offerFlower(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
-        "흠... 뭘 이런걸 다...",
+        "흠... 고마워",
         `<button onclick="closePopup()">확인</button>`
     );
 }
@@ -247,7 +259,7 @@ function talkRightDeer(){
     showPopup(
         "images/deer.png",
         "사슴",
-        "옛날부터 전해져 오던 말이 있었지...",
+        "옛날 이야기...",
         `<button onclick="rightNext()">다음</button>`
     );
 }
@@ -257,7 +269,7 @@ function rightNext(){
     showPopup(
         "images/deer.png",
         "사슴",
-        "그건 보이는게 다가 아니라는거지.<br><br>잘 기억하도록.",
+        "보이는 게 전부는 아니다",
         `<button onclick="closePopup()">확인</button>`
     );
 }
