@@ -7,10 +7,6 @@
 
 <link rel="stylesheet" href="css/style.css">
 
-<style>
-/* 기존 스타일 그대로 사용 */
-</style>
-
 </head>
 
 <body>
@@ -19,7 +15,7 @@
 
     <img src="images/forest_bg.png" class="bg">
 
-    <!-- 🍎 사과 -->
+    <!-- 🍎 황금사과 -->
     <div class="collectible apple-item" onclick="collectGoldenApple()">
         <img src="images/golden_apple.png">
     </div>
@@ -75,30 +71,6 @@
 <script>
 
 /* =====================
-   현재 위치 저장
-===================== */
-window.addEventListener("DOMContentLoaded", () => {
-
-    syncCollectedItems();
-    renderInventory();
-
-    // ✅ 현재 페이지 저장
-    localStorage.setItem("lastPage", "forest.html");
-});
-
-/* =====================
-   상태
-===================== */
-
-function hasFlag(key){
-    return localStorage.getItem(key) === "true";
-}
-
-function setFlag(key){
-    localStorage.setItem(key,"true");
-}
-
-/* =====================
    팝업
 ===================== */
 
@@ -119,10 +91,11 @@ function closePopup(){
 }
 
 /* =====================
-   아이템
+   아이템 획득
 ===================== */
 
 function collectGoldenApple(){
+
     addItem("goldenApple");
 
     showPopup(
@@ -134,6 +107,7 @@ function collectGoldenApple(){
 }
 
 function collectAxe(){
+
     addItem("axe");
 
     showPopup(
@@ -145,6 +119,7 @@ function collectAxe(){
 }
 
 function collectFlower(){
+
     addItem("flower");
 
     showPopup(
@@ -156,13 +131,13 @@ function collectFlower(){
 }
 
 /* =====================
-   🦌 사슴 (왼쪽)
+   🦌 왼쪽 사슴
 ===================== */
 
 function talkLeftAnimal(){
 
-    const lied = hasFlag("forest_deer_lied");
-    const gifted = hasFlag("forest_deer_gifted");
+    let lied = localStorage.getItem("forest_deer_lied") === "true";
+    let gifted = localStorage.getItem("forest_deer_gifted") === "true";
 
     if(lied && !gifted){
         showLeftAngry();
@@ -208,7 +183,8 @@ function truth(){
 }
 
 function lie(){
-    setFlag("forest_deer_lied");
+
+    localStorage.setItem("forest_deer_lied","true");
 
     showPopup(
         "images/babydeer.png",
@@ -240,7 +216,8 @@ function offerFlower(){
     }
 
     removeItem("flower");
-    setFlag("forest_deer_gifted");
+
+    localStorage.setItem("forest_deer_gifted","true");
 
     showPopup(
         "images/babydeer.png",
