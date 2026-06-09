@@ -135,12 +135,11 @@ body{
 .popup-box{
     position:relative;
     width:88%;
-    max-width:520px;
+    max-width:620px;
     background:#f9e9c8;
     border:6px solid #c89b5d;
     border-radius:30px;
-    padding:22px 18px 20px;
-    text-align:center;
+    overflow:hidden;
     box-shadow:0 10px 30px rgba(0,0,0,0.25);
 }
 
@@ -157,13 +156,34 @@ body{
     font-size:22px;
     font-weight:bold;
     cursor:pointer;
+    z-index:5;
+}
+
+.dialogue-wrap{
+    display:flex;
+    align-items:stretch;
+    min-height:240px;
+}
+
+.dialogue-text{
+    flex:1;
+    padding:26px 18px 18px 18px;
+    text-align:left;
+}
+
+.dialogue-portrait{
+    width:180px;
+    background:#e9d4aa;
+    border-left:6px solid #c89b5d;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:10px;
 }
 
 .popup-visual{
     width:100%;
-    height:180px;
-    margin-top:10px;
-    margin-bottom:14px;
+    height:100%;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -213,6 +233,34 @@ body{
 .choice-btn:active{
     transform:scale(0.98);
 }
+
+@media (max-width: 600px){
+
+    .dialogue-wrap{
+        flex-direction:column;
+        min-height:auto;
+    }
+
+    .dialogue-portrait{
+        width:100%;
+        height:180px;
+        border-left:none;
+        border-top:6px solid #c89b5d;
+    }
+
+    .dialogue-text{
+        text-align:center;
+        padding:22px 16px 16px;
+    }
+
+    .popup-title{
+        font-size:22px;
+    }
+
+    .popup-body{
+        font-size:18px;
+    }
+}
 </style>
 </head>
 <body>
@@ -250,12 +298,15 @@ body{
     <div class="popup-box">
         <button class="close-btn" onclick="closePopup()">✕</button>
 
-        <div class="popup-visual" id="popupVisual"></div>
+        <div class="dialogue-wrap">
+            <div class="dialogue-text">
+                <div class="popup-title" id="popupTitle"></div>
+                <div class="popup-body" id="popupBody"></div>
+                <div class="popup-actions" id="popupActions"></div>
+            </div>
 
-        <div class="popup-title" id="popupTitle"></div>
-        <div class="popup-body" id="popupBody"></div>
-
-        <div class="popup-actions" id="popupActions"></div>
+            <div class="dialogue-portrait" id="popupVisual"></div>
+        </div>
     </div>
 </div>
 
@@ -286,16 +337,10 @@ function setFlag(key){
     localStorage.setItem(key, "true");
 }
 
-function removeFlag(key){
-    localStorage.removeItem(key);
-}
-
 function showPopup({ imageSrc = "", imageFit = "contain", imagePosition = "center center", title = "", body = "", actions = "" }){
-    if(imageSrc){
-        popupVisual.innerHTML = `<img src="${imageSrc}" class="popup-media" style="object-fit:${imageFit}; object-position:${imagePosition};" alt="">`;
-    }else{
-        popupVisual.innerHTML = "";
-    }
+    popupVisual.innerHTML = imageSrc
+        ? `<img src="${imageSrc}" class="popup-media" style="object-fit:${imageFit}; object-position:${imagePosition};" alt="">`
+        : "";
 
     popupTitle.innerHTML = title;
     popupBody.innerHTML = body;
@@ -308,13 +353,13 @@ function closePopup(){
 }
 
 function syncCollectedItems(){
-    if(hasItem("goldenApple")) appleItem.style.display = "none";
-    if(hasItem("axe")) axeItem.style.display = "none";
-    if(hasItem("flower")) flowerItem.style.display = "none";
+    if (hasItem("goldenApple")) appleItem.style.display = "none";
+    if (hasItem("axe")) axeItem.style.display = "none";
+    if (hasItem("flower")) flowerItem.style.display = "none";
 }
 
 function collectGoldenApple(){
-    if(hasItem("goldenApple")) return;
+    if (hasItem("goldenApple")) return;
 
     addItem("goldenApple");
     syncCollectedItems();
@@ -328,7 +373,7 @@ function collectGoldenApple(){
 }
 
 function collectAxe(){
-    if(hasItem("axe")) return;
+    if (hasItem("axe")) return;
 
     addItem("axe");
     syncCollectedItems();
@@ -342,7 +387,7 @@ function collectAxe(){
 }
 
 function collectFlower(){
-    if(hasItem("flower")) return;
+    if (hasItem("flower")) return;
 
     addItem("flower");
     syncCollectedItems();
@@ -360,12 +405,12 @@ function talkLeftAnimal(){
     const lied = hasFlag("forest_deer_lied");
     const gifted = hasFlag("forest_deer_gifted");
 
-    if(lied && !gifted){
+    if (lied && !gifted) {
         showLeftAnimalAngry();
         return;
     }
 
-    if(gifted){
+    if (gifted) {
         showLeftAnimalQuestion();
         return;
     }
@@ -376,8 +421,6 @@ function talkLeftAnimal(){
 function showLeftAnimalIntro(){
     showPopup({
         imageSrc: LEFT_DEER_SRC,
-        imageFit: "contain",
-        imagePosition: "center center",
         title: "애기 사슴",
         body: "너 뭐야?!",
         actions: `<button class="choice-btn" onclick="showLeftAnimalQuestion()">다음</button>`
@@ -387,8 +430,6 @@ function showLeftAnimalIntro(){
 function showLeftAnimalQuestion(){
     showPopup({
         imageSrc: LEFT_DEER_SRC,
-        imageFit: "contain",
-        imagePosition: "center center",
         title: "애기 사슴",
         body: "여긴 아무나 들어올 수 없는 곳인데...<br>여기 어떻게 왔어?",
         actions: `
@@ -401,8 +442,6 @@ function showLeftAnimalQuestion(){
 function sayTruth(){
     showPopup({
         imageSrc: LEFT_DEER_SRC,
-        imageFit: "contain",
-        imagePosition: "center center",
         title: "애기 사슴",
         body: "홀리, 당근 알쥥~ 아주 중요한 날이라고 했던 것 같은데!",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
@@ -414,8 +453,6 @@ function sayLie(){
 
     showPopup({
         imageSrc: LEFT_DEER_SRC,
-        imageFit: "contain",
-        imagePosition: "center center",
         title: "애기 사슴",
         body: "아아아ㅏ아아아악!!!!!!!! 이 구라쟁이! 아주 싹이 노랗구나!",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
@@ -425,8 +462,6 @@ function sayLie(){
 function showLeftAnimalAngry(){
     showPopup({
         imageSrc: LEFT_DEER_SRC,
-        imageFit: "contain",
-        imagePosition: "center center",
         title: "애기 사슴",
         body: "이 거짓말쟁이!",
         actions: `<button class="choice-btn" onclick="offerFlower()">선물주기</button>`
@@ -434,7 +469,7 @@ function showLeftAnimalAngry(){
 }
 
 function offerFlower(){
-    if(!hasItem("flower")){
+    if (!hasItem("flower")) {
         showPopup({
             imageSrc: FLOWER_SRC,
             title: "꽃",
@@ -450,8 +485,6 @@ function offerFlower(){
 
     showPopup({
         imageSrc: LEFT_DEER_SRC,
-        imageFit: "contain",
-        imagePosition: "center center",
         title: "애기 사슴",
         body: "흠...흠.. 뭘 이런걸다.....",
         actions: `<button class="choice-btn" onclick="showLeftAnimalQuestion()">확인</button>`
@@ -462,8 +495,6 @@ function offerFlower(){
 function talkRightDeer(){
     showPopup({
         imageSrc: RIGHT_DEER_SRC,
-        imageFit: "contain",
-        imagePosition: "center center",
         title: "사슴",
         body: "....옛날부터 전해져 오던 말이 있었지./",
         actions: `<button class="choice-btn" onclick="rightDeerNext()">다음</button>`
@@ -473,8 +504,6 @@ function talkRightDeer(){
 function rightDeerNext(){
     showPopup({
         imageSrc: RIGHT_DEER_SRC,
-        imageFit: "contain",
-        imagePosition: "center center",
         title: "사슴",
         body: "그건 보이는게 다가 아니라는거지!<br><br>주인공이 말한다.<br>무슨 말을 하는거야......<br><br><b>잘 기억하도록</b>",
         actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
