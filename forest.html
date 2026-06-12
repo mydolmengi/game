@@ -318,10 +318,15 @@ body{
 window.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("lastPage", "forest.html");
 
+    syncCollectedItems();
+});
+
+/* 시작 시 이미 먹은 아이템 숨기기 */
+function syncCollectedItems(){
     if(hasItem("goldenApple")) document.getElementById("appleItem").style.display = "none";
     if(hasItem("axe")) document.getElementById("axeItem").style.display = "none";
     if(hasItem("flower")) document.getElementById("flowerItem").style.display = "none";
-});
+}
 
 function showPopup(img, title, body, actions){
     document.getElementById("popupVisual").innerHTML =
@@ -384,40 +389,40 @@ function talkLeftAnimal(){
     const gifted = localStorage.getItem("forest_deer_gifted") === "true";
 
     if(lied && !gifted){
-        showLeftAngry();
+        showLeftAnimalAngry();
         return;
     }
 
     if(gifted){
-        showLeftQuestion();
+        showLeftAnimalQuestion();
         return;
     }
 
-    showLeftIntro();
+    showLeftAnimalIntro();
 }
 
-function showLeftIntro(){
+function showLeftAnimalIntro(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
         "너 뭐야?!",
-        `<button class="choice-btn" onclick="showLeftQuestion()">다음</button>`
+        `<button class="choice-btn" onclick="showLeftAnimalQuestion()">다음</button>`
     );
 }
 
-function showLeftQuestion(){
+function showLeftAnimalQuestion(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
         "여긴 아무나 들어올 수 없는 곳인데...<br>여기 어떻게 왔어?",
         `
-        <button class="choice-btn" onclick="truth()">사실대로 말하기</button>
-        <button class="choice-btn" onclick="lie()">거짓말하기</button>
+        <button class="choice-btn" onclick="sayTruth()">사실대로 말하기</button>
+        <button class="choice-btn" onclick="sayLie()">거짓말하기</button>
         `
     );
 }
 
-function truth(){
+function sayTruth(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
@@ -426,7 +431,7 @@ function truth(){
     );
 }
 
-function lie(){
+function sayLie(){
     localStorage.setItem("forest_deer_lied", "true");
 
     showPopup(
@@ -437,7 +442,7 @@ function lie(){
     );
 }
 
-function showLeftAngry(){
+function showLeftAnimalAngry(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
@@ -452,7 +457,7 @@ function offerFlower(){
             "images/flower.png",
             "꽃",
             "꽃이 필요하다...<br>먼저 꽃을 찾아와야 해!",
-            `<button class="choice-btn" onclick="closePopup()">확인</button>`
+            `<button class="choice-btn" onclick="showLeftAnimalAngry()">확인</button>`
         );
         return;
     }
@@ -464,7 +469,7 @@ function offerFlower(){
         "images/babydeer.png",
         "애기 사슴",
         "흠...흠.. 뭘 이런걸다.....",
-        `<button class="choice-btn" onclick="closePopup()">확인</button>`
+        `<button class="choice-btn" onclick="showLeftAnimalQuestion()">확인</button>`
     );
 }
 
@@ -474,11 +479,11 @@ function talkRightDeer(){
         "images/deer.png",
         "사슴",
         "....옛날부터 전해져 오던 말이 있었지./",
-        `<button class="choice-btn" onclick="rightNext()">다음</button>`
+        `<button class="choice-btn" onclick="rightDeerNext()">다음</button>`
     );
 }
 
-function rightNext(){
+function rightDeerNext(){
     showPopup(
         "images/deer.png",
         "사슴",
