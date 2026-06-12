@@ -2,295 +2,177 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>집 내부</title>
+<title>드래그 좌표 생성기</title>
 
 <style>
-@font-face {
-    font-family:'GmarketSans';
-    src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
 body{
-    background:#000;
+    margin:0;
+    background:#111;
     display:flex;
     justify-content:center;
-    font-family:'GmarketSans', sans-serif;
+    font-family:sans-serif;
 }
 
-.game{
+.wrapper{
     position:relative;
-    width:min(100%,900px);
+    width:900px;
+    margin-top:10px;
 }
 
+/* 배경 */
 .bg{
     width:100%;
     display:block;
+    user-select:none;
 }
 
-/* =========================
-   🎯 클릭 영역 (디버그 ON)
-========================= */
-
-.zone{
+/* 생성되는 박스 */
+.box{
     position:absolute;
-    cursor:pointer;
-    z-index:10;
-    background:rgba(255,0,0,0.18);
+    width:120px;
+    height:120px;
+    background:rgba(255,0,0,0.3);
     border:2px dashed red;
+    cursor:grab;
 }
 
-/* 🛏 침대 (사다리꼴 느낌) */
-.bed-zone{
-    left:0.1%;
-    top:4.5%;
-    width:8.1%;
-    height:26.8%;
-    transform:skew(-10deg);
-}
-
-/* 👕 옷장 */
-.closet-zone{
-    left:27.2%;
-    top:41.7%;
-    width:10%;
-    height:28.8%;
-}
-
-/* 📚 책장 */
-.bookshelf-zone{
-    left:40.2%;
-    top:31.1%;
-    width:9%;
-    height:39%;
-}
-
-/* 🖼 액자 */
-.frame-zone{
-    left:52.1%;
-    top:29.7%;
-    width:8%;
-    height:25%;
-}
-
-/* 🍳 주방 */
-.kitchen-zone{
-    left:70.2%;
-    top:24.7%;
-    width:10%;
-    height:42.2%;
-}
-
-/* 📦 상자 */
-.box-zone{
-    left:92.7%;
-    top:50.5%;
-    width:6%;
-    height:15%;
-}
-
-/* =========================
-   버튼
-========================= */
-
-.back-btn{
-    position:absolute;
-    bottom:3%;
-    left:50%;
-    transform:translateX(-50%);
-    background:#f9e9c8;
-    border:6px solid #c89b5d;
-    border-radius:30px;
-    padding:12px 35px;
-    font-size:20px;
-    color:#5b3719;
-    cursor:pointer;
-    z-index:20;
-}
-
-.inventory-btn{
+/* 좌표 표시 */
+#info{
     position:fixed;
-    top:15px;
-    right:15px;
-    width:65px;
-    height:65px;
-    border:none;
-    border-radius:20px;
-    background:#ff9fd2;
-    font-size:30px;
-    cursor:pointer;
-    z-index:999;
-}
-
-/* =========================
-   팝업
-========================= */
-
-.popup{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.6);
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:1000;
-}
-
-.popup-box{
-    width:90%;
-    max-width:550px;
-    background:#f9e9c8;
-    border:6px solid #c89b5d;
-    border-radius:25px;
-    padding:20px;
-    text-align:center;
-    position:relative;
-}
-
-.close-btn{
-    position:absolute;
     top:10px;
-    right:10px;
-    width:35px;
-    height:35px;
-    border:none;
-    border-radius:50%;
-    background:#ff9fd2;
-    color:white;
-    cursor:pointer;
+    left:10px;
+    background:white;
+    padding:10px;
+    font-size:14px;
+    border-radius:10px;
+    z-index:999;
+    width:260px;
 }
 
-.choice-btn{
-    display:block;
+textarea{
     width:100%;
-    margin:10px 0;
-    padding:12px;
-    border:none;
-    border-radius:20px;
-    background:#ff9fd2;
-    color:white;
-    cursor:pointer;
+    height:120px;
+    margin-top:10px;
 }
-
-.popup-title{
-    font-size:22px;
-    margin-bottom:15px;
+button{
+    width:100%;
+    padding:8px;
+    margin-top:5px;
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="game">
+<div id="info">
+<b>📍 좌표 생성기</b><br>
+<span id="coords">클릭하세요</span>
 
-    <img src="images/house_inside.png" class="bg">
+<textarea id="output" placeholder="여기에 코드 자동 생성됨"></textarea>
 
-    <!-- 🛏 침대 -->
-    <div class="zone bed-zone" onclick="getBubbleTea()"></div>
-
-    <!-- 👕 옷장 -->
-    <div class="zone closet-zone" onclick="getJjamppong()"></div>
-
-    <!-- 📚 책장 -->
-    <div class="zone bookshelf-zone" onclick="showBook()"></div>
-
-    <!-- 🖼 액자 -->
-    <div class="zone frame-zone" onclick="showFrame()"></div>
-
-    <!-- 🍳 주방 -->
-    <div class="zone kitchen-zone" onclick="goKitchen()"></div>
-
-    <!-- 📦 상자 -->
-    <div class="zone box-zone" onclick="openBox()"></div>
-
-    <!-- ↩ -->
-    <button class="back-btn" onclick="location.href='room2.html'">
-        ↩ 돌아가기
-    </button>
-
+<button onclick="copyCode()">📋 복사</button>
+<button onclick="addBox()">➕ 박스 추가</button>
 </div>
 
-<!-- 🎒 인벤토리 -->
-<button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
+<div class="wrapper" id="map">
 
-<!-- 팝업 -->
-<div class="popup" id="popup">
-    <div class="popup-box">
+    <img src="images/house_inside.png" class="bg" id="bg">
 
-        <button class="close-btn" onclick="closePopup()">✕</button>
-
-        <div class="popup-title" id="title"></div>
-        <div id="body"></div>
-        <div id="actions"></div>
-
-    </div>
 </div>
-
-<script src="js/inventory.js"></script>
 
 <script>
 
-window.addEventListener("DOMContentLoaded",()=>{
-    localStorage.setItem("lastPage","house_inside.html");
+let activeBox = null;
+let offsetX = 0;
+let offsetY = 0;
+let boxCount = 0;
+
+/* 박스 추가 */
+function addBox(){
+
+    const box = document.createElement("div");
+    box.className = "box";
+    box.id = "box" + boxCount++;
+
+    box.style.left = "50%";
+    box.style.top = "50%";
+
+    document.getElementById("map").appendChild(box);
+
+    drag(box);
+}
+
+/* 드래그 */
+function drag(box){
+
+    box.addEventListener("mousedown", (e)=>{
+
+        activeBox = box;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+
+    });
+
+}
+
+/* 이동 */
+document.addEventListener("mousemove",(e)=>{
+
+    if(!activeBox) return;
+
+    const map = document.getElementById("map");
+    const rect = map.getBoundingClientRect();
+
+    let x = e.clientX - rect.left - offsetX;
+    let y = e.clientY - rect.top - offsetY;
+
+    activeBox.style.left = x + "px";
+    activeBox.style.top = y + "px";
+
+    let px = (x / rect.width * 100).toFixed(1);
+    let py = (y / rect.height * 100).toFixed(1);
+
+    document.getElementById("coords").innerText =
+    `left:${px}%; top:${py}%`;
+
+    activeBox.dataset.code =
+    `left:${px}%; top:${py}%;`;
+
+    updateOutput();
 });
 
-/* ================= 팝업 ================= */
+document.addEventListener("mouseup", ()=>{
 
-function show(title,body,actions){
-    document.getElementById("title").innerHTML=title;
-    document.getElementById("body").innerHTML=body;
-    document.getElementById("actions").innerHTML=actions;
-    document.getElementById("popup").style.display="flex";
+    activeBox = null;
+});
+
+/* 코드 생성 */
+function updateOutput(){
+
+    let boxes = document.querySelectorAll(".box");
+
+    let result = "";
+
+    boxes.forEach((b, i)=>{
+
+        let rect = b.getBoundingClientRect();
+        let map = document.getElementById("map").getBoundingClientRect();
+
+        let x = ((rect.left - map.left) / map.width * 100).toFixed(1);
+        let y = ((rect.top - map.top) / map.height * 100).toFixed(1);
+
+        result += `.zone${i}{ left:${x}%; top:${y}%; width:10%; height:10%; }\n`;
+    });
+
+    document.getElementById("output").value = result;
 }
 
-function closePopup(){
-    document.getElementById("popup").style.display="none";
-}
-
-/* ================= 아이템 ================= */
-
-function getBubbleTea(){
-    addItem("bubbleTea");
-    show("침대","흑당 버블티 획득","<button class='choice-btn' onclick='closePopup()'>확인</button>");
-}
-
-function getJjamppong(){
-    addItem("jjamppong");
-    show("옷장","짬뽕 획득","<button class='choice-btn' onclick='closePopup()'>확인</button>");
-}
-
-function showBook(){
-    show("책장","사진1 발견","<button class='choice-btn' onclick='closePopup()'>확인</button>");
-}
-
-function showFrame(){
-    show("액자","행복해 보인다.....","<button class='choice-btn' onclick='closePopup()'>확인</button>");
-}
-
-/* ================= 주방 ================= */
-
-function goKitchen(){
-    location.href="kitchen.html";
-}
-
-/* ================= 상자 ================= */
-
-function openBox(){
-    const code = prompt("비밀번호 입력");
-
-    if(code==="8297"){
-        addItem("key");
-        show("상자","열쇠 획득","<button class='choice-btn' onclick='closePopup()'>확인</button>");
-    }else{
-        alert("틀렸습니다");
-    }
+/* 복사 */
+function copyCode(){
+    let text = document.getElementById("output");
+    text.select();
+    document.execCommand("copy");
+    alert("복사 완료!");
 }
 
 </script>
