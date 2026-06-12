@@ -1,521 +1,445 @@
 <!DOCTYPE html>
+
 <html lang="ko">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>주방</title>
+
+<title>드래그 좌표 생성기 V2</title>
+
+​
 
 <style>
-@font-face {
-    font-family: 'GmarketSans';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-html, body{
-    width:100%;
-    min-height:100%;
-}
 
 body{
-    background:#000;
-    font-family:'GmarketSans', sans-serif;
+
+    margin:0;
+
+    background:#111;
+
     display:flex;
+
     justify-content:center;
-    align-items:flex-start;
-    overflow-x:hidden;
+
+    font-family:sans-serif;
+
 }
 
-.game{
+​
+
+/* 🔥 2배 확대 */
+
+.wrapper{
+
     position:relative;
-    width:min(100%, 900px);
-    margin:0 auto;
+
+    width:1800px; /* 900 → 1800 */
+
+    margin-top:20px;
+
 }
+
+​
 
 .bg{
+
     width:100%;
+
     display:block;
-    position:relative;
-    z-index:1;
+
+    user-select:none;
+
 }
 
-.zone{
+​
+
+/* =========================
+
+   🧱 박스 (드래그 + 리사이즈)
+
+========================= */
+
+​
+
+.box{
+
     position:absolute;
-    cursor:pointer;
-    z-index:20;
-    background:rgba(255,255,255,0);
+
+    min-width:40px;
+
+    min-height:40px;
+
+​
+
+    background:rgba(255,0,0,0.25);
+
+    border:2px dashed red;
+
+​
+
+    cursor:grab;
+
+    resize:both;      /* 🔥 크기 조절 가능 */
+
+    overflow:auto;
+
+​
+
+    z-index:10;
+
 }
 
-.fire-zone{
-    left:9%;
-    top:28%;
-    width:18%;
-    height:20%;
-}
+​
 
-.fridge-zone{
-    left:24%;
-    top:16%;
-    width:18%;
-    height:34%;
-}
+/* =========================
 
-.sink-zone{
-    left:41%;
-    top:55%;
-    width:16%;
-    height:20%;
-}
+   📊 UI 패널 (2배 확대)
 
-.rug-zone{
-    left:56%;
-    top:58%;
-    width:28%;
-    height:24%;
-}
+========================= */
 
-.basement-btn{
-    position:absolute;
-    left:66%;
-    top:73%;
-    transform:translateX(-50%);
-    display:none;
-    background:#f9e9c8;
-    border:6px solid #c89b5d;
-    border-radius:30px;
-    padding:12px 28px;
-    font-size:18px;
-    color:#5b3719;
-    cursor:pointer;
-    z-index:25;
-    box-shadow:0 8px 20px rgba(0,0,0,0.2);
-    font-family:'GmarketSans', sans-serif;
-}
+​
 
-.back-btn{
-    position:absolute;
-    bottom:3%;
-    left:50%;
-    transform:translateX(-50%);
-    background:#f9e9c8;
-    border:6px solid #c89b5d;
-    border-radius:30px;
-    padding:12px 35px;
-    font-size:20px;
-    color:#5b3719;
-    cursor:pointer;
-    z-index:30;
-    box-shadow:0 8px 20px rgba(0,0,0,0.2);
-    font-family:'GmarketSans', sans-serif;
-}
+#info{
 
-.inventory-btn{
     position:fixed;
-    top:15px;
-    right:15px;
-    width:65px;
-    height:65px;
-    border:none;
-    border-radius:20px;
-    background:#ff9fd2;
-    font-size:30px;
-    cursor:pointer;
+
+    top:20px;
+
+    left:20px;
+
+​
+
+    background:white;
+
+    padding:20px;
+
+​
+
+    font-size:18px;
+
+    border-radius:12px;
+
+​
+
+    width:520px;   /* 🔥 확대 */
+
     z-index:999;
-    box-shadow:0 8px 18px rgba(0,0,0,0.2);
-    font-family:'GmarketSans', sans-serif;
+
 }
 
-.popup{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.65);
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:1000;
-}
+​
 
-.popup-box{
-    position:relative;
-    width:90%;
-    max-width:620px;
-    background:#f9e9c8;
-    border:6px solid #c89b5d;
-    border-radius:30px;
-    overflow:hidden;
-    box-shadow:0 10px 30px rgba(0,0,0,0.25);
-}
+textarea{
 
-.close-btn{
-    position:absolute;
-    top:12px;
-    right:12px;
-    width:40px;
-    height:40px;
-    border:none;
-    border-radius:50%;
-    background:#ff9fd2;
-    color:white;
-    font-size:22px;
-    font-weight:bold;
-    cursor:pointer;
-    z-index:5;
-    font-family:'GmarketSans', sans-serif;
-}
-
-.popup-image{
-    height:280px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.18), rgba(249,233,200,0.55));
-    backdrop-filter:blur(8px);
-    border-bottom:6px solid #c89b5d;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    overflow:hidden;
-    position:relative;
-}
-
-.popup-media{
     width:100%;
-    height:100%;
-    object-fit:contain;
+
+    height:220px;  /* 🔥 확대 */
+
+    margin-top:10px;
+
+    font-size:14px;
+
+}
+
+​
+
+button{
+
+    width:100%;
+
+    padding:12px;
+
+    margin-top:8px;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
+
+​
+
+/* 좌표 표시 */
+
+#coords{
+
     display:block;
-}
 
-.popup-dialog{
-    padding:22px 18px 20px;
-    text-align:left;
-}
+    margin-top:10px;
 
-.popup-title{
-    font-size:26px;
-    color:#5b3719;
-    margin-bottom:10px;
-    line-height:1.5;
-}
-
-.popup-body{
-    font-size:20px;
-    color:#5b3719;
-    line-height:1.8;
-    margin-bottom:18px;
-    white-space:normal;
-}
-
-.popup-actions{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-.choice-btn{
-    background:#f9e9c8;
-    border:4px solid #c89b5d;
-    border-radius:22px;
-    padding:12px 16px;
-    font-size:18px;
-    color:#5b3719;
-    cursor:pointer;
-    font-family:'GmarketSans', sans-serif;
-    box-shadow:0 6px 14px rgba(0,0,0,0.12);
-}
-
-.choice-btn:active{
-    transform:scale(0.98);
-}
-
-.interactive-photo{
-    position:relative;
-    width:100%;
-    height:100%;
-}
-
-.photo-hotspot{
-    position:absolute;
-    cursor:pointer;
-    background:rgba(255,255,255,0);
-}
-
-.galbi-hotspot{
-    left:58%;
-    top:46%;
-    width:26%;
-    height:28%;
-}
-
-.rug-photo-hotspot{
-    left:0;
-    top:0;
-    width:100%;
-    height:100%;
-}
-
-.locked-door-hotspot{
-    left:47%;
-    top:34%;
-    width:18%;
-    height:36%;
-}
-
-.heart-wrap{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    height:100%;
-    color:#d94a7a;
-}
-
-.heart-icon{
-    width:90px;
-    height:90px;
-    object-fit:contain;
-    display:block;
-}
-
-.heart-label{
-    font-size:24px;
     font-weight:bold;
+
 }
 
-@media (max-width: 600px){
-
-    .popup-image{
-        height:220px;
-    }
-
-    .popup-dialog{
-        padding:18px 14px 16px;
-    }
-
-    .popup-title{
-        font-size:22px;
-    }
-
-    .popup-body{
-        font-size:18px;
-    }
-
-    .choice-btn{
-        font-size:16px;
-        padding:10px 14px;
-    }
-
-    .back-btn{
-        font-size:18px;
-        padding:10px 28px;
-    }
-
-    .inventory-btn{
-        width:58px;
-        height:58px;
-        font-size:26px;
-    }
-
-    .basement-btn{
-        font-size:16px;
-        padding:10px 22px;
-    }
-
-    .heart-icon{
-        width:72px;
-        height:72px;
-    }
-
-    .heart-label{
-        font-size:20px;
-    }
-}
 </style>
+
 </head>
+
+​
+
 <body>
 
-<div class="game">
-    <img src="images/kitchen_bg.png" class="bg" alt="주방 배경">
+​
 
-    <div class="zone fire-zone" onclick="getTiramisu()"></div>
-    <div class="zone fridge-zone" onclick="openFridge()"></div>
-    <div class="zone sink-zone" onclick="getIceAmericano()"></div>
-    <div class="zone rug-zone" onclick="openRugPhoto()"></div>
+<div id="info">
 
-    <button class="basement-btn" id="basementBtn" onclick="location.href='underground.html'">
-       지하 통로로 가기
-    </button>
+<b>🎯 드래그 좌표 생성기 V2 (업그레이드)</b>
 
-    <button class="back-btn" onclick="location.href='house_inside.html'">
-        ↩ 집 안으로 돌아가기
-    </button>
+​
+
+<span id="coords">좌표 대기중...</span>
+
+​
+
+<textarea id="output" placeholder="자동 CSS 코드"></textarea>
+
+​
+
+<button onclick="addBox()">➕ 박스 추가</button>
+
+<button onclick="copyCode()">📋 복사</button>
+
 </div>
 
-<button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
+​
 
-<div class="popup" id="popup">
-    <div class="popup-box">
-        <button class="close-btn" onclick="closePopup()">✕</button>
+<div class="wrapper" id="map">
 
-        <div class="popup-image" id="popupVisual"></div>
+​
 
-        <div class="popup-dialog">
-            <div class="popup-title" id="popupTitle"></div>
-            <div class="popup-body" id="popupBody"></div>
-            <div class="popup-actions" id="popupActions"></div>
-        </div>
-    </div>
+    <img src="images/kitchen_bg.png" class="bg">
+
+​
+
 </div>
 
-<script src="js/inventory.js"></script>
+​
 
 <script>
-window.addEventListener("DOMContentLoaded", () => {
-    localStorage.setItem("lastPage", "kitchen.html");
 
-    if(localStorage.getItem("basementOpened") === "true"){
-        document.getElementById("basementBtn").style.display = "block";
-    }
+​
+
+let activeBox = null;
+
+let offsetX = 0;
+
+let offsetY = 0;
+
+​
+
+/* =========================
+
+   ➕ 박스 추가 (자유 크기)
+
+========================= */
+
+​
+
+function addBox(){
+
+​
+
+    const box = document.createElement("div");
+
+    box.className = "box";
+
+​
+
+    box.style.left = "50%";
+
+    box.style.top = "50%";
+
+    box.style.width = "120px";
+
+    box.style.height = "120px";
+
+​
+
+    document.getElementById("map").appendChild(box);
+
+​
+
+    makeDraggable(box);
+
+}
+
+​
+
+/* =========================
+
+   🖱 드래그
+
+========================= */
+
+​
+
+function makeDraggable(box){
+
+​
+
+    box.addEventListener("mousedown",(e)=>{
+
+​
+
+        activeBox = box;
+
+​
+
+        offsetX = e.offsetX;
+
+        offsetY = e.offsetY;
+
+    });
+
+​
+
+}
+
+​
+
+/* =========================
+
+   📌 이동 처리
+
+========================= */
+
+​
+
+document.addEventListener("mousemove",(e)=>{
+
+​
+
+    if(!activeBox) return;
+
+​
+
+    const map = document.getElementById("map");
+
+    const rect = map.getBoundingClientRect();
+
+​
+
+    let x = e.clientX - rect.left - offsetX;
+
+    let y = e.clientY - rect.top - offsetY;
+
+​
+
+    activeBox.style.left = x + "px";
+
+    activeBox.style.top = y + "px";
+
+​
+
+    updateOutput();
+
 });
 
-function showPopup({ visualHTML = "", title = "", body = "", actions = "" }){
-    document.getElementById("popupVisual").innerHTML = visualHTML;
-    document.getElementById("popupTitle").innerHTML = title;
-    document.getElementById("popupBody").innerHTML = body;
-    document.getElementById("popupActions").innerHTML = actions;
-    document.getElementById("popup").style.display = "flex";
-}
+​
 
-function showImagePopup(img, title, body, actions){
-    showPopup({
-        visualHTML: `<img src="${img}" class="popup-media" alt="">`,
-        title,
-        body,
-        actions
+document.addEventListener("mouseup",()=>{
+
+​
+
+    activeBox = null;
+
+});
+
+​
+
+/* =========================
+
+   📊 코드 생성 (좌표 + 크기)
+
+========================= */
+
+​
+
+function updateOutput(){
+
+​
+
+    const boxes = document.querySelectorAll(".box");
+
+    const map = document.getElementById("map").getBoundingClientRect();
+
+​
+
+    let result = "";
+
+​
+
+    boxes.forEach((b,i)=>{
+
+​
+
+        let rect = b.getBoundingClientRect();
+
+​
+
+        let x = ((rect.left - map.left) / map.width * 100).toFixed(1);
+
+        let y = ((rect.top - map.top) / map.height * 100).toFixed(1);
+
+​
+
+        let w = (rect.width / map.width * 100).toFixed(1);
+
+        let h = (rect.height / map.height * 100).toFixed(1);
+
+​
+
+        result += `.zone${i}{ left:${x}%; top:${y}%; width:${w}%; height:${h}%; }\n`;
+
     });
+
+​
+
+    document.getElementById("output").value = result;
+
+​
+
+    document.getElementById("coords").innerText =
+
+    "좌표 + 크기 자동 생성 완료";
+
 }
 
-function closePopup(){
-    document.getElementById("popup").style.display = "none";
+​
+
+/* =========================
+
+   📋 복사
+
+========================= */
+
+​
+
+function copyCode(){
+
+​
+
+    let text = document.getElementById("output");
+
+    text.select();
+
+    document.execCommand("copy");
+
+​
+
+    alert("복사 완료!");
+
 }
 
-function getTiramisu(){
-    if(!hasItem("tiramisu")){
-        addItem("tiramisu");
-    }
+​
 
-    showImagePopup(
-        "images/tiramisu.png",
-        "티라미슈",
-        "...달콤해보인다",
-        `<button class="choice-btn" onclick="closePopup()">확인</button>`
-    );
-}
-
-function getIceAmericano(){
-    if(!hasItem("iceAmericano")){
-        addItem("iceAmericano");
-    }
-
-    showImagePopup(
-        "images/ice_americano.png",
-        "아이스 아메리카노",
-        "겁나 차갑다",
-        `<button class="choice-btn" onclick="closePopup()">확인</button>`
-    );
-}
-
-function openFridge(){
-    showPopup({
-        visualHTML: `
-            <div class="interactive-photo">
-                <img src="images/fridge_inside.png" class="popup-media" alt="냉장고 내부">
-                <div class="photo-hotspot galbi-hotspot" onclick="getHeartLife()"></div>
-            </div>
-        `,
-        title: "냉장고 내부",
-        body: "안에 갈비찜이 보인다.",
-        actions: `<button class="choice-btn" onclick="closePopup()">닫기</button>`
-    });
-}
-
-function getHeartLife(){
-    if(hasItem("heartLife")){
-        showPopup({
-            visualHTML: `
-                <div class="heart-wrap">
-                    <img src="images/heart.png" class="heart-icon" alt="하트 생명">
-                    <div class="heart-label">하트 생명</div>
-                </div>
-            `,
-            title: "하트 생명",
-            body: "이미 가지고 있다!",
-            actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
-        });
-        return;
-    }
-
-    addItem("heartLife");
-
-    showPopup({
-        visualHTML: `
-            <div class="heart-wrap">
-                <img src="images/heart.png" class="heart-icon" alt="하트 생명">
-                <div class="heart-label">하트 생명</div>
-            </div>
-        `,
-        title: "하트 생명",
-        body: "기회를 한번더...!",
-        actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
-    });
-}
-
-function openRugPhoto(){
-    showPopup({
-        visualHTML: `
-            <div class="interactive-photo">
-                <img src="images/rug.png" class="popup-media" alt="러그 사진">
-                <div class="photo-hotspot rug-photo-hotspot" onclick="showRugLiftedPhoto()"></div>
-            </div>
-        `,
-        title: "러그 사진",
-        body: "러그를 눌러보자.",
-        actions: `<button class="choice-btn" onclick="closePopup()">닫기</button>`
-    });
-}
-
-function showRugLiftedPhoto(){
-    showPopup({
-        visualHTML: `
-            <div class="interactive-photo">
-                <img src="images/rug_lifted.png" class="popup-media" alt="러그가 들춰진 사진">
-                <div class="photo-hotspot locked-door-hotspot" onclick="enterBasementCheck()"></div>
-            </div>
-        `,
-        title: "러그가 들춰진 사진",
-        body: "뭔가 잠긴 문이 있다.",
-        actions: `<button class="choice-btn" onclick="closePopup()">닫기</button>`
-    });
-}
-
-function enterBasementCheck(){
-    if(hasItem("key")){
-        localStorage.setItem("basementOpened", "true");
-        document.getElementById("basementBtn").style.display = "block";
-        location.href = "underground.html";
-        return;
-    }
-
-    showPopup({
-        visualHTML: `<img src="images/rug_lifted.png" class="popup-media" alt="러그가 들춰진 사진">`,
-        title: "자물쇠 잠긴 문",
-        body: "열쇠가 필요할 것 같다.",
-        actions: `<button class="choice-btn" onclick="showRugLiftedPhoto()">확인</button>`
-    });
-}
 </script>
 
+​
+
 </body>
+
 </html>
+
+
