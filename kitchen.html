@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>RPG MAP EDITOR FIXED ROTATE</title>
+<title>RPG MAP EDITOR FINAL</title>
 
 <style>
 body{
@@ -14,7 +14,7 @@ body{
 }
 
 /* ======================
-   🗺 맵
+   🗺 MAP
 ====================== */
 .wrapper{
     position:relative;
@@ -28,7 +28,7 @@ body{
 }
 
 /* ======================
-   🧱 오브젝트
+   🧱 OBJECT
 ====================== */
 .box{
     position:absolute;
@@ -52,7 +52,7 @@ body{
 }
 
 /* ======================
-   🔄 회전 핸들
+   🔘 ROTATE HANDLE
 ====================== */
 .rotate-handle{
     position:absolute;
@@ -62,15 +62,13 @@ body{
 
     width:14px;
     height:14px;
-
     background:yellow;
     border-radius:50%;
-
     cursor:grab;
 }
 
 /* ======================
-   📊 패널
+   📊 PANEL
 ====================== */
 #panel{
     position:fixed;
@@ -103,15 +101,21 @@ button{
 
 <body>
 
+<!-- ======================
+   UI
+====================== -->
 <div id="panel">
-<b>🎮 ROTATION FIXED EDITOR</b>
+<b>🎮 RPG MAP EDITOR FINAL</b>
 
 <textarea id="output"></textarea>
 
-<button onclick="addBox()">➕ 추가</button>
+<button onclick="addBox()">➕ 오브젝트 추가</button>
 <button onclick="copyCode()">📋 복사</button>
 </div>
 
+<!-- ======================
+   MAP
+====================== -->
 <div class="wrapper" id="map">
     <img src="images/house_inside.png">
 </div>
@@ -124,7 +128,7 @@ let offsetX = 0;
 let offsetY = 0;
 
 /* ======================
-   ➕ 생성
+   ➕ CREATE OBJECT
 ====================== */
 function addBox(){
 
@@ -134,8 +138,8 @@ function addBox(){
     box.style.left = "50%";
     box.style.top = "50%";
 
-    box.dataset.rotate = 0;
     box.dataset.name = prompt("이름 입력") || "object";
+    box.dataset.rotate = 0;
 
     const handle = document.createElement("div");
     handle.className = "rotate-handle";
@@ -148,7 +152,7 @@ function addBox(){
 }
 
 /* ======================
-   🖱 드래그
+   🖱 DRAG
 ====================== */
 function enableDrag(box){
 
@@ -158,48 +162,65 @@ function enableDrag(box){
 
         activeBox = box;
 
-        const mapRect = document.getElementById("map").getBoundingClientRect();
+        const rect = box.getBoundingClientRect();
 
-        offsetX = e.clientX - box.getBoundingClientRect().left;
-        offsetY = e.clientY - box.getBoundingClientRect().top;
-
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
     });
 }
 
 /* ======================
-   🔄 회전 (핵심 FIX)
+   🔄 ROTATE (FIXED DELTA)
 ====================== */
+
+let startAngle = 0;
+let startRotate = 0;
+
 function enableRotate(handle, box){
 
     handle.addEventListener("mousedown",(e)=>{
 
         activeRotateBox = box;
 
+        const r = box.getBoundingClientRect();
+
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+
+        startAngle =
+        Math.atan2(e.clientY - cy, e.clientX - cx);
+
+        startRotate =
+        parseFloat(box.dataset.rotate || 0);
+
         e.stopPropagation();
     });
 }
 
 /* ======================
-   📌 이동 + 회전
+   📌 MOVE + ROTATE
 ====================== */
 document.addEventListener("mousemove",(e)=>{
 
     const map = document.getElementById("map");
     const rect = map.getBoundingClientRect();
 
-    /* 🖱 드래그 */
+    /* DRAG */
     if(activeBox){
 
         let x = e.clientX - rect.left - offsetX;
         let y = e.clientY - rect.top - offsetY;
 
-        activeBox.style.left = (x / rect.width * 100) + "%";
-        activeBox.style.top = (y / rect.height * 100) + "%";
+        activeBox.style.left =
+        (x / rect.width * 100) + "%";
+
+        activeBox.style.top =
+        (y / rect.height * 100) + "%";
 
         updateOutput();
     }
 
-    /* 🔄 회전 */
+    /* ROTATE */
     if(activeRotateBox){
 
         const r = activeRotateBox.getBoundingClientRect();
@@ -207,17 +228,21 @@ document.addEventListener("mousemove",(e)=>{
         const cx = r.left + r.width / 2;
         const cy = r.top + r.height / 2;
 
-        const angle =
-        Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+        const currentAngle =
+        Math.atan2(e.clientY - cy, e.clientX - cx);
+
+        let delta = currentAngle - startAngle;
+
+        let finalAngle =
+        startRotate + delta * (180 / Math.PI);
 
         activeRotateBox.style.transform =
-        `rotate(${angle}deg)`;
+        `rotate(${finalAngle}deg)`;
 
-        activeRotateBox.dataset.rotate = angle;
+        activeRotateBox.dataset.rotate = finalAngle;
 
         updateOutput();
     }
-
 });
 
 document.addEventListener("mouseup",()=>{
@@ -227,7 +252,7 @@ document.addEventListener("mouseup",()=>{
 });
 
 /* ======================
-   📊 코드 생성
+   📊 OUTPUT
 ====================== */
 function updateOutput(){
 
@@ -242,7 +267,6 @@ function updateOutput(){
 
         let x = ((rect.left - map.left) / map.width * 100).toFixed(1);
         let y = ((rect.top - map.top) / map.height * 100).toFixed(1);
-
         let w = (rect.width / map.width * 100).toFixed(1);
         let h = (rect.height / map.height * 100).toFixed(1);
 
@@ -263,7 +287,7 @@ function updateOutput(){
 }
 
 /* ======================
-   📋 복사
+   📋 COPY
 ====================== */
 function copyCode(){
 
