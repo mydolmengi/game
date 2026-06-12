@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>RPG MAP EDITOR FINAL STABLE</title>
+<title>RPG MAP EDITOR FINAL PRO</title>
 
 <style>
 body{
@@ -28,7 +28,7 @@ body{
 }
 
 /* ======================
-   OBJECT (PX FIX)
+   BOX (PX 안정 버전)
 ====================== */
 .box{
     position:absolute;
@@ -49,23 +49,23 @@ body{
 
     transform-origin:center;
 
-    /* 🔥 중요: px 안정화 */
     will-change: left, top, width, height, transform;
 }
 
 /* ======================
-   🔄 ROTATE ICON
+   🔄 ROTATE ICON (BIG FIX)
 ====================== */
 .rotate-icon{
     position:absolute;
-    top:-20px;
+
+    top:-30px;
     left:50%;
     transform:translateX(-50%);
 
-    width:26px;
-    height:26px;
+    width:36px;
+    height:36px;
 
-    background:#fff;
+    background:white;
     border:2px solid #333;
     border-radius:50%;
 
@@ -73,9 +73,11 @@ body{
     align-items:center;
     justify-content:center;
 
+    font-size:22px;
     cursor:grab;
 
-    font-size:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.4);
+    user-select:none;
 }
 
 .rotate-icon::after{
@@ -114,8 +116,11 @@ button{
 
 <body>
 
+<!-- ======================
+   PANEL
+====================== -->
 <div id="panel">
-<b>🎮 RPG MAP EDITOR FINAL (STABLE)</b>
+<b>🎮 RPG MAP EDITOR FINAL PRO</b>
 
 <textarea id="output"></textarea>
 
@@ -123,6 +128,9 @@ button{
 <button onclick="copyCode()">📋 복사</button>
 </div>
 
+<!-- ======================
+   MAP
+====================== -->
 <div class="wrapper" id="map">
     <img src="images/house_inside.png">
 </div>
@@ -146,14 +154,13 @@ function addBox(){
     box.style.left = "100px";
     box.style.top = "100px";
 
-    box.dataset.name = prompt("이름") || "object";
+    box.dataset.name = prompt("이름 입력") || "object";
     box.dataset.rotate = 0;
 
     const icon = document.createElement("div");
     icon.className = "rotate-icon";
 
     box.appendChild(icon);
-
     document.getElementById("map").appendChild(box);
 
     enableDrag(box);
@@ -179,7 +186,7 @@ function enableDrag(box){
 }
 
 /* ======================
-   ROTATE (STABLE)
+   ROTATE (STABLE FIX)
 ====================== */
 let startAngle = 0;
 let startRotate = 0;
@@ -257,7 +264,7 @@ document.addEventListener("mouseup",()=>{
 });
 
 /* ======================
-   OUTPUT (PX FIX)
+   OUTPUT
 ====================== */
 function updateOutput(){
 
@@ -272,7 +279,6 @@ function updateOutput(){
 
         let x = rect.left - map.left;
         let y = rect.top - map.top;
-
         let w = rect.width;
         let h = rect.height;
 
