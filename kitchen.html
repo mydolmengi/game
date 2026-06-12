@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>RPG MAP EDITOR FINAL</title>
+<title>RPG MAP EDITOR - ROTATE ICON</title>
 
 <style>
 body{
@@ -14,7 +14,7 @@ body{
 }
 
 /* ======================
-   🗺 MAP
+   MAP
 ====================== */
 .wrapper{
     position:relative;
@@ -28,7 +28,7 @@ body{
 }
 
 /* ======================
-   🧱 OBJECT
+   BOX
 ====================== */
 .box{
     position:absolute;
@@ -40,7 +40,6 @@ body{
     border:2px dashed red;
 
     cursor:grab;
-    z-index:10;
 
     resize: both;
     overflow: hidden;
@@ -52,23 +51,39 @@ body{
 }
 
 /* ======================
-   🔘 ROTATE HANDLE
+   🔄 ROTATE ICON
 ====================== */
-.rotate-handle{
+.rotate-icon{
     position:absolute;
+
     top:-18px;
     left:50%;
     transform:translateX(-50%);
 
-    width:14px;
-    height:14px;
-    background:yellow;
+    width:18px;
+    height:18px;
+
+    background:#ffd400;
     border-radius:50%;
+
+    border:2px solid #333;
+
     cursor:grab;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:12px;
+    font-weight:bold;
+}
+
+.rotate-icon::after{
+    content:"↻";
 }
 
 /* ======================
-   📊 PANEL
+   PANEL
 ====================== */
 #panel{
     position:fixed;
@@ -79,9 +94,6 @@ body{
     background:white;
     padding:18px;
     border-radius:12px;
-
-    font-size:16px;
-    z-index:999;
 }
 
 textarea{
@@ -101,21 +113,15 @@ button{
 
 <body>
 
-<!-- ======================
-   UI
-====================== -->
 <div id="panel">
-<b>🎮 RPG MAP EDITOR FINAL</b>
+<b>🎮 ROTATE ICON EDITOR</b>
 
 <textarea id="output"></textarea>
 
-<button onclick="addBox()">➕ 오브젝트 추가</button>
+<button onclick="addBox()">➕ 추가</button>
 <button onclick="copyCode()">📋 복사</button>
 </div>
 
-<!-- ======================
-   MAP
-====================== -->
 <div class="wrapper" id="map">
     <img src="images/house_inside.png">
 </div>
@@ -124,11 +130,9 @@ button{
 
 let activeBox = null;
 let activeRotateBox = null;
-let offsetX = 0;
-let offsetY = 0;
 
 /* ======================
-   ➕ CREATE OBJECT
+   CREATE
 ====================== */
 function addBox(){
 
@@ -138,27 +142,28 @@ function addBox(){
     box.style.left = "50%";
     box.style.top = "50%";
 
-    box.dataset.name = prompt("이름 입력") || "object";
+    box.dataset.name = prompt("이름") || "object";
     box.dataset.rotate = 0;
 
-    const handle = document.createElement("div");
-    handle.className = "rotate-handle";
+    /* 🔥 회전 아이콘 */
+    const icon = document.createElement("div");
+    icon.className = "rotate-icon";
 
-    box.appendChild(handle);
+    box.appendChild(icon);
     document.getElementById("map").appendChild(box);
 
     enableDrag(box);
-    enableRotate(handle, box);
+    enableRotate(icon, box);
 }
 
 /* ======================
-   🖱 DRAG
+   DRAG
 ====================== */
 function enableDrag(box){
 
     box.addEventListener("mousedown",(e)=>{
 
-        if(e.target.classList.contains("rotate-handle")) return;
+        if(e.target.classList.contains("rotate-icon")) return;
 
         activeBox = box;
 
@@ -170,15 +175,15 @@ function enableDrag(box){
 }
 
 /* ======================
-   🔄 ROTATE (FIXED DELTA)
+   ROTATE (ICON BASED)
 ====================== */
 
 let startAngle = 0;
 let startRotate = 0;
 
-function enableRotate(handle, box){
+function enableRotate(icon, box){
 
-    handle.addEventListener("mousedown",(e)=>{
+    icon.addEventListener("mousedown",(e)=>{
 
         activeRotateBox = box;
 
@@ -198,7 +203,7 @@ function enableRotate(handle, box){
 }
 
 /* ======================
-   📌 MOVE + ROTATE
+   MOVE + ROTATE
 ====================== */
 document.addEventListener("mousemove",(e)=>{
 
@@ -211,11 +216,8 @@ document.addEventListener("mousemove",(e)=>{
         let x = e.clientX - rect.left - offsetX;
         let y = e.clientY - rect.top - offsetY;
 
-        activeBox.style.left =
-        (x / rect.width * 100) + "%";
-
-        activeBox.style.top =
-        (y / rect.height * 100) + "%";
+        activeBox.style.left = (x / rect.width * 100) + "%";
+        activeBox.style.top = (y / rect.height * 100) + "%";
 
         updateOutput();
     }
@@ -252,7 +254,7 @@ document.addEventListener("mouseup",()=>{
 });
 
 /* ======================
-   📊 OUTPUT
+   OUTPUT
 ====================== */
 function updateOutput(){
 
@@ -287,7 +289,7 @@ function updateOutput(){
 }
 
 /* ======================
-   📋 COPY
+   COPY
 ====================== */
 function copyCode(){
 
