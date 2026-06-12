@@ -3,94 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>집 내부</title>
+<title>집 내부 - 디버그 모드</title>
 
 <style>
-@font-face {
-    font-family: 'GmarketSans';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-html, body{
-    width:100%;
-    min-height:100%;
-}
-
 body{
+    margin:0;
     background:#000;
-    font-family:'GmarketSans', sans-serif;
     display:flex;
     justify-content:center;
-    align-items:flex-start;
-    overflow-x:hidden;
 }
 
+/* 전체 화면 */
 .game{
     position:relative;
-    width:min(100%, 900px);
-    margin:0 auto;
+    width:100%;
+    max-width:900px;
 }
 
+/* 배경 */
 .bg{
     width:100%;
     display:block;
-    position:relative;
-    z-index:1;
 }
 
-/* 클릭 영역 */
+/* =========================
+   🎯 클릭 영역 (디버그 ON)
+========================= */
 .zone{
     position:absolute;
     cursor:pointer;
-    background:rgba(255,255,255,0);
     z-index:10;
+
+    /* 🔥 보이게 만드는 핵심 */
+    background:rgba(255,0,0,0.25);
+    border:2px dashed red;
 }
 
-/* 대략적인 위치 */
-.bed-zone{
-    left:7%;
-    top:42%;
+/* 🛏 침대 */
+.bed{
+    left:8%;
+    top:45%;
     width:25%;
     height:25%;
 }
 
-.closet-zone{
+/* 🚪 옷장 */
+.closet{
     left:35%;
-    top:26%;
+    top:28%;
     width:13%;
-    height:31%;
+    height:30%;
 }
 
-.bookshelf-zone{
-    left:49%;
-    top:27%;
-    width:11%;
-    height:34%;
-}
-
-.frame-zone{
-    left:64%;
-    top:27%;
+/* 📚 책장 */
+.bookshelf{
+    left:50%;
+    top:28%;
     width:12%;
-    height:26%;
+    height:35%;
 }
 
-.kitchen-zone{
-    left:79%;
-    top:38%;
+/* 🖼 액자 */
+.frame{
+    left:66%;
+    top:30%;
+    width:13%;
+    height:25%;
+}
+
+/* 🍳 주방 */
+.kitchen{
+    left:80%;
+    top:40%;
     width:18%;
-    height:42%;
+    height:40%;
 }
 
-.box-zone{
+/* 📦 상자 */
+.box{
     left:84%;
-    top:61%;
+    top:62%;
     width:10%;
     height:14%;
 }
@@ -101,40 +93,34 @@ body{
     bottom:3%;
     left:50%;
     transform:translateX(-50%);
+    padding:12px 30px;
     background:#f9e9c8;
-    border:6px solid #c89b5d;
-    border-radius:30px;
-    padding:12px 35px;
-    font-size:20px;
-    color:#5b3719;
+    border:5px solid #c89b5d;
+    border-radius:25px;
     cursor:pointer;
-    box-shadow:0 8px 20px rgba(0,0,0,0.2);
     z-index:20;
-    font-family:'GmarketSans', sans-serif;
 }
 
-/* 인벤토리 버튼 */
+/* 인벤토리 */
 .inventory-btn{
     position:fixed;
     top:15px;
     right:15px;
-    width:65px;
-    height:65px;
+    width:60px;
+    height:60px;
     border:none;
-    border-radius:20px;
+    border-radius:15px;
     background:#ff9fd2;
-    font-size:30px;
+    font-size:25px;
     cursor:pointer;
     z-index:999;
-    box-shadow:0 8px 18px rgba(0,0,0,0.2);
-    font-family:'GmarketSans', sans-serif;
 }
 
-/* 팝업 공통 */
+/* 팝업 */
 .popup{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,0.65);
+    background:rgba(0,0,0,0.6);
     display:none;
     justify-content:center;
     align-items:center;
@@ -142,383 +128,59 @@ body{
 }
 
 .popup-box{
-    position:relative;
     width:90%;
-    max-width:620px;
+    max-width:500px;
     background:#f9e9c8;
-    border:6px solid #c89b5d;
-    border-radius:30px;
-    overflow:hidden;
-    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    border:5px solid #c89b5d;
+    border-radius:25px;
+    padding:20px;
+    position:relative;
 }
 
 .close-btn{
     position:absolute;
-    top:12px;
-    right:12px;
-    width:40px;
-    height:40px;
+    top:10px;
+    right:10px;
+    background:#ff9fd2;
     border:none;
+    width:35px;
+    height:35px;
     border-radius:50%;
-    background:#ff9fd2;
-    color:white;
-    font-size:22px;
-    font-weight:bold;
     cursor:pointer;
-    z-index:5;
-    font-family:'GmarketSans', sans-serif;
-}
-
-.popup-image{
-    height:280px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.18), rgba(249,233,200,0.55));
-    backdrop-filter:blur(8px);
-    border-bottom:6px solid #c89b5d;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    overflow:hidden;
-}
-
-.popup-media{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    display:block;
-}
-
-.popup-dialog{
-    padding:22px 18px 20px;
-    text-align:left;
-}
-
-.popup-title{
-    font-size:26px;
-    color:#5b3719;
-    margin-bottom:10px;
-    line-height:1.5;
-}
-
-.popup-body{
-    font-size:20px;
-    color:#5b3719;
-    line-height:1.8;
-    margin-bottom:18px;
-    white-space:normal;
-}
-
-.popup-actions{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-.choice-btn{
-    background:#f9e9c8;
-    border:4px solid #c89b5d;
-    border-radius:22px;
-    padding:12px 16px;
-    font-size:18px;
-    color:#5b3719;
-    cursor:pointer;
-    font-family:'GmarketSans', sans-serif;
-    box-shadow:0 6px 14px rgba(0,0,0,0.12);
-}
-
-.choice-btn:active{
-    transform:scale(0.98);
-}
-
-/* 키패드 */
-.keypad-box{
-    width:90%;
-    max-width:520px;
-}
-
-.code-display{
-    font-size:34px;
-    letter-spacing:10px;
-    color:#5b3719;
-    text-align:center;
-    margin:10px 0 18px;
-    font-weight:bold;
-}
-
-.keypad-grid{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:10px;
-    margin-bottom:14px;
-}
-
-.key-btn{
-    padding:14px 0;
-    border:none;
-    border-radius:18px;
-    background:#ff9fd2;
-    color:white;
-    font-size:20px;
-    cursor:pointer;
-    font-family:'GmarketSans', sans-serif;
-    box-shadow:0 6px 14px rgba(0,0,0,0.12);
-}
-
-.key-btn:active{
-    transform:scale(0.98);
-}
-
-.sub-btn{
-    background:#f1c8a0;
-    color:#5b3719;
-}
-
-.box-message{
-    font-size:18px;
-    color:#5b3719;
-    text-align:center;
-    min-height:24px;
-    margin-bottom:12px;
-}
-
-@media (max-width: 600px){
-
-    .popup-image{
-        height:220px;
-    }
-
-    .popup-dialog{
-        padding:18px 14px 16px;
-    }
-
-    .popup-title{
-        font-size:22px;
-    }
-
-    .popup-body{
-        font-size:18px;
-    }
-
-    .choice-btn{
-        font-size:16px;
-        padding:10px 14px;
-    }
-
-    .back-btn{
-        font-size:18px;
-        padding:10px 28px;
-    }
-
-    .inventory-btn{
-        width:58px;
-        height:58px;
-        font-size:26px;
-    }
-
-    .code-display{
-        font-size:28px;
-    }
-
-    .key-btn{
-        font-size:18px;
-        padding:12px 0;
-    }
 }
 </style>
 </head>
+
 <body>
 
 <div class="game">
-    <img src="images/house_inside.png" class="bg" alt="집 내부">
 
-    <div class="zone bed-zone" onclick="getBubbleTea()"></div>
-    <div class="zone closet-zone" onclick="getJjamppong()"></div>
-    <div class="zone bookshelf-zone" onclick="showBook()"></div>
-    <div class="zone frame-zone" onclick="showFrame()"></div>
-    <div class="zone kitchen-zone" onclick="goKitchen()"></div>
-    <div class="zone box-zone" onclick="openBoxPad()"></div>
+    <img src="images/house_inside.png" class="bg">
 
+    <!-- 🧪 클릭 영역들 (보이게 설정됨) -->
+    <div class="zone bed" onclick="alert('침대 클릭')"></div>
+
+    <div class="zone closet" onclick="alert('옷장 클릭')"></div>
+
+    <div class="zone bookshelf" onclick="alert('책장 클릭')"></div>
+
+    <div class="zone frame" onclick="alert('액자 클릭')"></div>
+
+    <div class="zone kitchen" onclick="alert('주방 이동')"></div>
+
+    <div class="zone box" onclick="alert('상자 클릭')"></div>
+
+    <!-- ↩ 돌아가기 -->
     <button class="back-btn" onclick="location.href='room2.html'">
         ↩ 돌아가기
     </button>
 
+    <!-- 🎒 인벤토리 -->
     <button class="inventory-btn" onclick="location.href='inventory.html'">
         🎒
     </button>
+
 </div>
-
-<!-- 기본 팝업 -->
-<div class="popup" id="popup">
-    <div class="popup-box">
-        <button class="close-btn" onclick="closePopup()">✕</button>
-
-        <div class="popup-image" id="popupVisual"></div>
-
-        <div class="popup-dialog">
-            <div class="popup-title" id="popupTitle"></div>
-            <div class="popup-body" id="popupBody"></div>
-            <div class="popup-actions" id="popupActions"></div>
-        </div>
-    </div>
-</div>
-
-<!-- 상자 키패드 팝업 -->
-<div class="popup" id="boxPopup">
-    <div class="popup-box keypad-box">
-        <button class="close-btn" onclick="closeBoxPad()">✕</button>
-
-        <div class="popup-dialog">
-            <div class="popup-title">비밀번호를 입력하시오</div>
-            <div class="code-display" id="boxCodeDisplay">____</div>
-
-            <div class="keypad-grid">
-                <button class="key-btn" onclick="pressBoxKey('1')">1</button>
-                <button class="key-btn" onclick="pressBoxKey('2')">2</button>
-                <button class="key-btn" onclick="pressBoxKey('3')">3</button>
-
-                <button class="key-btn" onclick="pressBoxKey('4')">4</button>
-                <button class="key-btn" onclick="pressBoxKey('5')">5</button>
-                <button class="key-btn" onclick="pressBoxKey('6')">6</button>
-
-                <button class="key-btn" onclick="pressBoxKey('7')">7</button>
-                <button class="key-btn" onclick="pressBoxKey('8')">8</button>
-                <button class="key-btn" onclick="pressBoxKey('9')">9</button>
-
-                <button class="key-btn sub-btn" onclick="clearBoxCode()">지우기</button>
-                <button class="key-btn" onclick="pressBoxKey('0')">0</button>
-                <button class="key-btn sub-btn" onclick="backBoxCode()">⌫</button>
-            </div>
-
-            <div class="box-message" id="boxMessage"></div>
-
-            <div class="popup-actions">
-                <button class="choice-btn" onclick="checkBoxCode()">확인</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="js/inventory.js"></script>
-
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-    localStorage.setItem("lastPage", "house_inside.html");
-});
-
-function showPopup(img, title, body, actions){
-    document.getElementById("popupVisual").innerHTML =
-        `<img src="${img}" class="popup-media" alt="">`;
-    document.getElementById("popupTitle").innerHTML = title;
-    document.getElementById("popupBody").innerHTML = body;
-    document.getElementById("popupActions").innerHTML = actions;
-    document.getElementById("popup").style.display = "flex";
-}
-
-function closePopup(){
-    document.getElementById("popup").style.display = "none";
-}
-
-function getBubbleTea(){
-    if(!hasItem("bubbleTea")){
-        addItem("bubbleTea");
-    }
-    showPopup(
-        "images/bubbletea.png",
-        "흑당 버블티",
-        "꿀맛도리 흑당 버블버블티~~~",
-        `<button class="choice-btn" onclick="closePopup()">확인</button>`
-    );
-}
-
-function getJjamppong(){
-    if(!hasItem("jjamppong")){
-        addItem("jjamppong");
-    }
-    showPopup(
-        "images/jjamppong.png",
-        "짬뽕",
-        "얼큰 짬뽕",
-        `<button class="choice-btn" onclick="closePopup()">확인</button>`
-    );
-}
-
-function showBook(){
-    showPopup(
-        "images/photo1.png",
-        "사진1",
-        "책장에서 발견한 사진",
-        `<button class="choice-btn" onclick="closePopup()">확인</button>`
-    );
-}
-
-function showFrame(){
-    showPopup(
-        "images/photo2.png",
-        "사진2",
-        "행복해 보인다.....",
-        `<button class="choice-btn" onclick="closePopup()">확인</button>`
-    );
-}
-
-function goKitchen(){
-    location.href = "kitchen.html";
-}
-
-/* 상자 키패드 */
-let boxCode = "";
-
-function openBoxPad(){
-    boxCode = "";
-    document.getElementById("boxMessage").innerHTML = "";
-    updateBox();
-    document.getElementById("boxPopup").style.display = "flex";
-}
-
-function closeBoxPad(){
-    document.getElementById("boxPopup").style.display = "none";
-}
-
-function pressBoxKey(num){
-    if(boxCode.length >= 4) return;
-    boxCode += num;
-    updateBox();
-}
-
-function backBoxCode(){
-    boxCode = boxCode.slice(0, -1);
-    updateBox();
-}
-
-function clearBoxCode(){
-    boxCode = "";
-    updateBox();
-}
-
-function updateBox(){
-    document.getElementById("boxCodeDisplay").textContent = boxCode.padEnd(4, "_");
-}
-
-function checkBoxCode(){
-    if(boxCode === "8297"){
-        if(!hasItem("key")){
-            addItem("key");
-        }
-
-        closeBoxPad();
-
-        showPopup(
-            "images/key.png",
-            "열쇠",
-            "열쇠를 얻었다.<br>어디에 쓰는 열쇠지?",
-            `<button class="choice-btn" onclick="closePopup()">확인</button>`
-        );
-        return;
-    }
-
-    document.getElementById("boxMessage").innerHTML = "바보... 그거 아닌데..";
-    boxCode = "";
-    updateBox();
-}
-</script>
 
 </body>
 </html>
