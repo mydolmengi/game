@@ -79,6 +79,20 @@
 <script>
 
 /* =====================
+   🔥 현재 위치 저장 (핵심 추가)
+===================== */
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    // 기존 기능
+    syncCollectedItems();
+    renderInventory();
+
+    // ⭐ 추가된 부분
+    localStorage.setItem("lastPage", "forest.html");
+});
+
+/* =====================
    팝업
 ===================== */
 
@@ -103,6 +117,7 @@ function closePopup(){
 ===================== */
 
 function collectGoldenApple(){
+
     addItem("goldenApple");
 
     showPopup(
@@ -114,6 +129,7 @@ function collectGoldenApple(){
 }
 
 function collectAxe(){
+
     addItem("axe");
 
     showPopup(
@@ -125,6 +141,7 @@ function collectAxe(){
 }
 
 function collectFlower(){
+
     addItem("flower");
 
     showPopup(
@@ -141,8 +158,11 @@ function collectFlower(){
 
 function talkLeftAnimal(){
 
-    let lied = localStorage.getItem("forest_deer_lied") === "true";
-    let gifted = localStorage.getItem("forest_deer_gifted") === "true";
+    let lied =
+    localStorage.getItem("forest_deer_lied") === "true";
+
+    let gifted =
+    localStorage.getItem("forest_deer_gifted") === "true";
 
     if(lied && !gifted){
         showLeftAngry();
@@ -188,6 +208,7 @@ function truth(){
 }
 
 function lie(){
+
     localStorage.setItem("forest_deer_lied","true");
 
     showPopup(
@@ -220,6 +241,7 @@ function offerFlower(){
     }
 
     removeItem("flower");
+
     localStorage.setItem("forest_deer_gifted","true");
 
     showPopup(
