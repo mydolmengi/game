@@ -2,218 +2,291 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>드래그 좌표 생성기 V2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>집 내부</title>
 
 <style>
-body{
+*{
     margin:0;
-    background:#111;
-    display:flex;
-    justify-content:center;
-    font-family:sans-serif;
+    padding:0;
+    box-sizing:border-box;
 }
 
-/* 🔥 2배 확대 */
-.wrapper{
+body{
+    background:#000;
+    display:flex;
+    justify-content:center;
+    font-family:'GmarketSans', sans-serif;
+}
+
+/* =========================
+   게임 화면
+========================= */
+.game{
     position:relative;
-    width:1800px; /* 900 → 1800 */
-    margin-top:20px;
+    width:min(100%,900px);
 }
 
 .bg{
     width:100%;
     display:block;
-    user-select:none;
 }
 
 /* =========================
-   🧱 박스 (드래그 + 리사이즈)
+   공통 클릭 영역
 ========================= */
-
-.box{
+.zone{
     position:absolute;
-    min-width:40px;
-    min-height:40px;
-
-    background:rgba(255,0,0,0.25);
-    border:2px dashed red;
-
-    cursor:grab;
-    resize:both;      /* 🔥 크기 조절 가능 */
-    overflow:auto;
-
-    z-index:10;
+    cursor:pointer;
+    background:rgba(255,255,255,0);
 }
 
 /* =========================
-   📊 UI 패널 (2배 확대)
+   🛏 침대
+========================= */
+.bed{
+    left:4.0%;
+    top:48.4%;
+    width:27.2%;
+    height:14.2%;
+}
+
+/* =========================
+   👕 옷장
+========================= */
+.closet{
+    left:23.9%;
+    top:29.0%;
+    width:18.4%;
+    height:20.7%;
+}
+
+/* =========================
+   📚 책장
+========================= */
+.bookshelf{
+    left:43.2%;
+    top:33.0%;
+    width:8.3%;
+    height:13.7%;
+}
+
+/* =========================
+   🖼 액자
+========================= */
+.frame{
+    left:53.1%;
+    top:29.1%;
+    width:11.3%;
+    height:8.6%;
+}
+
+/* =========================
+   🍳 부엌
+========================= */
+.kitchen{
+    left:66.9%;
+    top:23.7%;
+    width:33.3%;
+    height:25.4%;
+}
+
+/* =========================
+   📦 상자
+========================= */
+.box{
+    left:89.7%;
+    top:49.5%;
+    width:13.2%;
+    height:9.8%;
+}
+
+/* =========================
+   버튼
 ========================= */
 
-#info{
-    position:fixed;
-    top:20px;
-    left:20px;
-
-    background:white;
-    padding:20px;
-
+.back-btn{
+    position:absolute;
+    bottom:3%;
+    left:50%;
+    transform:translateX(-50%);
+    padding:12px 30px;
+    background:#f9e9c8;
+    border:5px solid #c89b5d;
+    border-radius:25px;
+    cursor:pointer;
     font-size:18px;
-    border-radius:12px;
+}
 
-    width:520px;   /* 🔥 확대 */
+.inventory-btn{
+    position:fixed;
+    top:15px;
+    right:15px;
+    width:60px;
+    height:60px;
+    border:none;
+    border-radius:15px;
+    background:#ff9fd2;
+    font-size:24px;
+    cursor:pointer;
     z-index:999;
 }
 
-textarea{
-    width:100%;
-    height:220px;  /* 🔥 확대 */
-    margin-top:10px;
-    font-size:14px;
+/* =========================
+   팝업
+========================= */
+.popup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
 }
 
-button{
-    width:100%;
-    padding:12px;
-    margin-top:8px;
-    font-size:16px;
+.popup-box{
+    width:90%;
+    max-width:500px;
+    background:#f9e9c8;
+    border:5px solid #c89b5d;
+    border-radius:25px;
+    padding:20px;
+    text-align:center;
+    position:relative;
+}
+
+.close-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:35px;
+    height:35px;
+    border:none;
+    border-radius:50%;
+    background:#ff9fd2;
+    color:white;
     cursor:pointer;
 }
 
-/* 좌표 표시 */
-#coords{
-    display:block;
-    margin-top:10px;
-    font-weight:bold;
+.popup-title{
+    font-size:22px;
+    margin-bottom:10px;
+}
+
+.popup-body{
+    font-size:18px;
+    margin-bottom:10px;
+}
+
+.choice-btn{
+    width:100%;
+    padding:12px;
+    margin-top:8px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    color:white;
+    cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div id="info">
-<b>🎯 드래그 좌표 생성기 V2 (업그레이드)</b>
-
-<span id="coords">좌표 대기중...</span>
-
-<textarea id="output" placeholder="자동 CSS 코드"></textarea>
-
-<button onclick="addBox()">➕ 박스 추가</button>
-<button onclick="copyCode()">📋 복사</button>
-</div>
-
-<div class="wrapper" id="map">
+<div class="game">
 
     <img src="images/house_inside.png" class="bg">
 
+    <!-- 🛏 침대 -->
+    <div class="zone bed" onclick="getItem('bubbleTea','흑당 버블티','꿀맛도리 흑당 버블버블티~~~')"></div>
+
+    <!-- 👕 옷장 -->
+    <div class="zone closet" onclick="getItem('jjamppong','짬뽕','얼큰 짬뽕')"></div>
+
+    <!-- 📚 책장 -->
+    <div class="zone bookshelf" onclick="showPhoto('사진1','책장 사진')"></div>
+
+    <!-- 🖼 액자 -->
+    <div class="zone frame" onclick="showPhoto('사진2','행복해 보인다.....')"></div>
+
+    <!-- 🍳 주방 -->
+    <div class="zone kitchen" onclick="location.href='kitchen.html'"></div>
+
+    <!-- 📦 상자 -->
+    <div class="zone box" onclick="openBox()"></div>
+
+    <!-- ↩ -->
+    <button class="back-btn" onclick="location.href='room2.html'">
+        돌아가기
+    </button>
+
 </div>
+
+<!-- 🎒 인벤토리 -->
+<button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
+
+<!-- 팝업 -->
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <button class="close-btn" onclick="closePopup()">✕</button>
+
+        <div class="popup-title" id="title"></div>
+        <div class="popup-body" id="body"></div>
+        <div id="actions"></div>
+    </div>
+</div>
+
+<script src="js/inventory.js"></script>
 
 <script>
 
-let activeBox = null;
-let offsetX = 0;
-let offsetY = 0;
-
 /* =========================
-   ➕ 박스 추가 (자유 크기)
+   팝업
 ========================= */
+function openPopup(t,b,a){
+    document.getElementById("title").innerHTML=t;
+    document.getElementById("body").innerHTML=b;
+    document.getElementById("actions").innerHTML=a;
+    document.getElementById("popup").style.display="flex";
+}
 
-function addBox(){
-
-    const box = document.createElement("div");
-    box.className = "box";
-
-    box.style.left = "50%";
-    box.style.top = "50%";
-    box.style.width = "120px";
-    box.style.height = "120px";
-
-    document.getElementById("map").appendChild(box);
-
-    makeDraggable(box);
+function closePopup(){
+    document.getElementById("popup").style.display="none";
 }
 
 /* =========================
-   🖱 드래그
+   아이템 획득
 ========================= */
+function getItem(id,title,desc){
 
-function makeDraggable(box){
+    if(!hasItem(id)){
+        addItem(id);
+    }
 
-    box.addEventListener("mousedown",(e)=>{
-
-        activeBox = box;
-
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
-    });
-
+    openPopup(title,desc,`<button class="choice-btn" onclick="closePopup()">확인</button>`);
 }
 
 /* =========================
-   📌 이동 처리
+   사진
 ========================= */
-
-document.addEventListener("mousemove",(e)=>{
-
-    if(!activeBox) return;
-
-    const map = document.getElementById("map");
-    const rect = map.getBoundingClientRect();
-
-    let x = e.clientX - rect.left - offsetX;
-    let y = e.clientY - rect.top - offsetY;
-
-    activeBox.style.left = x + "px";
-    activeBox.style.top = y + "px";
-
-    updateOutput();
-});
-
-document.addEventListener("mouseup",()=>{
-
-    activeBox = null;
-});
-
-/* =========================
-   📊 코드 생성 (좌표 + 크기)
-========================= */
-
-function updateOutput(){
-
-    const boxes = document.querySelectorAll(".box");
-    const map = document.getElementById("map").getBoundingClientRect();
-
-    let result = "";
-
-    boxes.forEach((b,i)=>{
-
-        let rect = b.getBoundingClientRect();
-
-        let x = ((rect.left - map.left) / map.width * 100).toFixed(1);
-        let y = ((rect.top - map.top) / map.height * 100).toFixed(1);
-
-        let w = (rect.width / map.width * 100).toFixed(1);
-        let h = (rect.height / map.height * 100).toFixed(1);
-
-        result += `.zone${i}{ left:${x}%; top:${y}%; width:${w}%; height:${h}%; }\n`;
-    });
-
-    document.getElementById("output").value = result;
-
-    document.getElementById("coords").innerText =
-    "좌표 + 크기 자동 생성 완료";
+function showPhoto(name,desc){
+    openPopup(name,desc,`<button class="choice-btn" onclick="closePopup()">확인</button>`);
 }
 
 /* =========================
-   📋 복사
+   상자 (키패드)
 ========================= */
+function openBox(){
 
-function copyCode(){
+    const code = prompt("비밀번호 입력");
 
-    let text = document.getElementById("output");
-    text.select();
-    document.execCommand("copy");
-
-    alert("복사 완료!");
+    if(code === "8297"){
+        addItem("key");
+        openPopup("상자","열쇠를 얻었다!","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+    }else{
+        openPopup("상자","바보... 그거 아닌데..","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+    }
 }
 
 </script>
