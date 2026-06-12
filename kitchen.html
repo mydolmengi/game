@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>RPG MAP EDITOR FIXED</title>
+<title>RPG MAP EDITOR FIXED ROTATE</title>
 
 <style>
 body{
@@ -28,7 +28,7 @@ body{
 }
 
 /* ======================
-   🧱 박스
+   🧱 오브젝트
 ====================== */
 .box{
     position:absolute;
@@ -52,7 +52,7 @@ body{
 }
 
 /* ======================
-   🔄 회전 핸들 (UI)
+   🔄 회전 핸들
 ====================== */
 .rotate-handle{
     position:absolute;
@@ -67,11 +67,10 @@ body{
     border-radius:50%;
 
     cursor:grab;
-    z-index:20;
 }
 
 /* ======================
-   📊 UI
+   📊 패널
 ====================== */
 #panel{
     position:fixed;
@@ -105,7 +104,7 @@ button{
 <body>
 
 <div id="panel">
-<b>🎮 FIXED ROTATION EDITOR</b>
+<b>🎮 ROTATION FIXED EDITOR</b>
 
 <textarea id="output"></textarea>
 
@@ -114,9 +113,7 @@ button{
 </div>
 
 <div class="wrapper" id="map">
-
     <img src="images/house_inside.png">
-
 </div>
 
 <script>
@@ -127,7 +124,7 @@ let offsetX = 0;
 let offsetY = 0;
 
 /* ======================
-   ➕ 박스 생성
+   ➕ 생성
 ====================== */
 function addBox(){
 
@@ -166,18 +163,18 @@ function enableDrag(box){
         offsetX = e.clientX - box.getBoundingClientRect().left;
         offsetY = e.clientY - box.getBoundingClientRect().top;
 
-        box.style.cursor = "grabbing";
     });
 }
 
 /* ======================
-   🔄 회전 시작
+   🔄 회전 (핵심 FIX)
 ====================== */
 function enableRotate(handle, box){
 
     handle.addEventListener("mousedown",(e)=>{
 
         activeRotateBox = box;
+
         e.stopPropagation();
     });
 }
@@ -190,7 +187,7 @@ document.addEventListener("mousemove",(e)=>{
     const map = document.getElementById("map");
     const rect = map.getBoundingClientRect();
 
-    /* ===== DRAG ===== */
+    /* 🖱 드래그 */
     if(activeBox){
 
         let x = e.clientX - rect.left - offsetX;
@@ -202,7 +199,7 @@ document.addEventListener("mousemove",(e)=>{
         updateOutput();
     }
 
-    /* ===== ROTATE (핵심 수정 완료) ===== */
+    /* 🔄 회전 */
     if(activeRotateBox){
 
         const r = activeRotateBox.getBoundingClientRect();
@@ -211,25 +208,19 @@ document.addEventListener("mousemove",(e)=>{
         const cy = r.top + r.height / 2;
 
         const angle =
-            Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+        Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
 
         activeRotateBox.style.transform =
-            `rotate(${angle}deg)`;
+        `rotate(${angle}deg)`;
 
         activeRotateBox.dataset.rotate = angle;
 
         updateOutput();
     }
+
 });
 
-/* ======================
-   📴 종료
-====================== */
 document.addEventListener("mouseup",()=>{
-
-    if(activeBox){
-        activeBox.style.cursor = "grab";
-    }
 
     activeBox = null;
     activeRotateBox = null;
@@ -251,6 +242,7 @@ function updateOutput(){
 
         let x = ((rect.left - map.left) / map.width * 100).toFixed(1);
         let y = ((rect.top - map.top) / map.height * 100).toFixed(1);
+
         let w = (rect.width / map.width * 100).toFixed(1);
         let h = (rect.height / map.height * 100).toFixed(1);
 
