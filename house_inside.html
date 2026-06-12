@@ -2,21 +2,31 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>드래그 좌표 편집기</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>집 내부</title>
 
 <style>
-body{
-    margin:0;
-    background:#111;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+@font-face {
+    font-family:'GmarketSans';
+    src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
 }
 
-.wrapper{
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    display:flex;
+    justify-content:center;
+    font-family:'GmarketSans', sans-serif;
+}
+
+.game{
     position:relative;
-    width:900px;
+    width:min(100%,900px);
 }
 
 .bg{
@@ -24,95 +34,264 @@ body{
     display:block;
 }
 
-/* 🎯 드래그 박스 */
-.box{
+/* =========================
+   🎯 클릭 영역 (디버그 ON)
+========================= */
+
+.zone{
     position:absolute;
-    width:120px;
-    height:120px;
-    background:rgba(255,0,0,0.3);
+    cursor:pointer;
+    z-index:10;
+    background:rgba(255,0,0,0.18);
     border:2px dashed red;
-    cursor:grab;
-    user-select:none;
 }
 
-/* 좌표 표시 */
-#info{
-    position:fixed;
-    top:10px;
-    left:10px;
-    background:#fff;
-    padding:10px;
-    font-size:14px;
-    border-radius:10px;
+/* 🛏 침대 (사다리꼴 느낌) */
+.bed-zone{
+    left:0.1%;
+    top:4.5%;
+    width:8.1%;
+    height:26.8%;
+    transform:skew(-10deg);
 }
+
+/* 👕 옷장 */
+.closet-zone{
+    left:27.2%;
+    top:41.7%;
+    width:10%;
+    height:28.8%;
+}
+
+/* 📚 책장 */
+.bookshelf-zone{
+    left:40.2%;
+    top:31.1%;
+    width:9%;
+    height:39%;
+}
+
+/* 🖼 액자 */
+.frame-zone{
+    left:52.1%;
+    top:29.7%;
+    width:8%;
+    height:25%;
+}
+
+/* 🍳 주방 */
+.kitchen-zone{
+    left:70.2%;
+    top:24.7%;
+    width:10%;
+    height:42.2%;
+}
+
+/* 📦 상자 */
+.box-zone{
+    left:92.7%;
+    top:50.5%;
+    width:6%;
+    height:15%;
+}
+
+/* =========================
+   버튼
+========================= */
+
+.back-btn{
+    position:absolute;
+    bottom:3%;
+    left:50%;
+    transform:translateX(-50%);
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:12px 35px;
+    font-size:20px;
+    color:#5b3719;
+    cursor:pointer;
+    z-index:20;
+}
+
+.inventory-btn{
+    position:fixed;
+    top:15px;
+    right:15px;
+    width:65px;
+    height:65px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    font-size:30px;
+    cursor:pointer;
+    z-index:999;
+}
+
+/* =========================
+   팝업
+========================= */
+
+.popup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+.popup-box{
+    width:90%;
+    max-width:550px;
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:25px;
+    padding:20px;
+    text-align:center;
+    position:relative;
+}
+
+.close-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:35px;
+    height:35px;
+    border:none;
+    border-radius:50%;
+    background:#ff9fd2;
+    color:white;
+    cursor:pointer;
+}
+
+.choice-btn{
+    display:block;
+    width:100%;
+    margin:10px 0;
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    color:white;
+    cursor:pointer;
+}
+
+.popup-title{
+    font-size:22px;
+    margin-bottom:15px;
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="info">
-좌표: <span id="coords">0,0</span>
-</div>
-
-<div class="wrapper" id="map">
+<div class="game">
 
     <img src="images/house_inside.png" class="bg">
 
-    <!-- 🧠 드래그 영역 (예: 침대) -->
-    <div class="box" id="bed"></div>
+    <!-- 🛏 침대 -->
+    <div class="zone bed-zone" onclick="getBubbleTea()"></div>
 
-    <div class="box" id="closet"></div>
+    <!-- 👕 옷장 -->
+    <div class="zone closet-zone" onclick="getJjamppong()"></div>
 
-    <div class="box" id="deer"></div>
+    <!-- 📚 책장 -->
+    <div class="zone bookshelf-zone" onclick="showBook()"></div>
+
+    <!-- 🖼 액자 -->
+    <div class="zone frame-zone" onclick="showFrame()"></div>
+
+    <!-- 🍳 주방 -->
+    <div class="zone kitchen-zone" onclick="goKitchen()"></div>
+
+    <!-- 📦 상자 -->
+    <div class="zone box-zone" onclick="openBox()"></div>
+
+    <!-- ↩ -->
+    <button class="back-btn" onclick="location.href='room2.html'">
+        ↩ 돌아가기
+    </button>
 
 </div>
 
+<!-- 🎒 인벤토리 -->
+<button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
+
+<!-- 팝업 -->
+<div class="popup" id="popup">
+    <div class="popup-box">
+
+        <button class="close-btn" onclick="closePopup()">✕</button>
+
+        <div class="popup-title" id="title"></div>
+        <div id="body"></div>
+        <div id="actions"></div>
+
+    </div>
+</div>
+
+<script src="js/inventory.js"></script>
+
 <script>
 
-let activeBox = null;
-let offsetX = 0;
-let offsetY = 0;
-
-document.querySelectorAll(".box").forEach(box => {
-
-    box.addEventListener("mousedown", (e) => {
-        activeBox = box;
-
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
-
-        box.style.cursor = "grabbing";
-    });
+window.addEventListener("DOMContentLoaded",()=>{
+    localStorage.setItem("lastPage","house_inside.html");
 });
 
-document.addEventListener("mousemove", (e) => {
+/* ================= 팝업 ================= */
 
-    if(!activeBox) return;
+function show(title,body,actions){
+    document.getElementById("title").innerHTML=title;
+    document.getElementById("body").innerHTML=body;
+    document.getElementById("actions").innerHTML=actions;
+    document.getElementById("popup").style.display="flex";
+}
 
-    const rect = document.getElementById("map").getBoundingClientRect();
+function closePopup(){
+    document.getElementById("popup").style.display="none";
+}
 
-    let x = e.clientX - rect.left - offsetX;
-    let y = e.clientY - rect.top - offsetY;
+/* ================= 아이템 ================= */
 
-    activeBox.style.left = x + "px";
-    activeBox.style.top = y + "px";
+function getBubbleTea(){
+    addItem("bubbleTea");
+    show("침대","흑당 버블티 획득","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+}
 
-    // 📍 퍼센트 변환 (게임용)
-    let percentX = (x / rect.width * 100).toFixed(1);
-    let percentY = (y / rect.height * 100).toFixed(1);
+function getJjamppong(){
+    addItem("jjamppong");
+    show("옷장","짬뽕 획득","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+}
 
-    document.getElementById("coords").innerText =
-    `left:${percentX}%; top:${percentY}%;`;
-});
+function showBook(){
+    show("책장","사진1 발견","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+}
 
-document.addEventListener("mouseup", () => {
+function showFrame(){
+    show("액자","행복해 보인다.....","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+}
 
-    if(activeBox){
-        activeBox.style.cursor = "grab";
+/* ================= 주방 ================= */
+
+function goKitchen(){
+    location.href="kitchen.html";
+}
+
+/* ================= 상자 ================= */
+
+function openBox(){
+    const code = prompt("비밀번호 입력");
+
+    if(code==="8297"){
+        addItem("key");
+        show("상자","열쇠 획득","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+    }else{
+        alert("틀렸습니다");
     }
-
-    activeBox = null;
-});
+}
 
 </script>
 
