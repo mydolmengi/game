@@ -15,7 +15,7 @@
 
     <img src="images/forest_bg.png" class="bg">
 
-    <!-- 🍎 황금사과 -->
+    <!-- 🍎 사과 -->
     <div class="collectible apple-item" onclick="collectGoldenApple()">
         <img src="images/golden_apple.png">
     </div>
@@ -37,35 +37,43 @@
     <div class="deer-right" onclick="talkRightDeer()"></div>
 
     <!-- ↩ 돌아가기 -->
-    <button class="back-btn" onclick="location.href='room1.html'">
+    <button class="back-btn"
+    onclick="location.href='room1.html'">
         ↩ 돌아가기
     </button>
 
     <!-- 🎒 인벤토리 -->
     <button class="inventory-btn"
     onclick="location.href='inventory.html'">
-    🎒
+        🎒
     </button>
 
 </div>
 
 <!-- 📌 팝업 -->
 <div class="popup" id="popup">
+
     <div class="popup-box">
 
-        <button class="close-btn" onclick="closePopup()">✕</button>
+        <button class="close-btn"
+        onclick="closePopup()">✕</button>
 
-        <div class="popup-image" id="popupVisual"></div>
+        <div class="popup-image"
+        id="popupVisual"></div>
 
         <div class="popup-dialog">
+
             <div id="popupTitle"></div>
             <div id="popupBody"></div>
             <div id="popupActions"></div>
+
         </div>
 
     </div>
+
 </div>
 
+<!-- ⚠️ 중요 -->
 <script src="js/inventory.js"></script>
 
 <script>
@@ -91,41 +99,38 @@ function closePopup(){
 }
 
 /* =====================
-   아이템 획득
+   아이템
 ===================== */
 
 function collectGoldenApple(){
-
     addItem("goldenApple");
 
     showPopup(
         "images/golden_apple.png",
         "황금 사과",
-        "황금 사과를 얻었다.<br>중요한 것 같다",
+        "중요한 것 같다",
         `<button onclick="closePopup()">확인</button>`
     );
 }
 
 function collectAxe(){
-
     addItem("axe");
 
     showPopup(
         "images/axe.png",
         "도끼",
-        "도끼를 얻었다.",
+        "도끼 획득",
         `<button onclick="closePopup()">확인</button>`
     );
 }
 
 function collectFlower(){
-
     addItem("flower");
 
     showPopup(
         "images/flower.png",
         "꽃",
-        "꽃을 얻었다.",
+        "꽃 획득",
         `<button onclick="closePopup()">확인</button>`
     );
 }
@@ -165,10 +170,10 @@ function showLeftQuestion(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
-        "여긴 아무나 들어올 수 없는 곳인데...<br>어떻게 왔어?",
+        "여긴 아무나 못 들어와",
         `
-        <button onclick="truth()">사실대로</button>
-        <button onclick="lie()">거짓말</button>
+        <button onclick="truth()">사실</button>
+        <button onclick="lie()">거짓</button>
         `
     );
 }
@@ -177,19 +182,18 @@ function truth(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
-        "중요한 날이었을 거야!",
+        "좋아",
         `<button onclick="closePopup()">확인</button>`
     );
 }
 
 function lie(){
-
     localStorage.setItem("forest_deer_lied","true");
 
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
-        "구라쟁이!",
+        "거짓말!",
         `<button onclick="closePopup()">확인</button>`
     );
 }
@@ -198,8 +202,8 @@ function showLeftAngry(){
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
-        "이 거짓말쟁이!",
-        `<button onclick="offerFlower()">선물주기</button>`
+        "화남",
+        `<button onclick="offerFlower()">선물</button>`
     );
 }
 
@@ -209,20 +213,19 @@ function offerFlower(){
         showPopup(
             "images/flower.png",
             "꽃",
-            "꽃이 필요하다...",
+            "꽃 필요",
             `<button onclick="closePopup()">확인</button>`
         );
         return;
     }
 
     removeItem("flower");
-
     localStorage.setItem("forest_deer_gifted","true");
 
     showPopup(
         "images/babydeer.png",
         "애기 사슴",
-        "흠... 고마워",
+        "고마워",
         `<button onclick="closePopup()">확인</button>`
     );
 }
@@ -236,7 +239,7 @@ function talkRightDeer(){
     showPopup(
         "images/deer.png",
         "사슴",
-        "옛날 이야기...",
+        "이야기",
         `<button onclick="rightNext()">다음</button>`
     );
 }
@@ -246,7 +249,7 @@ function rightNext(){
     showPopup(
         "images/deer.png",
         "사슴",
-        "보이는 게 전부는 아니다",
+        "끝",
         `<button onclick="closePopup()">확인</button>`
     );
 }
