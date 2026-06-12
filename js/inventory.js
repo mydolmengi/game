@@ -22,12 +22,24 @@ function hasItem(item){
     return getInventory().includes(item);
 }
 
-function goBack(){
-    const lastPage = localStorage.getItem("lastPage");
+/* =========================
+   🔥 수정된 goBack (핵심)
+========================= */
 
-    if(lastPage && lastPage !== "inventory.html"){
+function goBack(){
+
+    let lastPage = localStorage.getItem("lastPage");
+
+    // ❗ 안전장치 (혹시 값 이상할 때)
+    const validPages = [
+        "forest.html",
+        "house.html",
+        "cave.html"
+    ];
+
+    if(validPages.includes(lastPage)){
         location.href = lastPage;
-    }else{
+    } else {
         location.href = "room1.html";
     }
 }
