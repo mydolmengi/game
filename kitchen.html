@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>RPG MAP EDITOR - ROTATE ICON0000000</title>
+<title>RPG MAP EDITOR 🔄 FINAL</title>
 
 <style>
 body{
@@ -28,7 +28,7 @@ body{
 }
 
 /* ======================
-   BOX
+   OBJECT BOX
 ====================== */
 .box{
     position:absolute;
@@ -55,31 +55,29 @@ body{
 ====================== */
 .rotate-icon{
     position:absolute;
-
-    top:-18px;
+    top:-22px;
     left:50%;
     transform:translateX(-50%);
 
-    width:18px;
-    height:18px;
+    width:26px;
+    height:26px;
 
-    background:#ffd400;
-    border-radius:50%;
-
+    background:#ffffff;
     border:2px solid #333;
-
-    cursor:grab;
+    border-radius:50%;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    font-size:12px;
-    font-weight:bold;
+    cursor:grab;
+
+    box-shadow:0 2px 6px rgba(0,0,0,0.3);
 }
 
 .rotate-icon::after{
-    content:"↻";
+    content:"🔄";
+    font-size:14px;
 }
 
 /* ======================
@@ -94,6 +92,7 @@ body{
     background:white;
     padding:18px;
     border-radius:12px;
+    z-index:999;
 }
 
 textarea{
@@ -113,15 +112,21 @@ button{
 
 <body>
 
+<!-- ======================
+   UI PANEL
+====================== -->
 <div id="panel">
-<b>🎮 ROTATE ICON EDITOR</b>
+<b>🎮 RPG MAP EDITOR FINAL 🔄</b>
 
 <textarea id="output"></textarea>
 
-<button onclick="addBox()">➕ 추가</button>
+<button onclick="addBox()">➕ 오브젝트 추가</button>
 <button onclick="copyCode()">📋 복사</button>
 </div>
 
+<!-- ======================
+   MAP
+====================== -->
 <div class="wrapper" id="map">
     <img src="images/house_inside.png">
 </div>
@@ -130,9 +135,14 @@ button{
 
 let activeBox = null;
 let activeRotateBox = null;
+let offsetX = 0;
+let offsetY = 0;
+
+let startAngle = 0;
+let startRotate = 0;
 
 /* ======================
-   CREATE
+   ➕ CREATE OBJECT
 ====================== */
 function addBox(){
 
@@ -142,10 +152,10 @@ function addBox(){
     box.style.left = "50%";
     box.style.top = "50%";
 
-    box.dataset.name = prompt("이름") || "object";
+    box.dataset.name = prompt("오브젝트 이름") || "object";
     box.dataset.rotate = 0;
 
-    /* 🔥 회전 아이콘 */
+    /* 🔄 icon */
     const icon = document.createElement("div");
     icon.className = "rotate-icon";
 
@@ -157,7 +167,7 @@ function addBox(){
 }
 
 /* ======================
-   DRAG
+   🖱 DRAG
 ====================== */
 function enableDrag(box){
 
@@ -175,12 +185,8 @@ function enableDrag(box){
 }
 
 /* ======================
-   ROTATE (ICON BASED)
+   🔄 ROTATE (FIXED)
 ====================== */
-
-let startAngle = 0;
-let startRotate = 0;
-
 function enableRotate(icon, box){
 
     icon.addEventListener("mousedown",(e)=>{
@@ -203,7 +209,7 @@ function enableRotate(icon, box){
 }
 
 /* ======================
-   MOVE + ROTATE
+   📌 MOVE + ROTATE
 ====================== */
 document.addEventListener("mousemove",(e)=>{
 
@@ -254,7 +260,7 @@ document.addEventListener("mouseup",()=>{
 });
 
 /* ======================
-   OUTPUT
+   📊 OUTPUT
 ====================== */
 function updateOutput(){
 
@@ -289,7 +295,7 @@ function updateOutput(){
 }
 
 /* ======================
-   COPY
+   📋 COPY
 ====================== */
 function copyCode(){
 
