@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>RPG MAP EDITOR V3</title>
+<title>RPG MAP EDITOR FIXED</title>
 
 <style>
 body{
@@ -28,7 +28,7 @@ body{
 }
 
 /* ======================
-   🧱 오브젝트 박스
+   🧱 박스
 ====================== */
 .box{
     position:absolute;
@@ -52,11 +52,11 @@ body{
 }
 
 /* ======================
-   🔄 회전 핸들
+   🔄 회전 핸들 (UI)
 ====================== */
 .rotate-handle{
     position:absolute;
-    top:-20px;
+    top:-18px;
     left:50%;
     transform:translateX(-50%);
 
@@ -67,10 +67,11 @@ body{
     border-radius:50%;
 
     cursor:grab;
+    z-index:20;
 }
 
 /* ======================
-   📊 패널
+   📊 UI
 ====================== */
 #panel{
     position:fixed;
@@ -103,34 +104,30 @@ button{
 
 <body>
 
-<!-- ======================
-   📊 UI
-====================== -->
 <div id="panel">
-<b>🎮 RPG EDITOR V3 (FULL TOOL)</b>
+<b>🎮 FIXED ROTATION EDITOR</b>
 
 <textarea id="output"></textarea>
 
-<button onclick="addBox()">➕ 오브젝트 추가</button>
+<button onclick="addBox()">➕ 추가</button>
 <button onclick="copyCode()">📋 복사</button>
 </div>
 
-<!-- ======================
-   🗺 MAP
-====================== -->
 <div class="wrapper" id="map">
 
-    <img src="images/kitchen_bg.png">
+    <img src="images/house_inside.png">
 
 </div>
 
 <script>
 
 let activeBox = null;
-let activeRotate = null;
+let activeRotateBox = null;
+let offsetX = 0;
+let offsetY = 0;
 
 /* ======================
-   ➕ 오브젝트 생성
+   ➕ 박스 생성
 ====================== */
 function addBox(){
 
@@ -140,18 +137,13 @@ function addBox(){
     box.style.left = "50%";
     box.style.top = "50%";
 
-    /* 이름 */
-    box.dataset.name = prompt("오브젝트 이름 (예: 침대)") || "object";
-
-    /* 회전값 */
     box.dataset.rotate = 0;
+    box.dataset.name = prompt("이름 입력") || "object";
 
-    /* 회전 핸들 */
     const handle = document.createElement("div");
     handle.className = "rotate-handle";
 
     box.appendChild(handle);
-
     document.getElementById("map").appendChild(box);
 
     enableDrag(box);
@@ -169,36 +161,36 @@ function enableDrag(box){
 
         activeBox = box;
 
-        box.classList.add("dragging");
+        const mapRect = document.getElementById("map").getBoundingClientRect();
 
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
+        offsetX = e.clientX - box.getBoundingClientRect().left;
+        offsetY = e.clientY - box.getBoundingClientRect().top;
+
+        box.style.cursor = "grabbing";
     });
 }
 
 /* ======================
-   🔄 회전
+   🔄 회전 시작
 ====================== */
 function enableRotate(handle, box){
 
     handle.addEventListener("mousedown",(e)=>{
 
-        activeRotate = box;
-
+        activeRotateBox = box;
         e.stopPropagation();
     });
-
 }
 
 /* ======================
-   📌 이동
+   📌 이동 + 회전
 ====================== */
 document.addEventListener("mousemove",(e)=>{
 
     const map = document.getElementById("map");
     const rect = map.getBoundingClientRect();
 
-    /* 드래그 */
+    /* ===== DRAG ===== */
     if(activeBox){
 
         let x = e.clientX - rect.left - offsetX;
@@ -210,49 +202,37 @@ document.addEventListener("mousemove",(e)=>{
         updateOutput();
     }
 
-    /* 회전 */
-    if(activeRotate){
+    /* ===== ROTATE (핵심 수정 완료) ===== */
+    if(activeRotateBox){
 
-        const r = activeRotate.getBoundingClientRect();
+        const r = activeRotateBox.getBoundingClientRect();
+
         const cx = r.left + r.width / 2;
         const cy = r.top + r.height / 2;
 
-        const angle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+        const angle =
+            Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
 
-        activeRotate.style.transform =
-        `translateX(-50%) rotate(${angle}deg)`;
+        activeRotateBox.style.transform =
+            `rotate(${angle}deg)`;
 
-        activeRotate.dataset.rotate = angle;
-
-        activeRotate.style.transformOrigin = "center";
-
-        activeRotate.style.transform =
-        `translateX(-50%) rotate(${angle}deg)`;
-
-        activeRotate.style.transform =
-        activeRotate.style.transform;
-
-        activeRotate.style.transform =
-        `translateX(-50%) rotate(${angle}deg)`;
-
-        activeRotate.style.transform =
-        `rotate(${angle}deg)`;
-
-        activeRotate.parentElement.style.transform =
-        `rotate(${angle}deg)`;
+        activeRotateBox.dataset.rotate = angle;
 
         updateOutput();
     }
-
 });
 
 /* ======================
-   📴 마우스 업
+   📴 종료
 ====================== */
 document.addEventListener("mouseup",()=>{
 
+    if(activeBox){
+        activeBox.style.cursor = "grab";
+    }
+
     activeBox = null;
-    activeRotate = null;
+    activeRotateBox = null;
 });
 
 /* ======================
