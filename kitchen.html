@@ -2,108 +2,101 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>드래그 좌표 생성기 V2</title>
+<title>이미지 무관 드래그 에디터</title>
 
 <style>
 body{
     margin:0;
     background:#111;
+    font-family:sans-serif;
     display:flex;
     justify-content:center;
-    font-family:sans-serif;
 }
 
-/* 🔥 2배 확대 */
+/* 🔥 맵 영역 */
 .wrapper{
     position:relative;
-    width:1800px; /* 900 → 1800 */
+    width:900px;
     margin-top:20px;
 }
 
-.bg{
+img{
     width:100%;
     display:block;
     user-select:none;
 }
 
-/* =========================
-   🧱 박스 (드래그 + 리사이즈)
-========================= */
-
+/* ======================
+   🧱 드래그 박스
+====================== */
 .box{
     position:absolute;
-    min-width:40px;
-    min-height:40px;
+
+    width:10%;
+    height:10%;
 
     background:rgba(255,0,0,0.25);
     border:2px dashed red;
 
     cursor:grab;
-    resize:both;      /* 🔥 크기 조절 가능 */
-    overflow:auto;
-
     z-index:10;
 }
 
-/* =========================
-   📊 UI 패널 (2배 확대)
-========================= */
-
-#info{
+/* ======================
+   📊 UI 패널 (고정)
+====================== */
+#panel{
     position:fixed;
     top:20px;
     left:20px;
 
+    width:520px;
     background:white;
-    padding:20px;
-
-    font-size:18px;
+    padding:18px;
     border-radius:12px;
 
-    width:520px;   /* 🔥 확대 */
-    z-index:999;
+    font-size:16px;
 }
 
 textarea{
     width:100%;
-    height:220px;  /* 🔥 확대 */
+    height:220px;
     margin-top:10px;
-    font-size:14px;
 }
 
 button{
     width:100%;
-    padding:12px;
+    padding:10px;
     margin-top:8px;
-    font-size:16px;
     cursor:pointer;
 }
 
-/* 좌표 표시 */
-#coords{
-    display:block;
-    margin-top:10px;
+#info{
     font-weight:bold;
+    margin-top:10px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="info">
-<b>🎯 드래그 좌표 생성기 V2 (업그레이드)</b>
+<!-- 🔥 UI -->
+<div id="panel">
+<b>🎮 UNIVERSAL DRAG EDITOR</b>
 
-<span id="coords">좌표 대기중...</span>
+<div id="info">이미지 무관 좌표 시스템</div>
 
-<textarea id="output" placeholder="자동 CSS 코드"></textarea>
+<textarea id="output"></textarea>
 
 <button onclick="addBox()">➕ 박스 추가</button>
 <button onclick="copyCode()">📋 복사</button>
 </div>
 
+<!-- 🔥 맵 -->
 <div class="wrapper" id="map">
 
-    <img src="images/kitchen_bg" class="bg">
+    <!-- 👇 이미지 바꿔도 OK -->
+    <img src="images/kitchen_bg.png" id="bg">
 
 </div>
 
@@ -113,10 +106,9 @@ let activeBox = null;
 let offsetX = 0;
 let offsetY = 0;
 
-/* =========================
-   ➕ 박스 추가 (자유 크기)
-========================= */
-
+/* ======================
+   ➕ 박스 생성
+====================== */
 function addBox(){
 
     const box = document.createElement("div");
@@ -124,34 +116,27 @@ function addBox(){
 
     box.style.left = "50%";
     box.style.top = "50%";
-    box.style.width = "120px";
-    box.style.height = "120px";
 
     document.getElementById("map").appendChild(box);
 
-    makeDraggable(box);
+    enableDrag(box);
 }
 
-/* =========================
+/* ======================
    🖱 드래그
-========================= */
-
-function makeDraggable(box){
+====================== */
+function enableDrag(box){
 
     box.addEventListener("mousedown",(e)=>{
-
         activeBox = box;
-
         offsetX = e.offsetX;
         offsetY = e.offsetY;
     });
-
 }
 
-/* =========================
-   📌 이동 처리
-========================= */
-
+/* ======================
+   📌 이동 (핵심: % 기준)
+====================== */
 document.addEventListener("mousemove",(e)=>{
 
     if(!activeBox) return;
@@ -162,21 +147,19 @@ document.addEventListener("mousemove",(e)=>{
     let x = e.clientX - rect.left - offsetX;
     let y = e.clientY - rect.top - offsetY;
 
-    activeBox.style.left = x + "px";
-    activeBox.style.top = y + "px";
+    activeBox.style.left = (x / rect.width * 100) + "%";
+    activeBox.style.top = (y / rect.height * 100) + "%";
 
     updateOutput();
 });
 
 document.addEventListener("mouseup",()=>{
-
     activeBox = null;
 });
 
-/* =========================
-   📊 코드 생성 (좌표 + 크기)
-========================= */
-
+/* ======================
+   📊 코드 생성 (핵심)
+====================== */
 function updateOutput(){
 
     const boxes = document.querySelectorAll(".box");
@@ -186,31 +169,31 @@ function updateOutput(){
 
     boxes.forEach((b,i)=>{
 
-        let rect = b.getBoundingClientRect();
+        const rect = b.getBoundingClientRect();
 
         let x = ((rect.left - map.left) / map.width * 100).toFixed(1);
         let y = ((rect.top - map.top) / map.height * 100).toFixed(1);
-
         let w = (rect.width / map.width * 100).toFixed(1);
         let h = (rect.height / map.height * 100).toFixed(1);
 
-        result += `.zone${i}{ left:${x}%; top:${y}%; width:${w}%; height:${h}%; }\n`;
+        result += `.zone${i}{
+  left:${x}%;
+  top:${y}%;
+  width:${w}%;
+  height:${h}%;
+}\n\n`;
     });
 
     document.getElementById("output").value = result;
-
-    document.getElementById("coords").innerText =
-    "좌표 + 크기 자동 생성 완료";
 }
 
-/* =========================
+/* ======================
    📋 복사
-========================= */
-
+====================== */
 function copyCode(){
 
-    let text = document.getElementById("output");
-    text.select();
+    const t = document.getElementById("output");
+    t.select();
     document.execCommand("copy");
 
     alert("복사 완료!");
