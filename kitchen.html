@@ -81,6 +81,7 @@ body{
     height:24%;
 }
 
+/* 지하통로 들어가기 버튼 */
 .basement-btn{
     position:absolute;
     left:66%;
@@ -247,7 +248,7 @@ body{
     background:rgba(255,255,255,0);
 }
 
-/* 냉장고 내부: 갈비찜 */
+/* 냉장고 내부: 갈비찜 클릭 */
 .galbi-hotspot{
     left:58%;
     top:46%;
@@ -269,6 +270,27 @@ body{
     top:34%;
     width:18%;
     height:36%;
+}
+
+/* 하트 생명 연출 */
+.heart-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    height:100%;
+    color:#d94a7a;
+}
+
+.heart-icon{
+    font-size:72px;
+    line-height:1;
+}
+
+.heart-label{
+    font-size:24px;
+    font-weight:bold;
 }
 
 @media (max-width: 600px){
@@ -308,6 +330,14 @@ body{
     .basement-btn{
         font-size:16px;
         padding:10px 22px;
+    }
+
+    .heart-icon{
+        font-size:58px;
+    }
+
+    .heart-label{
+        font-size:20px;
     }
 }
 </style>
@@ -360,8 +390,6 @@ body{
 <script src="js/inventory.js"></script>
 
 <script>
-let rugStage = 0;
-
 window.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("lastPage", "주방.html");
 
@@ -436,28 +464,37 @@ function openFridge(){
 
 function getHeartLife(){
     if(hasItem("heartLife")){
-        showImagePopup(
-            "images/galbi.png",
-            "갈비찜",
-            "이미 하트 생명이 있다!",
-            `<button class="choice-btn" onclick="closePopup()">확인</button>`
-        );
+        showPopup({
+            visualHTML: `
+                <div class="heart-wrap">
+                    <div class="heart-icon">❤️</div>
+                    <div class="heart-label">하트 생명</div>
+                </div>
+            `,
+            title: "하트 생명",
+            body: "이미 가지고 있다!",
+            actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
+        });
         return;
     }
 
     addItem("heartLife");
 
-    showImagePopup(
-        "images/galbi.png",
-        "하트 생명",
-        "기회를 한번더...!",
-        `<button class="choice-btn" onclick="closePopup()">확인</button>`
-    );
+    showPopup({
+        visualHTML: `
+            <div class="heart-wrap">
+                <div class="heart-icon">❤️</div>
+                <div class="heart-label">하트 생명</div>
+            </div>
+        `,
+        title: "하트 생명",
+        body: "기회를 한번더...!",
+        actions: `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    });
 }
 
 /* 러그 사진 */
 function openRugPhoto(){
-    rugStage = 1;
     showPopup({
         visualHTML: `
             <div class="interactive-photo">
@@ -472,7 +509,6 @@ function openRugPhoto(){
 }
 
 function showRugLiftedPhoto(){
-    rugStage = 2;
     showPopup({
         visualHTML: `
             <div class="interactive-photo">
