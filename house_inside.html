@@ -2,185 +2,119 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>집 내부 - 디버그 모드</title>
+<title>드래그 좌표 편집기</title>
 
 <style>
 body{
     margin:0;
-    background:#000;
+    background:#111;
     display:flex;
     justify-content:center;
+    align-items:center;
+    height:100vh;
 }
 
-/* 전체 화면 */
-.game{
+.wrapper{
     position:relative;
-    width:100%;
-    max-width:900px;
+    width:900px;
 }
 
-/* 배경 */
 .bg{
     width:100%;
     display:block;
 }
 
-/* =========================
-   🎯 클릭 영역 (디버그 ON)
-========================= */
-.zone{
-    position:absolute;
-    cursor:pointer;
-    z-index:10;
-
-    /* 🔥 보이게 만드는 핵심 */
-    background:rgba(255,0,0,0.25);
-    border:2px dashed red;
-}
-
-/* 🛏 침대 */
-.bed{
-    left:8%;
-    top:45%;
-    width:25%;
-    height:25%;
-}
-
-/* 🚪 옷장 */
-.closet{
-    left:35%;
-    top:28%;
-    width:13%;
-    height:30%;
-}
-
-/* 📚 책장 */
-.bookshelf{
-    left:50%;
-    top:28%;
-    width:12%;
-    height:35%;
-}
-
-/* 🖼 액자 */
-.frame{
-    left:66%;
-    top:30%;
-    width:13%;
-    height:25%;
-}
-
-/* 🍳 주방 */
-.kitchen{
-    left:80%;
-    top:40%;
-    width:18%;
-    height:40%;
-}
-
-/* 📦 상자 */
+/* 🎯 드래그 박스 */
 .box{
-    left:84%;
-    top:62%;
-    width:10%;
-    height:14%;
-}
-
-/* 돌아가기 버튼 */
-.back-btn{
     position:absolute;
-    bottom:3%;
-    left:50%;
-    transform:translateX(-50%);
-    padding:12px 30px;
-    background:#f9e9c8;
-    border:5px solid #c89b5d;
-    border-radius:25px;
-    cursor:pointer;
-    z-index:20;
+    width:120px;
+    height:120px;
+    background:rgba(255,0,0,0.3);
+    border:2px dashed red;
+    cursor:grab;
+    user-select:none;
 }
 
-/* 인벤토리 */
-.inventory-btn{
+/* 좌표 표시 */
+#info{
     position:fixed;
-    top:15px;
-    right:15px;
-    width:60px;
-    height:60px;
-    border:none;
-    border-radius:15px;
-    background:#ff9fd2;
-    font-size:25px;
-    cursor:pointer;
-    z-index:999;
-}
-
-/* 팝업 */
-.popup{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.6);
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:1000;
-}
-
-.popup-box{
-    width:90%;
-    max-width:500px;
-    background:#f9e9c8;
-    border:5px solid #c89b5d;
-    border-radius:25px;
-    padding:20px;
-    position:relative;
-}
-
-.close-btn{
-    position:absolute;
     top:10px;
-    right:10px;
-    background:#ff9fd2;
-    border:none;
-    width:35px;
-    height:35px;
-    border-radius:50%;
-    cursor:pointer;
+    left:10px;
+    background:#fff;
+    padding:10px;
+    font-size:14px;
+    border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="game">
+<div id="info">
+좌표: <span id="coords">0,0</span>
+</div>
+
+<div class="wrapper" id="map">
 
     <img src="images/house_inside.png" class="bg">
 
-    <!-- 🧪 클릭 영역들 (보이게 설정됨) -->
-    <div class="zone bed" onclick="alert('침대 클릭')"></div>
+    <!-- 🧠 드래그 영역 (예: 침대) -->
+    <div class="box" id="bed"></div>
 
-    <div class="zone closet" onclick="alert('옷장 클릭')"></div>
+    <div class="box" id="closet"></div>
 
-    <div class="zone bookshelf" onclick="alert('책장 클릭')"></div>
-
-    <div class="zone frame" onclick="alert('액자 클릭')"></div>
-
-    <div class="zone kitchen" onclick="alert('주방 이동')"></div>
-
-    <div class="zone box" onclick="alert('상자 클릭')"></div>
-
-    <!-- ↩ 돌아가기 -->
-    <button class="back-btn" onclick="location.href='room2.html'">
-        ↩ 돌아가기
-    </button>
-
-    <!-- 🎒 인벤토리 -->
-    <button class="inventory-btn" onclick="location.href='inventory.html'">
-        🎒
-    </button>
+    <div class="box" id="deer"></div>
 
 </div>
+
+<script>
+
+let activeBox = null;
+let offsetX = 0;
+let offsetY = 0;
+
+document.querySelectorAll(".box").forEach(box => {
+
+    box.addEventListener("mousedown", (e) => {
+        activeBox = box;
+
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+
+        box.style.cursor = "grabbing";
+    });
+});
+
+document.addEventListener("mousemove", (e) => {
+
+    if(!activeBox) return;
+
+    const rect = document.getElementById("map").getBoundingClientRect();
+
+    let x = e.clientX - rect.left - offsetX;
+    let y = e.clientY - rect.top - offsetY;
+
+    activeBox.style.left = x + "px";
+    activeBox.style.top = y + "px";
+
+    // 📍 퍼센트 변환 (게임용)
+    let percentX = (x / rect.width * 100).toFixed(1);
+    let percentY = (y / rect.height * 100).toFixed(1);
+
+    document.getElementById("coords").innerText =
+    `left:${percentX}%; top:${percentY}%;`;
+});
+
+document.addEventListener("mouseup", () => {
+
+    if(activeBox){
+        activeBox.style.cursor = "grab";
+    }
+
+    activeBox = null;
+});
+
+</script>
 
 </body>
 </html>
