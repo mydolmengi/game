@@ -344,8 +344,8 @@ body{
     <div class="zone sink-zone" onclick="getIceAmericano()"></div>
     <div class="zone rug-zone" onclick="openRugPhoto()"></div>
 
-    <button class="basement-btn" id="basementBtn" onclick="location.href='underground_passage.html'">
-        Enter Underground Passage
+    <button class="basement-btn" id="basementBtn" onclick="location.href='underground.html'">
+       지하 통로로 가기
     </button>
 
     <button class="back-btn" onclick="location.href='house_inside.html'">
@@ -504,7 +504,7 @@ function enterBasementCheck(){
     if(hasItem("key")){
         localStorage.setItem("basementOpened", "true");
         document.getElementById("basementBtn").style.display = "block";
-        location.href = "underground_passage.html";
+        location.href = "underground.html";
         return;
     }
 
