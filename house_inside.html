@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>드래그 좌표 생성기</title>
+<title>드래그 좌표 생성기 V2</title>
 
 <style>
 body{
@@ -13,51 +13,77 @@ body{
     font-family:sans-serif;
 }
 
+/* 🔥 2배 확대 */
 .wrapper{
     position:relative;
-    width:900px;
-    margin-top:10px;
+    width:1800px; /* 900 → 1800 */
+    margin-top:20px;
 }
 
-/* 배경 */
 .bg{
     width:100%;
     display:block;
     user-select:none;
 }
 
-/* 생성되는 박스 */
+/* =========================
+   🧱 박스 (드래그 + 리사이즈)
+========================= */
+
 .box{
     position:absolute;
-    width:120px;
-    height:120px;
-    background:rgba(255,0,0,0.3);
+    min-width:40px;
+    min-height:40px;
+
+    background:rgba(255,0,0,0.25);
     border:2px dashed red;
+
     cursor:grab;
+    resize:both;      /* 🔥 크기 조절 가능 */
+    overflow:auto;
+
+    z-index:10;
 }
 
-/* 좌표 표시 */
+/* =========================
+   📊 UI 패널 (2배 확대)
+========================= */
+
 #info{
     position:fixed;
-    top:10px;
-    left:10px;
+    top:20px;
+    left:20px;
+
     background:white;
-    padding:10px;
-    font-size:14px;
-    border-radius:10px;
+    padding:20px;
+
+    font-size:18px;
+    border-radius:12px;
+
+    width:520px;   /* 🔥 확대 */
     z-index:999;
-    width:260px;
 }
 
 textarea{
     width:100%;
-    height:120px;
+    height:220px;  /* 🔥 확대 */
     margin-top:10px;
+    font-size:14px;
 }
+
 button{
     width:100%;
-    padding:8px;
-    margin-top:5px;
+    padding:12px;
+    margin-top:8px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+/* 좌표 표시 */
+#coords{
+    display:block;
+    margin-top:10px;
+    font-weight:bold;
 }
 </style>
 </head>
@@ -65,18 +91,19 @@ button{
 <body>
 
 <div id="info">
-<b>📍 좌표 생성기</b><br>
-<span id="coords">클릭하세요</span>
+<b>🎯 드래그 좌표 생성기 V2 (업그레이드)</b>
 
-<textarea id="output" placeholder="여기에 코드 자동 생성됨"></textarea>
+<span id="coords">좌표 대기중...</span>
 
-<button onclick="copyCode()">📋 복사</button>
+<textarea id="output" placeholder="자동 CSS 코드"></textarea>
+
 <button onclick="addBox()">➕ 박스 추가</button>
+<button onclick="copyCode()">📋 복사</button>
 </div>
 
 <div class="wrapper" id="map">
 
-    <img src="images/house_inside.png" class="bg" id="bg">
+    <img src="images/house_inside.png" class="bg">
 
 </div>
 
@@ -85,37 +112,46 @@ button{
 let activeBox = null;
 let offsetX = 0;
 let offsetY = 0;
-let boxCount = 0;
 
-/* 박스 추가 */
+/* =========================
+   ➕ 박스 추가 (자유 크기)
+========================= */
+
 function addBox(){
 
     const box = document.createElement("div");
     box.className = "box";
-    box.id = "box" + boxCount++;
 
     box.style.left = "50%";
     box.style.top = "50%";
+    box.style.width = "120px";
+    box.style.height = "120px";
 
     document.getElementById("map").appendChild(box);
 
-    drag(box);
+    makeDraggable(box);
 }
 
-/* 드래그 */
-function drag(box){
+/* =========================
+   🖱 드래그
+========================= */
 
-    box.addEventListener("mousedown", (e)=>{
+function makeDraggable(box){
+
+    box.addEventListener("mousedown",(e)=>{
 
         activeBox = box;
+
         offsetX = e.offsetX;
         offsetY = e.offsetY;
-
     });
 
 }
 
-/* 이동 */
+/* =========================
+   📌 이동 처리
+========================= */
+
 document.addEventListener("mousemove",(e)=>{
 
     if(!activeBox) return;
@@ -129,49 +165,54 @@ document.addEventListener("mousemove",(e)=>{
     activeBox.style.left = x + "px";
     activeBox.style.top = y + "px";
 
-    let px = (x / rect.width * 100).toFixed(1);
-    let py = (y / rect.height * 100).toFixed(1);
-
-    document.getElementById("coords").innerText =
-    `left:${px}%; top:${py}%`;
-
-    activeBox.dataset.code =
-    `left:${px}%; top:${py}%;`;
-
     updateOutput();
 });
 
-document.addEventListener("mouseup", ()=>{
+document.addEventListener("mouseup",()=>{
 
     activeBox = null;
 });
 
-/* 코드 생성 */
+/* =========================
+   📊 코드 생성 (좌표 + 크기)
+========================= */
+
 function updateOutput(){
 
-    let boxes = document.querySelectorAll(".box");
+    const boxes = document.querySelectorAll(".box");
+    const map = document.getElementById("map").getBoundingClientRect();
 
     let result = "";
 
-    boxes.forEach((b, i)=>{
+    boxes.forEach((b,i)=>{
 
         let rect = b.getBoundingClientRect();
-        let map = document.getElementById("map").getBoundingClientRect();
 
         let x = ((rect.left - map.left) / map.width * 100).toFixed(1);
         let y = ((rect.top - map.top) / map.height * 100).toFixed(1);
 
-        result += `.zone${i}{ left:${x}%; top:${y}%; width:10%; height:10%; }\n`;
+        let w = (rect.width / map.width * 100).toFixed(1);
+        let h = (rect.height / map.height * 100).toFixed(1);
+
+        result += `.zone${i}{ left:${x}%; top:${y}%; width:${w}%; height:${h}%; }\n`;
     });
 
     document.getElementById("output").value = result;
+
+    document.getElementById("coords").innerText =
+    "좌표 + 크기 자동 생성 완료";
 }
 
-/* 복사 */
+/* =========================
+   📋 복사
+========================= */
+
 function copyCode(){
+
     let text = document.getElementById("output");
     text.select();
     document.execCommand("copy");
+
     alert("복사 완료!");
 }
 
