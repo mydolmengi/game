@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>RPG 맵 에디터 FINAL</title>
+<title>RPG 맵 에디터 FINAL FIX</title>
 
 <style>
 body{
@@ -14,22 +14,27 @@ body{
 }
 
 /* ======================
-   🗺 맵 영역
+   🗺 맵 영역 (핵심 수정)
 ====================== */
 .wrapper{
     position:relative;
     width:900px;
+
+    /* 🔥 중요: 반드시 있어야 화면 보임 */
+    height:auto;
+
     margin-top:20px;
 }
 
+/* 🔥 이미지 확실히 보이게 */
 .wrapper img{
     width:100%;
+    height:auto;
     display:block;
-    user-select:none;
 }
 
 /* ======================
-   🧱 박스 (드래그 + 리사이즈)
+   🧱 드래그 박스
 ====================== */
 .box{
     position:absolute;
@@ -43,7 +48,6 @@ body{
     cursor:grab;
     z-index:10;
 
-    /* 🔥 핵심: 리사이즈 활성화 */
     resize: both;
     overflow: hidden;
 
@@ -86,7 +90,7 @@ button{
     margin-top:10px;
 }
 
-/* 드래그 중 커서 */
+/* 드래그 상태 */
 .dragging{
     cursor:grabbing !important;
 }
@@ -96,12 +100,12 @@ button{
 <body>
 
 <!-- ======================
-   📊 UI
+   📊 UI 패널
 ====================== -->
 <div id="panel">
-<b>🎮 RPG MAP EDITOR FINAL</b>
+<b>🎮 FINAL MAP EDITOR FIX</b>
 
-<div id="info">드래그 + 리사이즈 완전 지원</div>
+<div id="info">이미지 안 보이는 문제 해결 버전</div>
 
 <textarea id="output"></textarea>
 
@@ -114,7 +118,8 @@ button{
 ====================== -->
 <div class="wrapper" id="map">
 
-    <img src="imageskitchen_bg.png">
+    <!-- 🔥 여기 이미지 넣는 곳 -->
+    <img src="images/kitchen_bg.png">
 
 </div>
 
@@ -141,13 +146,13 @@ function addBox(){
 }
 
 /* ======================
-   🖱 드래그 시작
+   🖱 드래그
 ====================== */
 function enableDrag(box){
 
     box.addEventListener("mousedown",(e)=>{
 
-        // resize 핸들 클릭이면 드래그 안함
+        // resize 영역 클릭이면 드래그 안함
         if(e.offsetX > box.clientWidth - 20 &&
            e.offsetY > box.clientHeight - 20){
             return;
@@ -163,7 +168,7 @@ function enableDrag(box){
 }
 
 /* ======================
-   📌 이동
+   📌 이동 (100% 기준)
 ====================== */
 document.addEventListener("mousemove",(e)=>{
 
@@ -191,7 +196,7 @@ document.addEventListener("mouseup",()=>{
 });
 
 /* ======================
-   📊 코드 생성 (좌표 + 크기)
+   📊 코드 생성
 ====================== */
 function updateOutput(){
 
