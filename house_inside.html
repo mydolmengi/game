@@ -1,1 +1,279 @@
-<h1>🏠 집 내부</h1>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>집 내부</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+.zone{
+    position:absolute;
+    cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="game">
+
+    <!-- 🏠 집 내부 배경 -->
+    <img src="images/house_inside.png" class="bg">
+
+    <!-- 🛏 침대 -->
+    <div class="zone" style="left:10%; top:45%; width:25%; height:25%;"
+    onclick="getBubbleTea()"></div>
+
+    <!-- 🚪 옷장 -->
+    <div class="zone" style="left:35%; top:30%; width:12%; height:30%;"
+    onclick="getJjamppong()"></div>
+
+    <!-- 📚 책장 -->
+    <div class="zone" style="left:50%; top:30%; width:12%; height:35%;"
+    onclick="showBook()"></div>
+
+    <!-- 🖼 액자 -->
+    <div class="zone" style="left:65%; top:30%; width:15%; height:25%;"
+    onclick="showFrame()"></div>
+
+    <!-- 🍳 주방 이동 -->
+    <div class="zone" style="left:80%; top:40%; width:18%; height:40%;"
+    onclick="goKitchen()"></div>
+
+    <!-- 📦 상자 (키패드) -->
+    <div class="zone"
+    style="left:84%; top:62%; width:10%; height:14%;"
+    onclick="openBoxPad()"></div>
+
+    <!-- ↩ 돌아가기 -->
+    <button class="back-btn"
+    onclick="location.href='room2.html'">
+        ↩ 돌아가기
+    </button>
+
+    <!-- 🎒 인벤토리 -->
+    <button class="inventory-btn"
+    onclick="location.href='inventory.html'">
+        🎒
+    </button>
+
+</div>
+
+<!-- 📌 기본 팝업 -->
+<div class="popup" id="popup">
+
+    <div class="popup-box">
+
+        <button class="close-btn"
+        onclick="closePopup()">✕</button>
+
+        <div class="popup-image" id="popupVisual"></div>
+
+        <div class="popup-dialog">
+
+            <div id="popupTitle"></div>
+            <div id="popupBody"></div>
+            <div id="popupActions"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 📦 상자 키패드 -->
+<div class="popup" id="boxPopup" style="display:none;">
+
+    <div class="popup-box">
+
+        <button class="close-btn"
+        onclick="closeBoxPad()">✕</button>
+
+        <div class="popup-title">
+            비밀번호 입력
+        </div>
+
+        <div class="code-display" id="boxCodeDisplay">____</div>
+
+        <div class="keypad-grid">
+
+            <button class="key-btn" onclick="pressBoxKey('1')">1</button>
+            <button class="key-btn" onclick="pressBoxKey('2')">2</button>
+            <button class="key-btn" onclick="pressBoxKey('3')">3</button>
+
+            <button class="key-btn" onclick="pressBoxKey('4')">4</button>
+            <button class="key-btn" onclick="pressBoxKey('5')">5</button>
+            <button class="key-btn" onclick="pressBoxKey('6')">6</button>
+
+            <button class="key-btn" onclick="pressBoxKey('7')">7</button>
+            <button class="key-btn" onclick="pressBoxKey('8')">8</button>
+            <button class="key-btn" onclick="pressBoxKey('9')">9</button>
+
+            <button class="key-btn sub-btn" onclick="clearBoxCode()">지우기</button>
+            <button class="key-btn" onclick="pressBoxKey('0')">0</button>
+            <button class="key-btn sub-btn" onclick="backBoxCode()">⌫</button>
+
+        </div>
+
+        <div id="boxMessage"></div>
+
+        <div class="popup-actions">
+            <button class="choice-btn"
+            onclick="checkBoxCode()">
+                확인
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/inventory.js"></script>
+
+<script>
+
+/* =====================
+   위치 저장
+===================== */
+
+window.addEventListener("DOMContentLoaded", () => {
+    localStorage.setItem("lastPage", "house_inside.html");
+});
+
+/* =====================
+   팝업
+===================== */
+
+function showPopup(img,title,body,actions){
+
+    document.getElementById("popupVisual").innerHTML =
+    `<img src="${img}" class="popup-media">`;
+
+    document.getElementById("popupTitle").innerHTML = title;
+    document.getElementById("popupBody").innerHTML = body;
+    document.getElementById("popupActions").innerHTML = actions;
+
+    document.getElementById("popup").style.display="flex";
+}
+
+function closePopup(){
+    document.getElementById("popup").style.display="none";
+}
+
+/* =====================
+   아이템
+===================== */
+
+function getBubbleTea(){
+    addItem("bubbleTea");
+
+    showPopup(
+        "images/bubbletea.png",
+        "흑당 버블티",
+        "꿀맛도리!",
+        `<button onclick="closePopup()">확인</button>`
+    );
+}
+
+function getJjamppong(){
+    addItem("jjamppong");
+
+    showPopup(
+        "images/jjamppong.png",
+        "짬뽕",
+        "얼큰하다!",
+        `<button onclick="closePopup()">확인</button>`
+    );
+}
+
+function showBook(){
+    showPopup(
+        "images/photo1.png",
+        "사진1",
+        "의미심장한 사진",
+        `<button onclick="closePopup()">확인</button>`
+    );
+}
+
+function showFrame(){
+    showPopup(
+        "images/photo2.png",
+        "사진2",
+        "행복해 보인다.....",
+        `<button onclick="closePopup()">확인</button>`
+    );
+}
+
+function goKitchen(){
+    location.href = "kitchen.html";
+}
+
+/* =====================
+   📦 상자 키패드
+===================== */
+
+let boxCode = "";
+
+function openBoxPad(){
+    boxCode = "";
+    document.getElementById("boxMessage").innerHTML = "";
+    updateBox();
+    document.getElementById("boxPopup").style.display = "flex";
+}
+
+function closeBoxPad(){
+    document.getElementById("boxPopup").style.display = "none";
+}
+
+function pressBoxKey(num){
+    if(boxCode.length >= 4) return;
+    boxCode += num;
+    updateBox();
+}
+
+function backBoxCode(){
+    boxCode = boxCode.slice(0, -1);
+    updateBox();
+}
+
+function clearBoxCode(){
+    boxCode = "";
+    updateBox();
+}
+
+function updateBox(){
+    document.getElementById("boxCodeDisplay").textContent =
+    boxCode.padEnd(4,"_");
+}
+
+function checkBoxCode(){
+
+    if(boxCode === "8297"){
+
+        addItem("key");
+
+        showPopup(
+            "images/key.png",
+            "열쇠",
+            "열쇠를 얻었다.<br>어디에 쓰는 열쇠지?",
+            `<button onclick="closePopup()">확인</button>`
+        );
+
+        closeBoxPad();
+        return;
+    }
+
+    document.getElementById("boxMessage").innerHTML =
+    "바보... 그거 아닌데..";
+
+    boxCode = "";
+    updateBox();
+}
+
+</script>
+
+</body>
+</html>
