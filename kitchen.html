@@ -1,487 +1,259 @@
 <!DOCTYPE html>
-
 <html lang="ko">
-
 <head>
-
 <meta charset="UTF-8">
-
-<title>RPG 맵 에디터 FINAL FIX</title>
-
-​
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주방</title>
 
 <style>
-
 body{
-
     margin:0;
-
-    background:#111;
-
-    display:flex;
-
-    justify-content:center;
-
-    font-family:sans-serif;
-
+    background:#000;
+    font-family:'GmarketSans', sans-serif;
 }
 
-​
-
-/* ======================
-
-   🗺 맵 영역 (핵심 수정)
-
-====================== */
-
-.wrapper{
-
+.game{
     position:relative;
-
-    width:900px;
-
-​
-
-    /* 🔥 중요: 반드시 있어야 화면 보임 */
-
-    height:auto;
-
-​
-
-    margin-top:20px;
-
+    width:min(100%,900px);
+    margin:auto;
 }
 
-​
-
-/* 🔥 이미지 확실히 보이게 */
-
-.wrapper img{
-
+.bg{
     width:100%;
-
-    height:auto;
-
     display:block;
-
 }
 
-​
-
-/* ======================
-
-   🧱 드래그 박스
-
-====================== */
-
-.box{
-
+/* =====================
+   ZONE SYSTEM
+===================== */
+.zone{
     position:absolute;
-
-​
-
-    width:120px;
-
-    height:120px;
-
-​
-
-    background:rgba(255,0,0,0.25);
-
-    border:2px dashed red;
-
-​
-
-    cursor:grab;
-
-    z-index:10;
-
-​
-
-    resize: both;
-
-    overflow: hidden;
-
-​
-
-    min-width:30px;
-
-    min-height:30px;
-
-}
-
-​
-
-/* ======================
-
-   📊 UI 패널
-
-====================== */
-
-#panel{
-
-    position:fixed;
-
-    top:20px;
-
-    left:20px;
-
-​
-
-    width:520px;
-
-    background:white;
-
-    padding:18px;
-
-    border-radius:12px;
-
-​
-
-    font-size:16px;
-
-    z-index:999;
-
-}
-
-​
-
-textarea{
-
-    width:100%;
-
-    height:240px;
-
-    margin-top:10px;
-
-}
-
-​
-
-button{
-
-    width:100%;
-
-    padding:10px;
-
-    margin-top:8px;
-
     cursor:pointer;
-
+    background:rgba(255,255,255,0);
 }
 
-​
+/* 🍳 싱크대 */
+.sink-zone{
+    left:12.9%;
+    top:44.6%;
+    width:13.8%;
+    height:7.8%;
+}
 
-#info{
+/* 🔥 화로 */
+.fire-zone{
+    left:45.8%;
+    top:43.3%;
+    width:15.6%;
+    height:9.9%;
+}
 
-    font-weight:bold;
+/* 🧊 냉장고 */
+.fridge-zone{
+    left:74.9%;
+    top:32.5%;
+    width:15.6%;
+    height:13.5%;
+}
 
+/* 🟫 러그 */
+.rug-zone{
+    position:absolute;
+    left:211px;
+    top:967px;
+    width:425px;
+    height:389px;
+    transform:rotate(32deg);
+    cursor:pointer;
+}
+
+/* =====================
+   BUTTONS
+===================== */
+.back-btn{
+    position:absolute;
+    bottom:3%;
+    left:50%;
+    transform:translateX(-50%);
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:12px 30px;
+    cursor:pointer;
+}
+
+.inventory-btn{
+    position:fixed;
+    top:15px;
+    right:15px;
+    width:65px;
+    height:65px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    font-size:30px;
+    cursor:pointer;
+}
+
+/* =====================
+   BASMENT BTN
+===================== */
+.basement-btn{
+    position:absolute;
+    left:50%;
+    top:70%;
+    transform:translateX(-50%);
+    display:none;
+    background:#c89b5d;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:20px;
+    cursor:pointer;
+}
+
+/* =====================
+   POPUP
+===================== */
+.popup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.popup-box{
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:20px;
+    width:90%;
+    max-width:600px;
+    text-align:center;
+}
+
+.choice-btn{
+    width:100%;
     margin-top:10px;
-
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    color:white;
+    cursor:pointer;
 }
-
-​
-
-/* 드래그 상태 */
-
-.dragging{
-
-    cursor:grabbing !important;
-
-}
-
 </style>
-
 </head>
-
-​
 
 <body>
 
-​
+<div class="game">
 
-<!-- ======================
+    <img src="images/kitchen_bg.png" class="bg">
 
-   📊 UI 패널
+    <!-- 🍳 싱크대 -->
+    <div class="zone sink-zone" onclick="getIceAmericano()"></div>
 
-====================== -->
+    <!-- 🔥 화로 -->
+    <div class="zone fire-zone" onclick="getTiramisu()"></div>
 
-<div id="panel">
+    <!-- 🧊 냉장고 -->
+    <div class="zone fridge-zone" onclick="openFridge()"></div>
 
-<b>🎮 FINAL MAP EDITOR FIX</b>
+    <!-- 🟫 러그 -->
+    <div class="rug-zone" onclick="openRug()"></div>
 
-​
+    <!-- 지하통로 -->
+    <button class="basement-btn" id="basementBtn"
+    onclick="location.href='underground_passage.html'">
+        Enter Underground Passage
+    </button>
 
-<div id="info">이미지 안 보이는 문제 해결 버전</div>
-
-​
-
-<textarea id="output"></textarea>
-
-​
-
-<button onclick="addBox()">➕ 박스 추가</button>
-
-<button onclick="copyCode()">📋 복사</button>
-
-</div>
-
-​
-
-<!-- ======================
-
-   🗺 맵
-
-====================== -->
-
-<div class="wrapper" id="map">
-
-​
-
-    <!-- 🔥 여기 이미지 넣는 곳 -->
-
-    <img src="images/kitchen_bg.png">
-
-​
+    <!-- 돌아가기 -->
+    <button class="back-btn"
+    onclick="location.href='house_inside.html'">
+        집 안으로 돌아가기
+    </button>
 
 </div>
 
-​
+<button class="inventory-btn"
+onclick="location.href='inventory.html'">🎒</button>
+
+<!-- POPUP -->
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <div id="popupText"></div>
+        <div id="popupBtns"></div>
+    </div>
+</div>
+
+<script src="js/inventory.js"></script>
 
 <script>
 
-​
+window.onload = () => {
+    localStorage.setItem("lastPage","kitchen.html");
 
-let activeBox = null;
+    if(localStorage.getItem("basementOpened") === "true"){
+        document.getElementById("basementBtn").style.display="block";
+    }
+};
 
-let offsetX = 0;
-
-let offsetY = 0;
-
-​
-
-/* ======================
-
-   ➕ 박스 생성
-
-====================== */
-
-function addBox(){
-
-​
-
-    const box = document.createElement("div");
-
-    box.className = "box";
-
-​
-
-    box.style.left = "50%";
-
-    box.style.top = "50%";
-
-​
-
-    document.getElementById("map").appendChild(box);
-
-​
-
-    enableDrag(box);
-
+function show(msg,btn){
+    document.getElementById("popupText").innerHTML = msg;
+    document.getElementById("popupBtns").innerHTML = btn;
+    document.getElementById("popup").style.display="flex";
 }
 
-​
-
-/* ======================
-
-   🖱 드래그
-
-====================== */
-
-function enableDrag(box){
-
-​
-
-    box.addEventListener("mousedown",(e)=>{
-
-​
-
-        // resize 영역 클릭이면 드래그 안함
-
-        if(e.offsetX > box.clientWidth - 20 &&
-
-           e.offsetY > box.clientHeight - 20){
-
-            return;
-
-        }
-
-​
-
-        activeBox = box;
-
-​
-
-        offsetX = e.offsetX;
-
-        offsetY = e.offsetY;
-
-​
-
-        box.classList.add("dragging");
-
-    });
-
+function getTiramisu(){
+    addItem("tiramisu");
+    show("티라미슈","<button class='choice-btn' onclick='closePopup()'>확인</button>");
 }
 
-​
+function getIceAmericano(){
+    addItem("iceAmericano");
+    show("아이스 아메리카노","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+}
 
-/* ======================
+/* 냉장고 */
+function openFridge(){
+    show("냉장고 안",
+    "<button class='choice-btn' onclick='getHeart()'>갈비찜</button>");
+}
 
-   📌 이동 (100% 기준)
-
-====================== */
-
-document.addEventListener("mousemove",(e)=>{
-
-​
-
-    if(!activeBox) return;
-
-​
-
-    const map = document.getElementById("map");
-
-    const rect = map.getBoundingClientRect();
-
-​
-
-    let x = e.clientX - rect.left - offsetX;
-
-    let y = e.clientY - rect.top - offsetY;
-
-​
-
-    activeBox.style.left = (x / rect.width * 100) + "%";
-
-    activeBox.style.top = (y / rect.height * 100) + "%";
-
-​
-
-    updateOutput();
-
-});
-
-​
-
-document.addEventListener("mouseup",()=>{
-
-​
-
-    if(activeBox){
-
-        activeBox.classList.remove("dragging");
-
+function getHeart(){
+    if(hasItem("heart")){
+        show("이미 있음","<button onclick='closePopup()'>확인</button>");
+        return;
     }
 
-​
-
-    activeBox = null;
-
-});
-
-​
-
-/* ======================
-
-   📊 코드 생성
-
-====================== */
-
-function updateOutput(){
-
-​
-
-    const boxes = document.querySelectorAll(".box");
-
-    const map = document.getElementById("map").getBoundingClientRect();
-
-​
-
-    let result = "";
-
-​
-
-    boxes.forEach((b,i)=>{
-
-​
-
-        const rect = b.getBoundingClientRect();
-
-​
-
-        let x = ((rect.left - map.left) / map.width * 100).toFixed(1);
-
-        let y = ((rect.top - map.top) / map.height * 100).toFixed(1);
-
-​
-
-        let w = (rect.width / map.width * 100).toFixed(1);
-
-        let h = (rect.height / map.height * 100).toFixed(1);
-
-​
-
-        result += `.zone${i}{
-
-  left:${x}%;
-
-  top:${y}%;
-
-  width:${w}%;
-
-  height:${h}%;
-
-}\n\n`;
-
-    });
-
-​
-
-    document.getElementById("output").value = result;
-
+    addItem("heart");
+    show("하트 생명 획득","<button onclick='closePopup()'>확인</button>");
 }
 
-​
-
-/* ======================
-
-   📋 복사
-
-====================== */
-
-function copyCode(){
-
-​
-
-    const t = document.getElementById("output");
-
-    t.select();
-
-    document.execCommand("copy");
-
-​
-
-    alert("복사 완료!");
-
+/* 러그 */
+function openRug(){
+    show("러그 밑","<button onclick='checkDoor()'>확인</button>");
 }
 
-​
+function checkDoor(){
+    if(hasItem("key")){
+        localStorage.setItem("basementOpened","true");
+        document.getElementById("basementBtn").style.display="block";
+        location.href="underground_passage.html";
+    } else {
+        show("열쇠 필요","<button onclick='closePopup()'>확인</button>");
+    }
+}
+
+function closePopup(){
+    document.getElementById("popup").style.display="none";
+}
 
 </script>
 
-​
-
 </body>
-
 </html>
