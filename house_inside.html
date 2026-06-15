@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>RPG MAP EDITOR FINAL PRO</title>
+<title>RPG MAP EDITOR FIXED</title>
 
 <style>
 body{
@@ -28,56 +28,40 @@ body{
 }
 
 /* ======================
-   BOX (PX 안정 버전)
+   BOX
 ====================== */
 .box{
     position:absolute;
-
     width:120px;
     height:120px;
-
     background:rgba(255,0,0,0.25);
     border:2px dashed red;
-
     cursor:grab;
-
     resize: both;
-    overflow: hidden;
-
+    overflow:hidden;
     min-width:30px;
     min-height:30px;
-
     transform-origin:center;
-
-    will-change: left, top, width, height, transform;
 }
 
 /* ======================
-   🔄 ROTATE ICON (BIG FIX)
+   ROTATE ICON
 ====================== */
 .rotate-icon{
     position:absolute;
-
     top:-30px;
     left:50%;
     transform:translateX(-50%);
-
     width:36px;
     height:36px;
-
     background:white;
-    border:2px solid #333;
     border-radius:50%;
-
+    border:2px solid #333;
     display:flex;
-    align-items:center;
     justify-content:center;
-
+    align-items:center;
     font-size:22px;
     cursor:grab;
-
-    box-shadow:0 2px 8px rgba(0,0,0,0.4);
-    user-select:none;
 }
 
 .rotate-icon::after{
@@ -91,12 +75,10 @@ body{
     position:fixed;
     top:20px;
     left:20px;
-
     width:520px;
     background:white;
     padding:18px;
     border-radius:12px;
-    z-index:999;
 }
 
 textarea{
@@ -116,21 +98,17 @@ button{
 
 <body>
 
-<!-- ======================
-   PANEL
-====================== -->
+<!-- PANEL -->
 <div id="panel">
-<b>🎮 RPG MAP EDITOR FINAL PRO</b>
+<b>🎮 RPG MAP EDITOR FIXED</b>
 
 <textarea id="output"></textarea>
 
-<button onclick="addBox()">➕ 오브젝트 추가</button>
+<button onclick="addBox()">➕ 추가</button>
 <button onclick="copyCode()">📋 복사</button>
 </div>
 
-<!-- ======================
-   MAP
-====================== -->
+<!-- MAP -->
 <div class="wrapper" id="map">
     <img src="images/kitchen_bg.png">
 </div>
@@ -144,7 +122,7 @@ let offsetX = 0;
 let offsetY = 0;
 
 /* ======================
-   CREATE
+   CREATE BOX
 ====================== */
 function addBox(){
 
@@ -168,7 +146,7 @@ function addBox(){
 }
 
 /* ======================
-   DRAG (PX FIX)
+   DRAG
 ====================== */
 function enableDrag(box){
 
@@ -186,7 +164,7 @@ function enableDrag(box){
 }
 
 /* ======================
-   ROTATE (STABLE FIX)
+   ROTATE
 ====================== */
 let startAngle = 0;
 let startRotate = 0;
@@ -220,7 +198,6 @@ document.addEventListener("mousemove",(e)=>{
     const map = document.getElementById("map");
     const rect = map.getBoundingClientRect();
 
-    /* DRAG */
     if(activeBox){
 
         let x = e.clientX - rect.left - offsetX;
@@ -232,7 +209,6 @@ document.addEventListener("mousemove",(e)=>{
         updateOutput();
     }
 
-    /* ROTATE */
     if(activeRotateBox){
 
         const r = activeRotateBox.getBoundingClientRect();
@@ -258,7 +234,6 @@ document.addEventListener("mousemove",(e)=>{
 });
 
 document.addEventListener("mouseup",()=>{
-
     activeBox = null;
     activeRotateBox = null;
 });
@@ -285,7 +260,6 @@ function updateOutput(){
         let rot = b.dataset.rotate || 0;
         let name = b.dataset.name;
 
-        result += `/* ${name} */\n`;
         result += `.${name}{
   left:${x}px;
   top:${y}px;
