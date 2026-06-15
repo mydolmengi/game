@@ -35,17 +35,15 @@ body{
 }
 
 /* ======================
-   🪨 방패 돌
+   🪨 방패 (클릭 아이템)
 ====================== */
-.stone{
+.shield-item{
     position:absolute;
     left:8%;
     bottom:10%;
-    width:15%;
-    height:15%;
+    width:12%;
     cursor:pointer;
-    background:rgba(0,0,255,0.25);
-    border:2px solid blue;
+    z-index:5;
 }
 
 /* ======================
@@ -171,8 +169,10 @@ body{
 
     <img src="images/cave.png" class="bg">
 
-    <!-- 🪨 방패 -->
-    <div class="stone" onclick="getShield()"></div>
+    <!-- 🛡 방패 -->
+    <img src="images/shield.png"
+         class="shield-item"
+         onclick="getShield()">
 
     <!-- 문 -->
     <div class="door" onclick="openPopup()"></div>
@@ -232,7 +232,7 @@ function closePopup(){
 }
 
 /* ======================
-   RESET (FIXED)
+   RESET
 ====================== */
 function resetPopup(){
 
@@ -259,7 +259,7 @@ function useHand(){
 }
 
 /* ======================
-   도끼
+   도끼 (FIXED)
 ====================== */
 function useAxe(){
 
@@ -286,7 +286,7 @@ function useAxe(){
 }
 
 /* ======================
-   🪨 방패 획득
+   방패 획득 (클릭)
 ====================== */
 function getShield(){
 
@@ -303,10 +303,13 @@ function getShield(){
 }
 
 /* ======================
-   이동
+   이동 + 저장 FIX
 ====================== */
 function enterCave(){
+
     localStorage.setItem("caveOpened", "true");
+    localStorage.setItem("lastPage", "cave.html"); // 🔥 핵심 수정
+
     location.href = "cave_inside.html";
 }
 
