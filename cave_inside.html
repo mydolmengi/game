@@ -6,6 +6,17 @@
 <title>동굴 내부</title>
 
 <style>
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
 body{
     margin:0;
     background:#000;
@@ -33,8 +44,10 @@ body{
     font-size:18px;
     color:#5b3719;
     cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
+/* 마녀 이동 */
 .enter-btn{
     position:absolute;
     left:50%;
@@ -43,6 +56,7 @@ body{
     display:none;
 }
 
+/* 돌아가기 */
 .back-btn{
     position:absolute;
     bottom:3%;
@@ -72,11 +86,41 @@ body{
 
     <img src="images/cave_inside.png" class="bg">
 
+    <!-- 🗣 혼잣말 UI -->
+    <div id="dialog"
+        style="
+        position:absolute;
+        bottom:18%;
+        left:50%;
+        transform:translateX(-50%);
+        width:85%;
+        background:#f9e9c8;
+        border:6px solid #c89b5d;
+        border-radius:25px;
+        padding:18px;
+        font-size:20px;
+        color:#5b3719;
+        text-align:center;
+        box-shadow:0 10px 25px rgba(0,0,0,0.3);
+        ">
+        와... 여기는 어디지?
+    </div>
+
+    <!-- 다음 버튼 -->
+    <button class="game-btn"
+        id="nextBtn"
+        style="position:absolute; bottom:8%; left:50%; transform:translateX(-50%);"
+        onclick="nextDialogue()">
+        다음
+    </button>
+
+    <!-- 마녀 이동 -->
     <button class="game-btn enter-btn" id="enterBtn"
     onclick="location.href='cave_mage.html'">
         마녀의 집으로 바로가기
     </button>
 
+    <!-- 돌아가기 -->
     <button class="game-btn back-btn"
     onclick="location.href='cave.html'">
         돌아가기
@@ -84,13 +128,14 @@ body{
 
 </div>
 
+<!-- 인벤토리 -->
 <button class="inventory-btn"
 onclick="location.href='inventory.html'">🎒</button>
 
 <script>
 
 /* ======================
-   복귀 시스템 FIX
+   상태 복구
 ====================== */
 window.addEventListener("DOMContentLoaded", () => {
 
@@ -100,6 +145,83 @@ window.addEventListener("DOMContentLoaded", () => {
         document.getElementById("enterBtn").style.display="block";
     }
 });
+
+/* ======================
+   대사 시스템
+====================== */
+let step = 0;
+
+function nextDialogue(){
+
+    step++;
+
+    const dialog = document.getElementById("dialog");
+
+    if(step === 1){
+        dialog.innerHTML = "안으로 더 들어가볼까?";
+    }
+
+    else if(step === 2){
+        dialog.innerHTML = "뭔가... 날 보호할 물건이 필요할 것 같다.";
+        document.getElementById("nextBtn").innerText = "선택하기";
+    }
+
+    else if(step === 3){
+        showChoice();
+    }
+}
+
+/* ======================
+   선택지
+====================== */
+function showChoice(){
+
+    const dialog = document.getElementById("dialog");
+
+    dialog.innerHTML = `
+        <div>어떻게 할까?</div>
+        <button onclick="goIn()" class="game-btn" style="margin-top:10px;">들어간다</button>
+        <button onclick="goOut()" class="game-btn" style="margin-top:10px;">아니야, 나가자</button>
+    `;
+
+    document.getElementById("nextBtn").style.display = "none";
+}
+
+/* ======================
+   선택 결과
+====================== */
+function goIn(){
+
+    if(localStorage.getItem("shield") === "true" ||
+       localStorage.getItem("hasShield") === "true"){
+
+        localStorage.setItem("caveUnlocked","true");
+
+        document.getElementById("dialog").innerHTML =
+        "방패가 나를 보호해준다...!";
+
+        document.getElementById("enterBtn").style.display = "block";
+    }
+
+    else{
+
+        document.body.style.background = "#111";
+
+        document.getElementById("dialog").innerHTML =
+        "??? 쑤쑤숫쑥<br>헉! 화살이다!!!";
+
+        const btn = document.createElement("button");
+        btn.innerHTML = "도망치자";
+        btn.className = "game-btn";
+        btn.onclick = () => location.href = "cave.html";
+
+        document.getElementById("dialog").appendChild(btn);
+    }
+}
+
+function goOut(){
+    location.href = "cave.html";
+}
 
 </script>
 
