@@ -294,7 +294,7 @@ function checkDoor(){
 
     if(hasItem("key")){
         localStorage.setItem("basementOpened","true");
-        location.href="underground_passage.html";
+        location.href="underground.html";
     } else {
         show("열쇠 필요",
         `<button class='choice-btn' onclick='closePopup()'>확인</button>`);
