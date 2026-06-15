@@ -19,9 +19,6 @@ body{
     font-family:'GmarketSans', sans-serif;
 }
 
-/* =========================
-   GAME
-========================= */
 .game{
     position:relative;
     width:min(100%,900px);
@@ -32,35 +29,19 @@ body{
     display:block;
 }
 
-/* =========================
-   ZONE
-========================= */
 .zone{
     position:absolute;
     cursor:pointer;
 }
 
-/* 침대 */
-.bed{ left:4.0%; top:48.4%; width:27.2%; height:14.2%; }
+/* zones */
+.bed{ left:4%; top:48%; width:27%; height:14%; }
+.closet{ left:24%; top:29%; width:18%; height:20%; }
+.bookshelf{ left:43%; top:33%; width:8%; height:13%; }
+.frame{ left:53%; top:29%; width:11%; height:8%; }
+.kitchen{ left:66%; top:23%; width:33%; height:25%; }
+.box{ left:89%; top:49%; width:13%; height:9%; }
 
-/* 옷장 */
-.closet{ left:23.9%; top:29.0%; width:18.4%; height:20.7%; }
-
-/* 책장 */
-.bookshelf{ left:43.2%; top:33.0%; width:8.3%; height:13.7%; }
-
-/* 액자 */
-.frame{ left:53.1%; top:29.1%; width:11.3%; height:8.6%; }
-
-/* 주방 */
-.kitchen{ left:66.9%; top:23.7%; width:33.3%; height:25.4%; }
-
-/* 상자 */
-.box{ left:89.7%; top:49.5%; width:13.2%; height:9.8%; }
-
-/* =========================
-   BUTTON
-========================= */
 .back-btn{
     position:absolute;
     bottom:3%;
@@ -86,9 +67,7 @@ body{
     cursor:pointer;
 }
 
-/* =========================
-   POPUP
-========================= */
+/* popup */
 .popup{
     position:fixed;
     inset:0;
@@ -96,27 +75,23 @@ body{
     display:none;
     justify-content:center;
     align-items:center;
-    z-index:1000;
 }
 
 .popup-box{
     width:90%;
     max-width:500px;
     background:#f9e9c8;
-    border:5px solid #c89b5d;
     border-radius:25px;
+    border:5px solid #c89b5d;
     padding:20px;
     text-align:center;
 }
 
-/* =========================
-   KEYPAD STYLE (핵심)
-========================= */
 .keypad{
     display:grid;
     grid-template-columns:repeat(3,1fr);
     gap:10px;
-    margin-top:15px;
+    margin-top:10px;
 }
 
 .keypad button{
@@ -124,26 +99,17 @@ body{
     background:#f9e9c8;
     border:5px solid #c89b5d;
     border-radius:20px;
-    font-size:18px;
     cursor:pointer;
 }
 
-.code-display{
-    font-size:22px;
-    letter-spacing:8px;
-    margin-bottom:10px;
-}
-
-/* popup buttons */
 .choice-btn{
+    margin-top:10px;
     width:100%;
     padding:12px;
-    margin-top:8px;
     border:none;
     border-radius:20px;
     background:#ff9fd2;
     color:white;
-    cursor:pointer;
 }
 </style>
 </head>
@@ -154,21 +120,21 @@ body{
 
     <img src="images/house_inside.png" class="bg">
 
-    <!-- 🛏 침대 -->
+    <!-- 🛏 버블티 (FIXED) -->
     <div class="zone bed"
-    onclick="getItem('bubbletea','images/bubble_tea.png','흑당 버블티','꿀맛도리 흑당 버블버블티~~~')"></div>
+    onclick="getItem('bubbletea','bubbletea','흑당 버블티','꿀맛도리 흑당 버블버블티~~~')"></div>
 
     <!-- 👕 옷장 -->
     <div class="zone closet"
-    onclick="getItem('jjamppong','images/jjamppong.png','짬뽕','얼큰 짬뽕')"></div>
+    onclick="getItem('jjamppong','jjamppong','짬뽕','얼큰 짬뽕')"></div>
 
     <!-- 📚 책장 -->
     <div class="zone bookshelf"
-    onclick="showPhoto('images/photo1.png','사진1','책장 사진')"></div>
+    onclick="showPhoto('photo1','사진1','책장 사진')"></div>
 
     <!-- 🖼 액자 -->
     <div class="zone frame"
-    onclick="showPhoto('images/photo2.png','사진2','행복해 보인다.....')"></div>
+    onclick="showPhoto('photo2','사진2','행복해 보인다.....')"></div>
 
     <!-- 🍳 주방 -->
     <div class="zone kitchen"
@@ -178,17 +144,15 @@ body{
     <div class="zone box"
     onclick="openBox()"></div>
 
-    <!-- ↩ -->
     <button class="back-btn" onclick="location.href='room2.html'">
         돌아가기
     </button>
 
 </div>
 
-<!-- 🎒 인벤토리 -->
 <button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
 
-<!-- POPUP -->
+<!-- popup -->
 <div class="popup" id="popup">
     <div class="popup-box">
 
@@ -204,21 +168,28 @@ body{
 <script>
 
 /* =========================
+   LAST PAGE FIX
+========================= */
+window.onload = () => {
+    localStorage.setItem("lastPage","house_inside.html");
+};
+
+/* =========================
    POPUP
 ========================= */
 function openPopup(t,b,a){
-    document.getElementById("title").innerHTML = t;
-    document.getElementById("body").innerHTML = b;
-    document.getElementById("actions").innerHTML = a;
-    document.getElementById("popup").style.display = "flex";
+    document.getElementById("title").innerHTML=t;
+    document.getElementById("body").innerHTML=b;
+    document.getElementById("actions").innerHTML=a;
+    document.getElementById("popup").style.display="flex";
 }
 
 function closePopup(){
-    document.getElementById("popup").style.display = "none";
+    document.getElementById("popup").style.display="none";
 }
 
 /* =========================
-   ITEM (FIXED IMAGE)
+   ITEM FIX (핵심)
 ========================= */
 function getItem(id,img,title,desc){
 
@@ -228,7 +199,7 @@ function getItem(id,img,title,desc){
 
     openPopup(
         title,
-        `<img src="${img}" style="width:180px; display:block; margin:10px auto;"><br>${desc}`,
+        `<img src="images/${img}.png" style="width:180px;"><br>${desc}`,
         `<button class="choice-btn" onclick="closePopup()">확인</button>`
     );
 }
@@ -240,23 +211,23 @@ function showPhoto(img,title,desc){
 
     openPopup(
         title,
-        `<img src="${img}" style="width:200px; display:block; margin:10px auto;"><br>${desc}`,
+        `<img src="images/${img}.png" style="width:200px;"><br>${desc}`,
         `<button class="choice-btn" onclick="closePopup()">확인</button>`
     );
 }
 
 /* =========================
-   KEYPAD BOX (FINAL FIX)
+   KEYPAD BOX
 ========================= */
-let code = "";
+let code="";
 
 function openBox(){
 
-    code = "";
+    code="";
 
     openPopup(
-        "🔐 비밀번호 입력",
-        `<div class="code-display" id="codeText">____</div>`,
+        "비밀번호",
+        `<div id="code">____</div>`,
         `
         <div class="keypad">
             <button onclick="press(1)">1</button>
@@ -268,7 +239,7 @@ function openBox(){
             <button onclick="press(7)">7</button>
             <button onclick="press(8)">8</button>
             <button onclick="press(9)">9</button>
-            <button onclick="clearCode()">C</button>
+            <button onclick="clearC()">C</button>
             <button onclick="press(0)">0</button>
             <button onclick="check()">✔</button>
         </div>
@@ -277,36 +248,32 @@ function openBox(){
 }
 
 function press(n){
-
-    if(code.length >= 4) return;
-
-    code += n;
-
-    document.getElementById("codeText").innerText =
-    code.padEnd(4,"_");
+    if(code.length>=4) return;
+    code+=n;
+    document.getElementById("code").innerText=code.padEnd(4,"_");
 }
 
-function clearCode(){
-    code = "";
-    document.getElementById("codeText").innerText = "____";
+function clearC(){
+    code="";
+    document.getElementById("code").innerText="____";
 }
 
 function check(){
 
-    if(code === "8297"){
+    if(code==="8297"){
 
         addItem("key");
 
         openPopup(
-            "상자",
-            "열쇠를 얻었다!",
+            "성공",
+            `<img src="images/key.png" style="width:120px;"><br>열쇠 획득`,
             `<button class="choice-btn" onclick="closePopup()">확인</button>`
         );
 
     }else{
 
         openPopup(
-            "상자",
+            "실패",
             "바보... 그거 아닌데..",
             `<button class="choice-btn" onclick="closePopup()">확인</button>`
         );
