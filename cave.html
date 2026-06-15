@@ -34,9 +34,7 @@ body{
     display:block;
 }
 
-/* ======================
-   🛡 방패
-====================== */
+/* 🛡 방패 */
 .shield-item{
     position:absolute;
     left:8%;
@@ -46,9 +44,7 @@ body{
     z-index:5;
 }
 
-/* ======================
-   문
-====================== */
+/* 🚪 문 */
 .door{
     position:absolute;
     left:35%;
@@ -60,9 +56,7 @@ body{
     border:3px solid lime;
 }
 
-/* ======================
-   버튼
-====================== */
+/* 버튼 */
 .game-btn{
     background:#f9e9c8;
     border:6px solid #c89b5d;
@@ -80,6 +74,7 @@ body{
     transform:translateX(-50%);
 }
 
+/* 🔥 바로 들어가기 버튼 */
 .enter-btn{
     position:absolute;
     left:50%;
@@ -88,9 +83,7 @@ body{
     display:none;
 }
 
-/* ======================
-   인벤토리
-====================== */
+/* 인벤토리 */
 .inventory-btn{
     position:fixed;
     top:15px;
@@ -104,9 +97,7 @@ body{
     cursor:pointer;
 }
 
-/* ======================
-   팝업
-====================== */
+/* 팝업 */
 .popup{
     position:fixed;
     inset:0;
@@ -175,16 +166,16 @@ body{
          id="shield"
          onclick="getShield()">
 
-    <!-- 문 -->
+    <!-- 🚪 문 -->
     <div class="door" onclick="openPopup()"></div>
 
-    <!-- 바로 들어가기 -->
+    <!-- 🔥 바로 들어가기 -->
     <button class="game-btn enter-btn" id="enterBtn"
     onclick="location.href='cave_inside.html'">
         🚪 바로 들어가기
     </button>
 
-    <!-- 돌아가기 -->
+    <!-- ↩ 돌아가기 -->
     <button class="game-btn back-btn"
     onclick="location.href='room1.html'">
         ↩ 돌아가기
@@ -259,7 +250,7 @@ function useHand(){
 }
 
 /* ======================
-   도끼 (FIXED)
+   도끼 (FIXED + BUTTON FIX)
 ====================== */
 function useAxe(){
 
@@ -274,8 +265,13 @@ function useAxe(){
 
         removeItem("axe");
 
-    } else {
+        // 🔥 핵심: 버튼 생성
+        document.getElementById("enterBtn").style.display = "block";
 
+        // 상태 저장
+        localStorage.setItem("caveOpened", "true");
+    }
+    else{
         document.getElementById("popupContent").innerHTML =
         "도끼가 없다..!";
 
@@ -286,7 +282,7 @@ function useAxe(){
 }
 
 /* ======================
-   방패 획득 (클릭 + 사라짐)
+   방패 획득 (클릭 + 삭제)
 ====================== */
 function getShield(){
 
@@ -308,13 +304,11 @@ function getShield(){
 }
 
 /* ======================
-   이동 + 저장 FIX
+   이동
 ====================== */
 function enterCave(){
 
     localStorage.setItem("caveOpened", "true");
-
-    // 🔥 중요: 복귀용 저장
     localStorage.setItem("lastPage", "cave.html");
 
     location.href = "cave_inside.html";
