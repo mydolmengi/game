@@ -1,1 +1,255 @@
-<h1>🕳️ 동굴 안</h1>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>동굴 내부</title>
+
+<style>
+body{
+    margin:0;
+    background:#000;
+    font-family:'GmarketSans', sans-serif;
+}
+
+.game{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    margin:auto;
+}
+
+.bg{
+    width:100%;
+    display:block;
+}
+
+/* 어두워짐 효과 */
+.dark{
+    filter:brightness(0.2);
+}
+
+/* ======================
+   하단 대화창
+====================== */
+.dialog{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#f9e9c8;
+    border-top:6px solid #c89b5d;
+    padding:20px;
+    box-sizing:border-box;
+}
+
+.text{
+    font-size:18px;
+    color:#5b3719;
+    line-height:1.6;
+    min-height:60px;
+}
+
+/* 버튼 */
+.btn{
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+/* 마녀 버튼 */
+.witch-btn{
+    position:absolute;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    display:none;
+    padding:12px 20px;
+    background:#c89b5d;
+    border:none;
+    border-radius:20px;
+    color:white;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game" id="game">
+
+    <img src="images/cave_inside.png" class="bg" id="bg">
+
+    <!-- 🔥 마녀 바로가기 버튼 -->
+    <button class="witch-btn" id="witchBtn"
+    onclick="goWitch()">
+        마녀의 집으로 바로가기
+    </button>
+
+    <!-- 대화창 -->
+    <div class="dialog" id="dialog">
+        <div class="text" id="text"></div>
+        <div id="buttons"></div>
+    </div>
+
+</div>
+
+<script>
+
+/* ======================
+   상태
+====================== */
+let step = 0;
+
+/* 방패 여부 */
+function hasShield(){
+    return hasItem("images/shield.png");
+}
+
+/* ======================
+   시작
+====================== */
+window.onload = () => {
+
+    // 이미 방패로 클리어했으면 버튼 표시
+    if(localStorage.getItem("caveCleared") === "true"){
+        document.getElementById("witchBtn").style.display = "block";
+    }
+
+    showStep0();
+};
+
+/* ======================
+   STEP 0
+====================== */
+function showStep0(){
+
+    step = 0;
+
+    setText("와 여기는 어디지?");
+
+    setButtons([
+        {text:"다음", action:showStep1}
+    ]);
+}
+
+/* ======================
+   STEP 1
+====================== */
+function showStep1(){
+
+    setText("안으로 더 들어가볼까?");
+
+    setButtons([
+        {text:"다음", action:showStep2}
+    ]);
+}
+
+/* ======================
+   STEP 2 (선택)
+====================== */
+function showStep2(){
+
+    setText("뭔가 날 보호할 물건이 필요할 것 같다");
+
+    setButtons([
+        {text:"들어간다", action:enterCave},
+        {text:"아니야, 나가자", action:exitCave}
+    ]);
+}
+
+/* ======================
+   들어가기
+====================== */
+function enterCave(){
+
+    if(hasShield()){
+
+        // 성공 루트
+        localStorage.setItem("caveCleared","true");
+
+        setText("방패가 나를 지켜준다...\n앞으로 나아간다");
+
+        setButtons([
+            {text:"마녀의 집으로 이동", action:goWitch}
+        ]);
+
+        document.getElementById("witchBtn").style.display = "block";
+
+    }else{
+
+        // 실패 루트
+        dangerEvent();
+    }
+}
+
+/* ======================
+   위험 이벤트
+====================== */
+function dangerEvent(){
+
+    document.getElementById("bg").classList.add("dark");
+
+    setText("??? 쑤쑤숫쑥\n헐 화살이다!!!");
+
+    setButtons([
+        {text:"도망치자", action:runAway}
+    ]);
+}
+
+/* ======================
+   도망
+====================== */
+function runAway(){
+
+    location.href = "cave.html";
+}
+
+/* ======================
+   나가기
+====================== */
+function exitCave(){
+    location.href = "cave.html";
+}
+
+/* ======================
+   마녀 이동
+====================== */
+function goWitch(){
+    location.href = "witch_house.html";
+}
+
+/* ======================
+   UI 함수
+====================== */
+function setText(t){
+    document.getElementById("text").innerText = t;
+}
+
+function setButtons(btns){
+
+    const box = document.getElementById("buttons");
+    box.innerHTML = "";
+
+    btns.forEach(b=>{
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.innerText = b.text;
+        btn.onclick = b.action;
+        box.appendChild(btn);
+    });
+}
+
+</script>
+
+<!-- inventory.js -->
+<script src="js/inventory.js"></script>
+
+</body>
+</html>
