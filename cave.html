@@ -19,10 +19,7 @@ body{
     width:min(100%, 900px);
 }
 
-.bg{
-    width:100%;
-    display:block;
-}
+.bg{ width:100%; display:block; }
 
 /* 방패 */
 .shield-item{
@@ -123,27 +120,6 @@ onclick="location.href='inventory.html'">🎒</button>
 <script>
 
 /* ======================
-   도끼 사용 (핵심)
-====================== */
-function useAxe(){
-
-    if(!hasItem("axe")) return;
-
-    removeItem("axe");
-
-    // 상태 저장 (핵심)
-    localStorage.setItem("caveOpened","true");
-    localStorage.setItem("caveUnlocked","true");
-
-    // 버튼 활성화
-    const btn = document.getElementById("enterBtn");
-    if(btn) btn.style.display = "block";
-
-    // 즉시 이동
-    location.href = "cave_inside.html";
-}
-
-/* ======================
    방패
 ====================== */
 function getShield(){
@@ -158,12 +134,28 @@ function getShield(){
 }
 
 /* ======================
+   도끼
+====================== */
+function useAxe(){
+
+    if(!hasItem("axe")) return;
+
+    removeItem("axe");
+
+    localStorage.setItem("caveUnlocked","true");
+
+    location.href = "cave_inside.html";
+}
+
+/* ======================
    상태 복구
 ====================== */
 window.addEventListener("DOMContentLoaded", () => {
 
-    if(localStorage.getItem("caveUnlocked") === "true"){
-        document.getElementById("enterBtn").style.display = "block";
+    localStorage.setItem("lastPage","cave.html");
+
+    if(localStorage.getItem("caveUnlocked")==="true"){
+        document.getElementById("enterBtn").style.display="block";
     }
 });
 
