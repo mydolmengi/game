@@ -43,7 +43,7 @@ body{
     cursor:pointer;
 }
 
-/* 돌아가기 (동굴 스타일) */
+/* 버튼 */
 .back-btn{
     position:absolute;
     bottom:3%;
@@ -58,7 +58,6 @@ body{
     color:#5b3719;
 }
 
-/* 인벤토리 */
 .inventory-btn{
     position:fixed;
     top:15px;
@@ -70,20 +69,6 @@ body{
     background:#ff9fd2;
     font-size:30px;
     cursor:pointer;
-}
-
-/* 지하 버튼 */
-.basement-btn{
-    position:absolute;
-    left:50%;
-    top:70%;
-    transform:translateX(-50%);
-    display:none;
-    background:#c89b5d;
-    color:white;
-    border:none;
-    padding:12px 20px;
-    border-radius:20px;
 }
 
 /* popup */
@@ -117,10 +102,38 @@ body{
     cursor:pointer;
 }
 
-img.popup-img{
+.popup-img{
     width:200px;
     margin:10px 0;
+    cursor:pointer;
 }
+
+/* ======================
+   🧊 냉장고 애니메이션
+====================== */
+.fridge-open {
+    animation: fridgeShake 0.6s ease;
+}
+
+@keyframes fridgeShake {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.03) rotate(1deg); }
+    50% { transform: scale(0.98) rotate(-1deg); }
+    100% { transform: scale(1); }
+}
+
+/* ======================
+   🟫 러그 들림 효과
+====================== */
+.rug-lift {
+    animation: rugUp 0.4s ease forwards;
+}
+
+@keyframes rugUp {
+    from { transform: rotate(32deg) translateY(0); }
+    to   { transform: rotate(32deg) translateY(-25px); }
+}
+
 </style>
 </head>
 
@@ -142,13 +155,7 @@ img.popup-img{
     <!-- 러그 -->
     <div class="rug-zone" onclick="openRug()"></div>
 
-    <!-- 지하통로 -->
-    <button class="basement-btn" id="basementBtn"
-    onclick="location.href='underground_passage.html'">
-        Enter Underground Passage
-    </button>
-
-    <!-- 집으로 -->
+    <!-- 돌아가기 -->
     <button class="back-btn"
     onclick="location.href='house_inside.html'">
         집 안으로 돌아가기
@@ -171,15 +178,6 @@ onclick="location.href='inventory.html'">🎒</button>
 
 <script>
 
-window.onload = () => {
-
-    localStorage.setItem("lastPage","kitchen.html");
-
-    if(localStorage.getItem("basementOpened")==="true"){
-        document.getElementById("basementBtn").style.display="block";
-    }
-};
-
 function show(t,b){
     document.getElementById("txt").innerHTML=t;
     document.getElementById("btns").innerHTML=b;
@@ -195,8 +193,13 @@ function closePopup(){
 ====================== */
 function getIce(){
     addItem("iceAmericano");
-    show("아이스 아메리카노<br>겁나 차갑다",
-    "<button class='choice-btn' onclick='closePopup()'>확인</button>");
+
+    show(`
+        아이스 아메리카노
+        <br><img src="images/ice.png" class="popup-img">
+        <br>겁나 차갑다
+    `,
+    `<button class='choice-btn' onclick='closePopup()'>확인</button>`);
 }
 
 /* ======================
@@ -204,64 +207,97 @@ function getIce(){
 ====================== */
 function getCake(){
     addItem("tiramisu");
-    show("티라미수<br>달콤해보인다",
-    "<button class='choice-btn' onclick='closePopup()'>확인</button>");
+
+    show(`
+        티라미수
+        <br><img src="images/tiramisu.png" class="popup-img">
+        <br>달콤해보인다
+    `,
+    `<button class='choice-btn' onclick='closePopup()'>확인</button>`);
 }
 
 /* ======================
-   냉장고 3단계
+   냉장고 (애니메이션 추가)
 ====================== */
 function openFridge(){
 
-    show("냉장고",
-    `<img class='popup-img' src='images/fridge.png'><br>
-    <button class='choice-btn' onclick='openMeat()'>갈비찜</button>`);
+    const fridge = document.querySelector(".fridge-zone");
+
+    fridge.classList.add("fridge-open");
+
+    setTimeout(() => {
+        fridge.classList.remove("fridge-open");
+    }, 600);
+
+    show(`
+        냉장고
+        <br><br>
+        <img src="images/fridge.png"
+        class="popup-img"
+        onclick="getHeart()">
+        <br>이미지를 클릭
+    `,
+    `<button class='choice-btn' onclick='closePopup()'>닫기</button>`);
 }
 
-function openMeat(){
+function getHeart(){
 
     if(hasItem("heart")){
-        show("이미 하트 있음",
-        "<button class='choice-btn' onclick='closePopup()'>확인</button>");
+        show("이미 있음",
+        `<button class='choice-btn' onclick='closePopup()'>확인</button>`);
         return;
     }
 
     addItem("heart");
 
-    show("💖 하트 생명 획득",
-    "<button class='choice-btn' onclick='closePopup()'>확인</button>");
+    show(`
+        💖 하트 생명 획득
+        <br><img src="images/heart.png" class="popup-img">
+    `,
+    `<button class='choice-btn' onclick='closePopup()'>확인</button>`);
 }
 
 /* ======================
-   러그 3단계
+   러그 (들림 효과 추가)
 ====================== */
 function openRug(){
 
-    show("러그",
-    `<img class='popup-img' src='images/rug1.png'><br>
-    <button class='choice-btn' onclick='rug2()'>확인</button>`);
+    const rug = document.querySelector(".rug-zone");
+
+    rug.classList.add("rug-lift");
+
+    show(`
+        러그
+        <br><br>
+        <img src="images/rug1.png"
+        class="popup-img"
+        onclick="rug2()">
+        <br>이미지 클릭
+    `,
+    `<button class='choice-btn' onclick='closePopup()'>닫기</button>`);
 }
 
 function rug2(){
 
-    show("러그 아래",
-    `<img class='popup-img' src='images/rug2.png'><br>
-    <button class='choice-btn' onclick='checkDoor()'>문 확인</button>`);
+    show(`
+        러그 아래
+        <br><br>
+        <img src="images/rug2.png"
+        class="popup-img"
+        onclick="checkDoor()">
+        <br>자물쇠 클릭
+    `,
+    `<button class='choice-btn' onclick='closePopup()'>닫기</button>`);
 }
 
 function checkDoor(){
 
     if(hasItem("key")){
-
         localStorage.setItem("basementOpened","true");
-        document.getElementById("basementBtn").style.display="block";
-
         location.href="underground_passage.html";
-
     } else {
-
         show("열쇠 필요",
-        "<button class='choice-btn' onclick='closePopup()'>확인</button>");
+        `<button class='choice-btn' onclick='closePopup()'>확인</button>`);
     }
 }
 
