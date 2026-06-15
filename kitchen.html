@@ -1,316 +1,487 @@
 <!DOCTYPE html>
+
 <html lang="ko">
+
 <head>
+
 <meta charset="UTF-8">
-<title>RPG MAP EDITOR FINAL PRO</title>
+
+<title>RPG 맵 에디터 FINAL FIX</title>
+
+​
 
 <style>
+
 body{
+
     margin:0;
+
     background:#111;
+
     display:flex;
+
     justify-content:center;
+
     font-family:sans-serif;
+
 }
 
+​
+
 /* ======================
-   MAP
+
+   🗺 맵 영역 (핵심 수정)
+
 ====================== */
+
 .wrapper{
+
     position:relative;
+
     width:900px;
+
+​
+
+    /* 🔥 중요: 반드시 있어야 화면 보임 */
+
+    height:auto;
+
+​
+
     margin-top:20px;
+
 }
+
+​
+
+/* 🔥 이미지 확실히 보이게 */
 
 .wrapper img{
+
     width:100%;
+
+    height:auto;
+
     display:block;
+
 }
 
+​
+
 /* ======================
-   BOX (PX 안정 버전)
+
+   🧱 드래그 박스
+
 ====================== */
+
 .box{
+
     position:absolute;
+
+​
 
     width:120px;
+
     height:120px;
 
+​
+
     background:rgba(255,0,0,0.25);
+
     border:2px dashed red;
 
+​
+
     cursor:grab;
+
+    z-index:10;
+
+​
 
     resize: both;
+
     overflow: hidden;
 
+​
+
     min-width:30px;
+
     min-height:30px;
 
-    transform-origin:center;
-
-    will-change: left, top, width, height, transform;
 }
+
+​
 
 /* ======================
-   🔄 ROTATE ICON (BIG FIX)
+
+   📊 UI 패널
+
 ====================== */
-.rotate-icon{
-    position:absolute;
 
-    top:-30px;
-    left:50%;
-    transform:translateX(-50%);
-
-    width:36px;
-    height:36px;
-
-    background:white;
-    border:2px solid #333;
-    border-radius:50%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:22px;
-    cursor:grab;
-
-    box-shadow:0 2px 8px rgba(0,0,0,0.4);
-    user-select:none;
-}
-
-.rotate-icon::after{
-    content:"🔄";
-}
-
-/* ======================
-   PANEL
-====================== */
 #panel{
+
     position:fixed;
+
     top:20px;
+
     left:20px;
 
+​
+
     width:520px;
+
     background:white;
+
     padding:18px;
+
     border-radius:12px;
+
+​
+
+    font-size:16px;
+
     z-index:999;
+
 }
+
+​
 
 textarea{
+
     width:100%;
+
     height:240px;
+
     margin-top:10px;
+
 }
 
+​
+
 button{
+
     width:100%;
+
     padding:10px;
+
     margin-top:8px;
+
     cursor:pointer;
+
 }
+
+​
+
+#info{
+
+    font-weight:bold;
+
+    margin-top:10px;
+
+}
+
+​
+
+/* 드래그 상태 */
+
+.dragging{
+
+    cursor:grabbing !important;
+
+}
+
 </style>
+
 </head>
+
+​
 
 <body>
 
+​
+
 <!-- ======================
-   PANEL
+
+   📊 UI 패널
+
 ====================== -->
+
 <div id="panel">
-<b>🎮 RPG MAP EDITOR FINAL PRO</b>
+
+<b>🎮 FINAL MAP EDITOR FIX</b>
+
+​
+
+<div id="info">이미지 안 보이는 문제 해결 버전</div>
+
+​
 
 <textarea id="output"></textarea>
 
-<button onclick="addBox()">➕ 오브젝트 추가</button>
+​
+
+<button onclick="addBox()">➕ 박스 추가</button>
+
 <button onclick="copyCode()">📋 복사</button>
+
 </div>
 
+​
+
 <!-- ======================
-   MAP
+
+   🗺 맵
+
 ====================== -->
+
 <div class="wrapper" id="map">
-    <img src="images/house_inside.png">
+
+​
+
+    <!-- 🔥 여기 이미지 넣는 곳 -->
+
+    <img src="images/kitchen_bg.png">
+
+​
+
 </div>
+
+​
 
 <script>
 
+​
+
 let activeBox = null;
-let activeRotateBox = null;
 
 let offsetX = 0;
+
 let offsetY = 0;
 
+​
+
 /* ======================
-   CREATE
+
+   ➕ 박스 생성
+
 ====================== */
+
 function addBox(){
 
+​
+
     const box = document.createElement("div");
+
     box.className = "box";
 
-    box.style.left = "100px";
-    box.style.top = "100px";
+​
 
-    box.dataset.name = prompt("이름 입력") || "object";
-    box.dataset.rotate = 0;
+    box.style.left = "50%";
 
-    const icon = document.createElement("div");
-    icon.className = "rotate-icon";
+    box.style.top = "50%";
 
-    box.appendChild(icon);
+​
+
     document.getElementById("map").appendChild(box);
 
+​
+
     enableDrag(box);
-    enableRotate(icon, box);
+
 }
 
+​
+
 /* ======================
-   DRAG (PX FIX)
+
+   🖱 드래그
+
 ====================== */
+
 function enableDrag(box){
+
+​
 
     box.addEventListener("mousedown",(e)=>{
 
-        if(e.target.classList.contains("rotate-icon")) return;
+​
+
+        // resize 영역 클릭이면 드래그 안함
+
+        if(e.offsetX > box.clientWidth - 20 &&
+
+           e.offsetY > box.clientHeight - 20){
+
+            return;
+
+        }
+
+​
 
         activeBox = box;
 
-        const rect = box.getBoundingClientRect();
+​
 
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
+        offsetX = e.offsetX;
+
+        offsetY = e.offsetY;
+
+​
+
+        box.classList.add("dragging");
+
     });
+
 }
 
-/* ======================
-   ROTATE (STABLE FIX)
-====================== */
-let startAngle = 0;
-let startRotate = 0;
-
-function enableRotate(icon, box){
-
-    icon.addEventListener("mousedown",(e)=>{
-
-        activeRotateBox = box;
-
-        const r = box.getBoundingClientRect();
-
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-
-        startAngle =
-        Math.atan2(e.clientY - cy, e.clientX - cx);
-
-        startRotate =
-        parseFloat(box.dataset.rotate || 0);
-
-        e.stopPropagation();
-    });
-}
+​
 
 /* ======================
-   MOVE + ROTATE
+
+   📌 이동 (100% 기준)
+
 ====================== */
+
 document.addEventListener("mousemove",(e)=>{
 
+​
+
+    if(!activeBox) return;
+
+​
+
     const map = document.getElementById("map");
+
     const rect = map.getBoundingClientRect();
 
-    /* DRAG */
-    if(activeBox){
+​
 
-        let x = e.clientX - rect.left - offsetX;
-        let y = e.clientY - rect.top - offsetY;
+    let x = e.clientX - rect.left - offsetX;
 
-        activeBox.style.left = x + "px";
-        activeBox.style.top = y + "px";
+    let y = e.clientY - rect.top - offsetY;
 
-        updateOutput();
-    }
+​
 
-    /* ROTATE */
-    if(activeRotateBox){
+    activeBox.style.left = (x / rect.width * 100) + "%";
 
-        const r = activeRotateBox.getBoundingClientRect();
+    activeBox.style.top = (y / rect.height * 100) + "%";
 
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
+​
 
-        const currentAngle =
-        Math.atan2(e.clientY - cy, e.clientX - cx);
+    updateOutput();
 
-        let delta = currentAngle - startAngle;
-
-        let finalAngle =
-        startRotate + delta * (180 / Math.PI);
-
-        activeRotateBox.style.transform =
-        `rotate(${finalAngle}deg)`;
-
-        activeRotateBox.dataset.rotate = finalAngle;
-
-        updateOutput();
-    }
 });
+
+​
 
 document.addEventListener("mouseup",()=>{
 
+​
+
+    if(activeBox){
+
+        activeBox.classList.remove("dragging");
+
+    }
+
+​
+
     activeBox = null;
-    activeRotateBox = null;
+
 });
 
+​
+
 /* ======================
-   OUTPUT
+
+   📊 코드 생성
+
 ====================== */
+
 function updateOutput(){
 
+​
+
     const boxes = document.querySelectorAll(".box");
+
     const map = document.getElementById("map").getBoundingClientRect();
+
+​
 
     let result = "";
 
-    boxes.forEach((b)=>{
+​
+
+    boxes.forEach((b,i)=>{
+
+​
 
         const rect = b.getBoundingClientRect();
 
-        let x = rect.left - map.left;
-        let y = rect.top - map.top;
-        let w = rect.width;
-        let h = rect.height;
+​
 
-        let rot = b.dataset.rotate || 0;
-        let name = b.dataset.name;
+        let x = ((rect.left - map.left) / map.width * 100).toFixed(1);
 
-        result += `/* ${name} */\n`;
-        result += `.${name}{
-  left:${x}px;
-  top:${y}px;
-  width:${w}px;
-  height:${h}px;
-  transform:rotate(${rot}deg);
+        let y = ((rect.top - map.top) / map.height * 100).toFixed(1);
+
+​
+
+        let w = (rect.width / map.width * 100).toFixed(1);
+
+        let h = (rect.height / map.height * 100).toFixed(1);
+
+​
+
+        result += `.zone${i}{
+
+  left:${x}%;
+
+  top:${y}%;
+
+  width:${w}%;
+
+  height:${h}%;
+
 }\n\n`;
+
     });
 
+​
+
     document.getElementById("output").value = result;
+
 }
+
+​
 
 /* ======================
-   COPY
+
+   📋 복사
+
 ====================== */
+
 function copyCode(){
 
+​
+
     const t = document.getElementById("output");
+
     t.select();
+
     document.execCommand("copy");
 
+​
+
     alert("복사 완료!");
+
 }
+
+​
 
 </script>
 
+​
+
 </body>
+
 </html>
