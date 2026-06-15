@@ -6,86 +6,119 @@
 <title>인벤토리</title>
 
 <link rel="stylesheet" href="css/style.css">
+
+<style>
+.inventory-page{
+    display:flex;
+    justify-content:center;
+    padding:40px;
+    font-family:'GmarketSans', sans-serif;
+}
+
+.inventory-box{
+    width:90%;
+    max-width:500px;
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:20px;
+    text-align:center;
+}
+
+.inventory-item{
+    background:#fff;
+    margin:10px 0;
+    padding:10px;
+    border-radius:15px;
+    border:2px solid #c89b5d;
+    font-size:18px;
+}
+
+.choice-btn{
+    width:100%;
+    margin-top:20px;
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    color:white;
+    cursor:pointer;
+    font-size:18px;
+}
+</style>
 </head>
 
 <body>
 
-<!-- 🎒 인벤토리 전체 -->
 <div class="inventory-page">
 
     <div class="inventory-box">
 
         <h2>🎒 인벤토리</h2>
 
-        <!-- 아이템 리스트 -->
         <div id="inventoryItems"></div>
 
-        <!-- 돌아가기 버튼 -->
-        <button class="choice-btn"
-        onclick="goBack()">
-
+        <button class="choice-btn" onclick="goBack()">
             게임으로 돌아가기
-
         </button>
 
     </div>
 
 </div>
 
-<!-- JS 연결 -->
 <script src="js/inventory.js"></script>
 
 <script>
 
 /* =========================
-   인벤토리 렌더링
+   ITEM RENDER FIX
 ========================= */
-
 function renderInventory(){
 
-    const list =
-    document.getElementById("inventoryItems");
-
-    const items =
-    getInventory();
+    const list = document.getElementById("inventoryItems");
+    const items = getInventory();
 
     if(items.length === 0){
-
-        list.innerHTML =
-        "<div class='inventory-item'>비어있음</div>";
-
+        list.innerHTML = "<div class='inventory-item'>비어있음</div>";
         return;
     }
 
     const data = {
-        goldenApple : {
-            name : "🍎 황금 사과"
-        },
-        axe : {
-            name : "🪓 도끼"
-        },
-        flower : {
-            name : "🌸 꽃"
-        }
+        bubbletea : "🍹 흑당 버블티",
+        jjamppong : "🍜 짬뽕",
+        flower : "🌸 꽃",
+        axe : "🪓 도끼",
+        shield : "🛡 방패",
+        key : "🔑 열쇠",
+        heart : "💖 하트 생명"
     };
 
     list.innerHTML = items.map(item => {
-
         return `
-        <div class="inventory-item">
-
-            ${data[item]?.name || item}
-
-        </div>
+            <div class="inventory-item">
+                ${data[item] || item}
+            </div>
         `;
-
     }).join("");
 }
 
 /* =========================
-   시작 시 실행
+   돌아가기 FIX (핵심)
 ========================= */
+function goBack(){
 
+    const last = localStorage.getItem("lastPage");
+
+    if(last){
+        location.href = last;
+    }else{
+        location.href = "room1.html";
+    }
+}
+
+/* =========================
+   START
+========================= */
 window.addEventListener("DOMContentLoaded", () => {
     renderInventory();
 });
