@@ -26,34 +26,13 @@ body{
 .zone{
     position:absolute;
     cursor:pointer;
-    background:rgba(255,255,255,0);
 }
 
-/* 싱크대 */
-.sink-zone{
-    left:12.9%;
-    top:44.6%;
-    width:13.8%;
-    height:7.8%;
-}
+/* zones */
+.sink-zone{ left:12.9%; top:44.6%; width:13.8%; height:7.8%; }
+.fire-zone{ left:45.8%; top:43.3%; width:15.6%; height:9.9%; }
+.fridge-zone{ left:74.9%; top:32.5%; width:15.6%; height:13.5%; }
 
-/* 화로 */
-.fire-zone{
-    left:45.8%;
-    top:43.3%;
-    width:15.6%;
-    height:9.9%;
-}
-
-/* 냉장고 */
-.fridge-zone{
-    left:74.9%;
-    top:32.5%;
-    width:15.6%;
-    height:13.5%;
-}
-
-/* 러그 */
 .rug-zone{
     position:absolute;
     left:211px;
@@ -64,7 +43,7 @@ body{
     cursor:pointer;
 }
 
-/* 버튼 */
+/* 돌아가기 (동굴 스타일) */
 .back-btn{
     position:absolute;
     bottom:3%;
@@ -75,8 +54,11 @@ body{
     border-radius:30px;
     padding:12px 30px;
     cursor:pointer;
+    font-size:18px;
+    color:#5b3719;
 }
 
+/* 인벤토리 */
 .inventory-btn{
     position:fixed;
     top:15px;
@@ -90,7 +72,7 @@ body{
     cursor:pointer;
 }
 
-/* basement */
+/* 지하 버튼 */
 .basement-btn{
     position:absolute;
     left:50%;
@@ -132,6 +114,12 @@ body{
     border-radius:20px;
     background:#ff9fd2;
     color:white;
+    cursor:pointer;
+}
+
+img.popup-img{
+    width:200px;
+    margin:10px 0;
 }
 </style>
 </head>
@@ -146,7 +134,7 @@ body{
     <div class="zone sink-zone" onclick="getIce()"></div>
 
     <!-- 화로 -->
-    <div class="zone fire-zone" onclick="getTiramisu()"></div>
+    <div class="zone fire-zone" onclick="getCake()"></div>
 
     <!-- 냉장고 -->
     <div class="zone fridge-zone" onclick="openFridge()"></div>
@@ -183,9 +171,6 @@ onclick="location.href='inventory.html'">🎒</button>
 
 <script>
 
-/* ======================
-   INIT
-====================== */
 window.onload = () => {
 
     localStorage.setItem("lastPage","kitchen.html");
@@ -210,32 +195,33 @@ function closePopup(){
 ====================== */
 function getIce(){
     addItem("iceAmericano");
-    show("아이스 아메리카노",
+    show("아이스 아메리카노<br>겁나 차갑다",
     "<button class='choice-btn' onclick='closePopup()'>확인</button>");
 }
 
 /* ======================
    화로
 ====================== */
-function getTiramisu(){
+function getCake(){
     addItem("tiramisu");
-    show("티라미수",
+    show("티라미수<br>달콤해보인다",
     "<button class='choice-btn' onclick='closePopup()'>확인</button>");
 }
 
 /* ======================
-   냉장고 (하트 1회 제한)
+   냉장고 3단계
 ====================== */
 function openFridge(){
 
     show("냉장고",
-    "<button class='choice-btn' onclick='getHeart()'>갈비찜</button>");
+    `<img class='popup-img' src='images/fridge.png'><br>
+    <button class='choice-btn' onclick='openMeat()'>갈비찜</button>`);
 }
 
-function getHeart(){
+function openMeat(){
 
     if(hasItem("heart")){
-        show("이미 있음",
+        show("이미 하트 있음",
         "<button class='choice-btn' onclick='closePopup()'>확인</button>");
         return;
     }
@@ -247,12 +233,20 @@ function getHeart(){
 }
 
 /* ======================
-   러그
+   러그 3단계
 ====================== */
 function openRug(){
 
     show("러그",
-    "<button class='choice-btn' onclick='checkDoor()'>확인</button>");
+    `<img class='popup-img' src='images/rug1.png'><br>
+    <button class='choice-btn' onclick='rug2()'>확인</button>`);
+}
+
+function rug2(){
+
+    show("러그 아래",
+    `<img class='popup-img' src='images/rug2.png'><br>
+    <button class='choice-btn' onclick='checkDoor()'>문 확인</button>`);
 }
 
 function checkDoor(){
