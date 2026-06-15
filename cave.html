@@ -35,7 +35,7 @@ body{
 }
 
 /* ======================
-   🪨 방패 (클릭 아이템)
+   🛡 방패
 ====================== */
 .shield-item{
     position:absolute;
@@ -172,6 +172,7 @@ body{
     <!-- 🛡 방패 -->
     <img src="images/shield.png"
          class="shield-item"
+         id="shield"
          onclick="getShield()">
 
     <!-- 문 -->
@@ -220,7 +221,7 @@ onclick="location.href='inventory.html'">🎒</button>
 <script>
 
 /* ======================
-   팝업
+   POPUP
 ====================== */
 function openPopup(){
     document.getElementById("popup").style.display = "flex";
@@ -235,7 +236,6 @@ function closePopup(){
    RESET
 ====================== */
 function resetPopup(){
-
     document.getElementById("popupContent").innerHTML =
     "문을 어떻게 열지?";
 
@@ -263,7 +263,7 @@ function useHand(){
 ====================== */
 function useAxe(){
 
-    if(hasItem("images/axe.png")){
+    if(hasItem("axe")){
 
         document.getElementById("popupContent").innerHTML =
         "깡! 깡!<br><br>문이 열렸다!";
@@ -272,7 +272,7 @@ function useAxe(){
             <button class="choice-btn" onclick="enterCave()">들어가기</button>
         `;
 
-        removeItem("images/axe.png");
+        removeItem("axe");
 
     } else {
 
@@ -286,11 +286,16 @@ function useAxe(){
 }
 
 /* ======================
-   방패 획득 (클릭)
+   방패 획득 (클릭 + 사라짐)
 ====================== */
 function getShield(){
 
-    addItem("images/shield.png");
+    if(hasItem("shield")) return;
+
+    addItem("shield");
+
+    // 🔥 화면에서 제거
+    document.getElementById("shield").style.display = "none";
 
     document.getElementById("popupContent").innerHTML =
     "🛡 방패를 얻었다!";
@@ -308,7 +313,9 @@ function getShield(){
 function enterCave(){
 
     localStorage.setItem("caveOpened", "true");
-    localStorage.setItem("lastPage", "cave.html"); // 🔥 핵심 수정
+
+    // 🔥 중요: 복귀용 저장
+    localStorage.setItem("lastPage", "cave.html");
 
     location.href = "cave_inside.html";
 }
