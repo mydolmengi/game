@@ -20,7 +20,7 @@ body{
 }
 
 /* =========================
-   게임 화면
+   GAME
 ========================= */
 .game{
     position:relative;
@@ -33,7 +33,7 @@ body{
 }
 
 /* =========================
-   공통 클릭 영역
+   ZONE
 ========================= */
 .zone{
     position:absolute;
@@ -41,9 +41,7 @@ body{
     background:rgba(255,255,255,0);
 }
 
-/* =========================
-   🛏 침대
-========================= */
+/* 침대 */
 .bed{
     left:4.0%;
     top:48.4%;
@@ -51,9 +49,7 @@ body{
     height:14.2%;
 }
 
-/* =========================
-   👕 옷장
-========================= */
+/* 옷장 */
 .closet{
     left:23.9%;
     top:29.0%;
@@ -61,9 +57,7 @@ body{
     height:20.7%;
 }
 
-/* =========================
-   📚 책장
-========================= */
+/* 책장 */
 .bookshelf{
     left:43.2%;
     top:33.0%;
@@ -71,9 +65,7 @@ body{
     height:13.7%;
 }
 
-/* =========================
-   🖼 액자
-========================= */
+/* 액자 */
 .frame{
     left:53.1%;
     top:29.1%;
@@ -81,9 +73,7 @@ body{
     height:8.6%;
 }
 
-/* =========================
-   🍳 부엌
-========================= */
+/* 주방 */
 .kitchen{
     left:66.9%;
     top:23.7%;
@@ -91,9 +81,7 @@ body{
     height:25.4%;
 }
 
-/* =========================
-   📦 상자
-========================= */
+/* 상자 */
 .box{
     left:89.7%;
     top:49.5%;
@@ -102,9 +90,8 @@ body{
 }
 
 /* =========================
-   버튼
+   BUTTON
 ========================= */
-
 .back-btn{
     position:absolute;
     bottom:3%;
@@ -115,7 +102,6 @@ body{
     border:5px solid #c89b5d;
     border-radius:25px;
     cursor:pointer;
-    font-size:18px;
 }
 
 .inventory-btn{
@@ -133,7 +119,7 @@ body{
 }
 
 /* =========================
-   팝업
+   POPUP
 ========================= */
 .popup{
     position:fixed;
@@ -199,22 +185,28 @@ body{
     <img src="images/house_inside.png" class="bg">
 
     <!-- 🛏 침대 -->
-    <div class="zone bed" onclick="getItem('bubbleTea','흑당 버블티','꿀맛도리 흑당 버블버블티~~~')"></div>
+    <div class="zone bed"
+    onclick="getItem('bubbleTea','images/bubble_tea.png','흑당 버블티','꿀맛도리 흑당 버블버블티~~~')"></div>
 
     <!-- 👕 옷장 -->
-    <div class="zone closet" onclick="getItem('jjamppong','짬뽕','얼큰 짬뽕')"></div>
+    <div class="zone closet"
+    onclick="getItem('jjamppong','images/jjamppong.png','짬뽕','얼큰 짬뽕')"></div>
 
     <!-- 📚 책장 -->
-    <div class="zone bookshelf" onclick="showPhoto('사진1','책장 사진')"></div>
+    <div class="zone bookshelf"
+    onclick="showPhoto('images/photo1.png','사진1','책장 사진')"></div>
 
     <!-- 🖼 액자 -->
-    <div class="zone frame" onclick="showPhoto('사진2','행복해 보인다.....')"></div>
+    <div class="zone frame"
+    onclick="showPhoto('images/photo2.png','사진2','행복해 보인다.....')"></div>
 
     <!-- 🍳 주방 -->
-    <div class="zone kitchen" onclick="location.href='kitchen.html'"></div>
+    <div class="zone kitchen"
+    onclick="location.href='kitchen.html'"></div>
 
     <!-- 📦 상자 -->
-    <div class="zone box" onclick="openBox()"></div>
+    <div class="zone box"
+    onclick="openBox()"></div>
 
     <!-- ↩ -->
     <button class="back-btn" onclick="location.href='room2.html'">
@@ -226,7 +218,7 @@ body{
 <!-- 🎒 인벤토리 -->
 <button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
 
-<!-- 팝업 -->
+<!-- POPUP -->
 <div class="popup" id="popup">
     <div class="popup-box">
         <button class="close-btn" onclick="closePopup()">✕</button>
@@ -242,50 +234,71 @@ body{
 <script>
 
 /* =========================
-   팝업
+   POPUP
 ========================= */
 function openPopup(t,b,a){
-    document.getElementById("title").innerHTML=t;
-    document.getElementById("body").innerHTML=b;
-    document.getElementById("actions").innerHTML=a;
-    document.getElementById("popup").style.display="flex";
+    document.getElementById("title").innerHTML = t;
+    document.getElementById("body").innerHTML = b;
+    document.getElementById("actions").innerHTML = a;
+    document.getElementById("popup").style.display = "flex";
 }
 
 function closePopup(){
-    document.getElementById("popup").style.display="none";
+    document.getElementById("popup").style.display = "none";
 }
 
 /* =========================
-   아이템 획득
+   ITEM (IMAGE FIXED)
 ========================= */
-function getItem(id,title,desc){
+function getItem(id,img,title,desc){
 
-    if(!hasItem(id)){
-        addItem(id);
+    if(!hasItem(img)){
+        addItem(img);
     }
 
-    openPopup(title,desc,`<button class="choice-btn" onclick="closePopup()">확인</button>`);
+    openPopup(
+        title,
+        `<img src="${img}" style="width:180px; margin:10px 0;"><br>${desc}`,
+        `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    );
 }
 
 /* =========================
-   사진
+   PHOTO
 ========================= */
-function showPhoto(name,desc){
-    openPopup(name,desc,`<button class="choice-btn" onclick="closePopup()">확인</button>`);
+function showPhoto(img,title,desc){
+
+    openPopup(
+        title,
+        `<img src="${img}" style="width:200px; margin:10px 0;"><br>${desc}`,
+        `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    );
 }
 
 /* =========================
-   상자 (키패드)
+   BOX (KEYPAD)
 ========================= */
 function openBox(){
 
     const code = prompt("비밀번호 입력");
 
     if(code === "8297"){
-        addItem("key");
-        openPopup("상자","열쇠를 얻었다!","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+
+        addItem("images/key.png");
+
+        openPopup(
+            "상자",
+            "열쇠를 얻었다!",
+            `<button class='choice-btn' onclick='closePopup()'>확인</button>`
+        );
+
     }else{
-        openPopup("상자","바보... 그거 아닌데..","<button class='choice-btn' onclick='closePopup()'>확인</button>");
+
+        openPopup(
+            "상자",
+            "바보... 그거 아닌데..",
+            `<button class='choice-btn' onclick='closePopup()'>확인</button>`
+        );
     }
 }
 
