@@ -35,7 +35,6 @@ body{
     cursor:pointer;
 }
 
-/* 마녀 이동 */
 .enter-btn{
     position:absolute;
     left:50%;
@@ -44,7 +43,6 @@ body{
     display:none;
 }
 
-/* 돌아가기 */
 .back-btn{
     position:absolute;
     bottom:3%;
@@ -74,13 +72,11 @@ body{
 
     <img src="images/cave_inside.png" class="bg">
 
-    <!-- 마녀 이동 -->
     <button class="game-btn enter-btn" id="enterBtn"
     onclick="location.href='cave_mage.html'">
         마녀의 집으로 바로가기
     </button>
 
-    <!-- 돌아가기 -->
     <button class="game-btn back-btn"
     onclick="location.href='cave.html'">
         돌아가기
@@ -94,14 +90,14 @@ onclick="location.href='inventory.html'">🎒</button>
 <script>
 
 /* ======================
-   상태 체크 (핵심 수정)
+   복귀 시스템 FIX
 ====================== */
 window.addEventListener("DOMContentLoaded", () => {
 
     localStorage.setItem("lastPage","cave_inside.html");
 
-    if(localStorage.getItem("caveUnlocked") === "true"){
-        document.getElementById("enterBtn").style.display = "block";
+    if(localStorage.getItem("caveUnlocked")==="true"){
+        document.getElementById("enterBtn").style.display="block";
     }
 });
 
