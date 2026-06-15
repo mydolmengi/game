@@ -35,7 +35,7 @@ body{
     cursor:pointer;
 }
 
-/* 바로가기 버튼 */
+/* 마녀 이동 버튼 */
 .enter-btn{
     position:absolute;
     left:50%;
@@ -74,13 +74,13 @@ body{
 
     <img src="images/cave_inside.png" class="bg">
 
-    <!-- 🔥 마녀 집으로 이동 버튼 -->
+    <!-- 마녀 이동 -->
     <button class="game-btn enter-btn" id="enterBtn"
     onclick="location.href='cave_mage.html'">
         마녀의 집으로 바로가기
     </button>
 
-    <!-- ↩ 돌아가기 -->
+    <!-- 돌아가기 -->
     <button class="game-btn back-btn"
     onclick="location.href='cave.html'">
         돌아가기
@@ -88,25 +88,29 @@ body{
 
 </div>
 
-<!-- 🎒 인벤토리 -->
+<!-- 인벤 -->
 <button class="inventory-btn"
 onclick="location.href='inventory.html'">🎒</button>
 
 <script>
 
-/* ======================
-   핵심 FIX
-====================== */
-window.onload = function(){
+/* =========================
+   SAFE INIT (FULL FIX)
+========================= */
+window.addEventListener("DOMContentLoaded", () => {
 
-    // 🔥 동굴 입구 클리어 상태 체크
-    if(localStorage.getItem("caveOpened") === "true"){
-        document.getElementById("enterBtn").style.display = "block";
-    }
-
-    // 현재 위치 저장 (인벤 복귀용)
+    // 현재 위치 저장
     localStorage.setItem("lastPage","cave_inside.html");
-};
+
+    // 버튼 안전 호출
+    const enterBtn = document.getElementById("enterBtn");
+
+    const isOpened = localStorage.getItem("caveOpened");
+
+    if(isOpened === "true" && enterBtn){
+        enterBtn.style.display = "block";
+    }
+});
 
 </script>
 
