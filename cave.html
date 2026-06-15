@@ -3,11 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>동굴 내부</title>
+<title>동굴 입구</title>
 
 <style>
-body{
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
+
+*{
     margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
     background:#000;
     font-family:'GmarketSans', sans-serif;
     display:flex;
@@ -16,12 +26,34 @@ body{
 
 .game{
     position:relative;
-    width:min(100%,900px);
+    width:min(100%, 900px);
 }
 
 .bg{
     width:100%;
     display:block;
+}
+
+/* 🛡 방패 */
+.shield-item{
+    position:absolute;
+    left:8%;
+    bottom:10%;
+    width:12%;
+    cursor:pointer;
+    z-index:5;
+}
+
+/* 🚪 문 */
+.door{
+    position:absolute;
+    left:35%;
+    top:28%;
+    width:30%;
+    height:35%;
+    cursor:pointer;
+    background:rgba(0,255,0,0.25);
+    border:3px solid lime;
 }
 
 /* 버튼 */
@@ -35,21 +67,20 @@ body{
     cursor:pointer;
 }
 
-/* 마녀 이동 버튼 */
-.enter-btn{
-    position:absolute;
-    left:50%;
-    top:55%;
-    transform:translateX(-50%);
-    display:none;
-}
-
-/* 돌아가기 */
 .back-btn{
     position:absolute;
     bottom:3%;
     left:50%;
     transform:translateX(-50%);
+}
+
+/* 🔥 바로 들어가기 버튼 */
+.enter-btn{
+    position:absolute;
+    left:50%;
+    top:52%;
+    transform:translateX(-50%);
+    display:none;
 }
 
 /* 인벤토리 */
@@ -65,6 +96,61 @@ body{
     font-size:30px;
     cursor:pointer;
 }
+
+/* 팝업 */
+.popup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+.popup-box{
+    position:relative;
+    width:85%;
+    max-width:500px;
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:25px;
+    text-align:center;
+}
+
+.close-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    background:#ff9fd2;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.popup-title{
+    font-size:22px;
+    color:#5b3719;
+    margin-bottom:15px;
+}
+
+.choice-btn{
+    display:block;
+    width:100%;
+    margin:10px 0;
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
 </style>
 </head>
 
@@ -72,45 +158,161 @@ body{
 
 <div class="game">
 
-    <img src="images/cave_inside.png" class="bg">
+    <img src="images/cave.png" class="bg">
 
-    <!-- 마녀 이동 -->
+    <!-- 🛡 방패 -->
+    <img src="images/shield.png"
+         class="shield-item"
+         id="shield"
+         onclick="getShield()">
+
+    <!-- 🚪 문 -->
+    <div class="door" onclick="openPopup()"></div>
+
+    <!-- 🔥 바로 들어가기 -->
     <button class="game-btn enter-btn" id="enterBtn"
-    onclick="location.href='cave_mage.html'">
-        마녀의 집으로 바로가기
+    onclick="location.href='cave_inside.html'">
+        🚪 바로 들어가기
     </button>
 
-    <!-- 돌아가기 -->
+    <!-- ↩ 돌아가기 -->
     <button class="game-btn back-btn"
-    onclick="location.href='cave.html'">
-        돌아가기
+    onclick="location.href='room1.html'">
+        ↩ 돌아가기
     </button>
 
 </div>
 
-<!-- 인벤 -->
+<!-- 🎒 인벤토리 -->
 <button class="inventory-btn"
 onclick="location.href='inventory.html'">🎒</button>
 
+<!-- 팝업 -->
+<div class="popup" id="popup">
+
+    <div class="popup-box">
+
+        <button class="close-btn" onclick="closePopup()">✕</button>
+
+        <div class="popup-title" id="popupContent">
+            문을 어떻게 열지?
+        </div>
+
+        <div id="buttons">
+            <button class="choice-btn" onclick="useHand()">✋ 손</button>
+            <button class="choice-btn" onclick="useAxe()">🪓 도끼</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/inventory.js"></script>
+
 <script>
 
-/* =========================
-   SAFE INIT (FULL FIX)
-========================= */
-window.addEventListener("DOMContentLoaded", () => {
+/* ======================
+   POPUP
+====================== */
+function openPopup(){
+    document.getElementById("popup").style.display = "flex";
+    resetPopup();
+}
 
-    // 현재 위치 저장
-    localStorage.setItem("lastPage","cave_inside.html");
+function closePopup(){
+    document.getElementById("popup").style.display = "none";
+}
 
-    // 버튼 안전 호출
-    const enterBtn = document.getElementById("enterBtn");
+/* ======================
+   RESET
+====================== */
+function resetPopup(){
+    document.getElementById("popupContent").innerHTML =
+    "문을 어떻게 열지?";
 
-    const isOpened = localStorage.getItem("caveOpened");
+    document.getElementById("buttons").innerHTML = `
+        <button class="choice-btn" onclick="useHand()">✋ 손</button>
+        <button class="choice-btn" onclick="useAxe()">🪓 도끼</button>
+    `;
+}
 
-    if(isOpened === "true" && enterBtn){
-        enterBtn.style.display = "block";
+/* ======================
+   손
+====================== */
+function useHand(){
+
+    document.getElementById("popupContent").innerHTML =
+    "아야얏,<br>너무 단단해서 열 수가 없어.....";
+
+    document.getElementById("buttons").innerHTML = `
+        <button class="choice-btn" onclick="resetPopup()">확인</button>
+    `;
+}
+
+/* ======================
+   도끼 (FIXED + BUTTON FIX)
+====================== */
+function useAxe(){
+
+    if(hasItem("axe")){
+
+        document.getElementById("popupContent").innerHTML =
+        "깡! 깡!<br><br>문이 열렸다!";
+
+        document.getElementById("buttons").innerHTML = `
+            <button class="choice-btn" onclick="enterCave()">들어가기</button>
+        `;
+
+        removeItem("axe");
+
+        // 🔥 핵심: 버튼 생성
+        document.getElementById("enterBtn").style.display = "block";
+
+        // 상태 저장
+        localStorage.setItem("caveOpened", "true");
     }
-});
+    else{
+        document.getElementById("popupContent").innerHTML =
+        "도끼가 없다..!";
+
+        document.getElementById("buttons").innerHTML = `
+            <button class="choice-btn" onclick="resetPopup()">확인</button>
+        `;
+    }
+}
+
+/* ======================
+   방패 획득 (클릭 + 삭제)
+====================== */
+function getShield(){
+
+    if(hasItem("shield")) return;
+
+    addItem("shield");
+
+    // 🔥 화면에서 제거
+    document.getElementById("shield").style.display = "none";
+
+    document.getElementById("popupContent").innerHTML =
+    "🛡 방패를 얻었다!";
+
+    document.getElementById("buttons").innerHTML = `
+        <button class="choice-btn" onclick="closePopup()">확인</button>
+    `;
+
+    document.getElementById("popup").style.display = "flex";
+}
+
+/* ======================
+   이동
+====================== */
+function enterCave(){
+
+    localStorage.setItem("caveOpened", "true");
+    localStorage.setItem("lastPage", "cave.html");
+
+    location.href = "cave_inside.html";
+}
 
 </script>
 
