@@ -47,7 +47,7 @@ body{
     box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
-/* 마녀 이동 */
+/* 이동 버튼 */
 .enter-btn{
     position:absolute;
     left:50%;
@@ -56,7 +56,6 @@ body{
     display:none;
 }
 
-/* 돌아가기 */
 .back-btn{
     position:absolute;
     bottom:3%;
@@ -77,6 +76,14 @@ body{
     font-size:30px;
     cursor:pointer;
 }
+
+/* 선택 UI */
+.choice-box{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:10px;
+}
 </style>
 </head>
 
@@ -86,7 +93,7 @@ body{
 
     <img src="images/cave_inside.png" class="bg">
 
-    <!-- 🗣 혼잣말 UI -->
+    <!-- 대사 -->
     <div id="dialog"
         style="
         position:absolute;
@@ -106,7 +113,7 @@ body{
         와... 여기는 어디지?
     </div>
 
-    <!-- 다음 버튼 -->
+    <!-- 다음 -->
     <button class="game-btn"
         id="nextBtn"
         style="position:absolute; bottom:8%; left:50%; transform:translateX(-50%);"
@@ -114,7 +121,7 @@ body{
         다음
     </button>
 
-    <!-- 마녀 이동 -->
+    <!-- 이동 -->
     <button class="game-btn enter-btn" id="enterBtn"
     onclick="location.href='cave_mage.html'">
         마녀의 집으로 바로가기
@@ -128,7 +135,6 @@ body{
 
 </div>
 
-<!-- 인벤토리 -->
 <button class="inventory-btn"
 onclick="location.href='inventory.html'">🎒</button>
 
@@ -141,8 +147,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
     localStorage.setItem("lastPage","cave_inside.html");
 
-    if(localStorage.getItem("caveUnlocked")==="true"){
-        document.getElementById("enterBtn").style.display="block";
+    if(localStorage.getItem("caveUnlocked") === "true"){
+        document.getElementById("enterBtn").style.display = "block";
     }
 });
 
@@ -153,9 +159,8 @@ let step = 0;
 
 function nextDialogue(){
 
-    step++;
-
     const dialog = document.getElementById("dialog");
+    step++;
 
     if(step === 1){
         dialog.innerHTML = "안으로 더 들어가볼까?";
@@ -172,16 +177,19 @@ function nextDialogue(){
 }
 
 /* ======================
-   선택지
+   선택 UI
 ====================== */
 function showChoice(){
 
     const dialog = document.getElementById("dialog");
 
     dialog.innerHTML = `
-        <div>어떻게 할까?</div>
-        <button onclick="goIn()" class="game-btn" style="margin-top:10px;">들어간다</button>
-        <button onclick="goOut()" class="game-btn" style="margin-top:10px;">아니야, 나가자</button>
+        어떻게 할까?
+
+        <div class="choice-box">
+            <button class="game-btn" onclick="goIn()">들어간다</button>
+            <button class="game-btn" onclick="goOut()">아니야, 나가자</button>
+        </div>
     `;
 
     document.getElementById("nextBtn").style.display = "none";
@@ -192,8 +200,11 @@ function showChoice(){
 ====================== */
 function goIn(){
 
-    if(localStorage.getItem("shield") === "true" ||
-       localStorage.getItem("hasShield") === "true"){
+    const hasShield =
+        localStorage.getItem("shield") === "true" ||
+        localStorage.getItem("hasShield") === "true";
+
+    if(hasShield){
 
         localStorage.setItem("caveUnlocked","true");
 
@@ -202,17 +213,16 @@ function goIn(){
 
         document.getElementById("enterBtn").style.display = "block";
     }
-
     else{
-
-        document.body.style.background = "#111";
 
         document.getElementById("dialog").innerHTML =
         "??? 쑤쑤숫쑥<br>헉! 화살이다!!!";
 
+        document.getElementById("nextBtn").style.display = "none";
+
         const btn = document.createElement("button");
-        btn.innerHTML = "도망치자";
         btn.className = "game-btn";
+        btn.innerText = "도망치자";
         btn.onclick = () => location.href = "cave.html";
 
         document.getElementById("dialog").appendChild(btn);
