@@ -35,32 +35,22 @@ body{
     display:block;
 }
 
-/* 버튼 */
-.game-btn{
+/* 마녀로 이동 버튼 */
+.enter-btn{
+    position:absolute;
+    left:50%;
+    top:52%;
+    transform:translateX(-50%);
+    display:none;
+    z-index:20;
     background:#f9e9c8;
     border:6px solid #c89b5d;
     border-radius:30px;
-    padding:12px 30px;
+    padding:12px 28px;
     font-size:18px;
     color:#5b3719;
     cursor:pointer;
     box-shadow:0 8px 20px rgba(0,0,0,0.2);
-}
-
-/* 이동 버튼 */
-.enter-btn{
-    position:absolute;
-    left:50%;
-    top:55%;
-    transform:translateX(-50%);
-    display:none;
-}
-
-.back-btn{
-    position:absolute;
-    bottom:3%;
-    left:50%;
-    transform:translateX(-50%);
 }
 
 /* 인벤토리 */
@@ -75,14 +65,73 @@ body{
     background:#ff9fd2;
     font-size:30px;
     cursor:pointer;
+    z-index:999;
+    box-shadow:0 8px 18px rgba(0,0,0,0.2);
 }
 
-/* 선택 UI */
-.choice-box{
+/* 하단 설명창 */
+.dialog-ui{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:31%;
+    background:#efe0ba;
+    border-top:6px solid #b88c49;
+    box-shadow:0 -8px 24px rgba(0,0,0,0.28);
+    padding:18px 18px 14px;
+    z-index:15;
+}
+
+.dialog-ui::before{
+    content:"";
+    position:absolute;
+    inset:10px;
+    border:2px solid rgba(120, 88, 40, 0.18);
+    border-radius:18px;
+    pointer-events:none;
+}
+
+.dialog-name{
+    color:#24509a;
+    font-size:26px;
+    font-weight:900;
+    line-height:1;
+    margin-bottom:8px;
+}
+
+.dialog-text{
+    color:#6b4b28;
+    font-size:23px;
+    line-height:1.7;
+    white-space:pre-line;
+    padding-right:92px;
+    min-height:84px;
+}
+
+.dialog-actions{
+    position:absolute;
+    right:18px;
+    bottom:14px;
     display:flex;
-    flex-direction:column;
     gap:10px;
-    margin-top:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.dialog-btn{
+    background:#f7f1e1;
+    border:4px solid #b88c49;
+    border-radius:18px;
+    padding:10px 16px;
+    font-size:16px;
+    color:#5b3719;
+    cursor:pointer;
+    box-shadow:0 6px 14px rgba(0,0,0,0.12);
+}
+
+.dialog-btn:hover{
+    filter:brightness(0.98);
 }
 </style>
 </head>
@@ -91,148 +140,111 @@ body{
 
 <div class="game">
 
-    <img src="images/cave_inside.png" class="bg">
+    <img src="images/cave_inside.png" class="bg" alt="동굴 내부">
 
-    <!-- 대사 -->
-    <div id="dialog"
-        style="
-        position:absolute;
-        bottom:18%;
-        left:50%;
-        transform:translateX(-50%);
-        width:85%;
-        background:#f9e9c8;
-        border:6px solid #c89b5d;
-        border-radius:25px;
-        padding:18px;
-        font-size:20px;
-        color:#5b3719;
-        text-align:center;
-        box-shadow:0 10px 25px rgba(0,0,0,0.3);
-        ">
-        와... 여기는 어디지?
-    </div>
-
-    <!-- 다음 -->
-    <button class="game-btn"
-        id="nextBtn"
-        style="position:absolute; bottom:8%; left:50%; transform:translateX(-50%);"
-        onclick="nextDialogue()">
-        다음
-    </button>
-
-    <!-- 이동 -->
-    <button class="game-btn enter-btn" id="enterBtn"
-    onclick="location.href='cave_mage.html'">
+    <!-- 마녀 이동 -->
+    <button class="enter-btn" id="enterBtn" onclick="location.href='cave_mage.html'">
         마녀의 집으로 바로가기
     </button>
 
-    <!-- 돌아가기 -->
-    <button class="game-btn back-btn"
-    onclick="location.href='cave.html'">
-        돌아가기
-    </button>
+    <!-- 하단 설명창 -->
+    <div class="dialog-ui">
+        <div class="dialog-name" id="dialogName">혼잣말</div>
+        <div class="dialog-text" id="dialogText">와... 여기는 어디지?</div>
+        <div class="dialog-actions" id="dialogActions">
+            <button class="dialog-btn" id="nextBtn" onclick="nextDialogue()">다음</button>
+        </div>
+    </div>
 
 </div>
 
-<button class="inventory-btn"
-onclick="location.href='inventory.html'">🎒</button>
+<!-- 인벤토리 -->
+<button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
+
+<script src="js/inventory.js"></script>
 
 <script>
+let step = 0;
 
-/* ======================
-   상태 복구
-====================== */
+function setDialog(name, text, actionsHtml){
+    document.getElementById("dialogName").innerText = name;
+    document.getElementById("dialogText").innerHTML = text;
+    document.getElementById("dialogActions").innerHTML = actionsHtml || "";
+}
+
+function syncShieldState(){
+    // 예전 버전에서 shield가 localStorage 플래그로 남아 있던 경우를 흡수
+    const legacyShield =
+        localStorage.getItem("shield") === "true" ||
+        localStorage.getItem("hasShield") === "true";
+
+    if(legacyShield && !hasItem("shield")){
+        addItem("shield");
+    }
+}
+
 window.addEventListener("DOMContentLoaded", () => {
+    localStorage.setItem("lastPage", "cave_inside.html");
+    syncShieldState();
 
-    localStorage.setItem("lastPage","cave_inside.html");
-
-    if(localStorage.getItem("caveUnlocked") === "true"){
+    // 미션이 끝난 뒤에만 버튼 표시
+    if(localStorage.getItem("caveMissionClear") === "true"){
         document.getElementById("enterBtn").style.display = "block";
     }
 });
 
-/* ======================
-   대사 시스템
-====================== */
-let step = 0;
-
 function nextDialogue(){
-
-    const dialog = document.getElementById("dialog");
     step++;
 
     if(step === 1){
-        dialog.innerHTML = "안으로 더 들어가볼까?";
+        setDialog("혼잣말", "안으로 더 들어가볼까?", `<button class="dialog-btn" id="nextBtn" onclick="nextDialogue()">다음</button>`);
     }
-
     else if(step === 2){
-        dialog.innerHTML = "뭔가... 날 보호할 물건이 필요할 것 같다.";
-        document.getElementById("nextBtn").innerText = "선택하기";
+        setDialog("혼잣말", "뭔가... 날 보호할 물건이 필요할 것 같다.", `<button class="dialog-btn" id="nextBtn" onclick="showChoice()">선택하기</button>`);
     }
-
-    else if(step === 3){
+    else if(step >= 3){
         showChoice();
     }
 }
 
-/* ======================
-   선택 UI
-====================== */
 function showChoice(){
-
-    const dialog = document.getElementById("dialog");
-
-    dialog.innerHTML = `
-        어떻게 할까?
-
-        <div class="choice-box">
-            <button class="game-btn" onclick="goIn()">들어간다</button>
-            <button class="game-btn" onclick="goOut()">아니야, 나가자</button>
-        </div>
-    `;
-
-    document.getElementById("nextBtn").style.display = "none";
+    setDialog(
+        "혼잣말",
+        "어떻게 할까?",
+        `
+            <button class="dialog-btn" onclick="goIn()">들어간다</button>
+            <button class="dialog-btn" onclick="goOut()">아니야, 나가자</button>
+        `
+    );
 }
 
-/* ======================
-   선택 결과
-====================== */
 function goIn(){
-
     const hasShield =
+        hasItem("shield") ||                 // 정상 인벤토리
         localStorage.getItem("shield") === "true" ||
         localStorage.getItem("hasShield") === "true";
 
     if(hasShield){
-
-        localStorage.setItem("caveUnlocked","true");
-
-        document.getElementById("dialog").innerHTML =
-        "방패가 나를 보호해준다...!";
-
+        localStorage.setItem("caveMissionClear", "true");
         document.getElementById("enterBtn").style.display = "block";
-    }
-    else{
 
-        document.getElementById("dialog").innerHTML =
-        "??? 쑤쑤숫쑥<br>헉! 화살이다!!!";
-
-        document.getElementById("nextBtn").style.display = "none";
-
-        const btn = document.createElement("button");
-        btn.className = "game-btn";
-        btn.innerText = "도망치자";
-        btn.onclick = () => location.href = "cave.html";
-
-        document.getElementById("dialog").appendChild(btn);
+        setDialog(
+            "혼잣말",
+            "방패가 나를 보호해준다...!",
+            ""
+        );
+    } else {
+        setDialog(
+            "혼잣말",
+            "??? 쑤쑤숫쑥\n헉! 화살이다!!!",
+            `<button class="dialog-btn" onclick="goOut()">도망치자</button>`
+        );
     }
 }
 
 function goOut(){
     location.href = "cave.html";
 }
-
 </script>
 
 </body>
