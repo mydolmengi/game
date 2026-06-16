@@ -1,1 +1,252 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Royal Luxury Invitation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+height:100vh;overflow:hidden;
+display:flex;justify-content:center;align-items:center;
+background:
+radial-gradient(circle at top,#8a6729,#130c07 65%);
+font-family:"Times New Roman",serif;
+}
+.stage{
+position:relative;width:100%;height:100%;
+display:flex;justify-content:center;align-items:center;
+overflow:hidden;
+}
+.particles,.fireworks{position:absolute;inset:0;pointer-events:none}
+.chandelier{
+position:absolute;top:-40px;left:50%;transform:translateX(-50%);
+font-size:120px;color:#ffd70055;
+filter:drop-shadow(0 0 30px gold);
+}
+.envelope{
+position:relative;width:560px;height:360px;
+cursor:pointer;perspective:2000px;
+transition:transform 2s;
+}
+.back{
+position:absolute;inset:0;border-radius:16px;
+background:linear-gradient(#b58b59,#7c5631);
+border:4px solid #d4af37;
+}
+.letter{
+position:absolute;
+left:30px;top:20px;
+width:500px;height:720px;
+padding:45px;
+background:
+radial-gradient(circle at top,rgba(255,255,255,.9),transparent 25%),
+linear-gradient(#fff9eb,#f1ddb0);
+border:6px solid #d4af37;
+box-shadow:0 0 60px rgba(255,215,0,.5);
+opacity:0;
+transform:translateY(250px) scale(.1) rotateX(70deg);
+z-index:2;
+}
+.letter:before{
+content:"";
+position:absolute;inset:12px;
+border:2px solid #d4af37;
+}
+.front{
+position:absolute;left:0;right:0;bottom:0;height:190px;
+background:#aa7d4b;
+clip-path:polygon(0 100%,50% 0,100% 100%);
+z-index:5;
+}
+.flap{
+position:absolute;left:0;right:0;top:0;height:190px;
+background:#c79a61;
+clip-path:polygon(0 0,100% 0,50% 100%);
+transform-origin:top;
+z-index:6;
+}
+.seal{
+position:absolute;left:50%;top:50%;
+transform:translate(-50%,-50%);
+width:90px;height:90px;border-radius:50%;
+background:radial-gradient(circle,#d44,#600);
+display:flex;align-items:center;justify-content:center;
+color:#ffd700;font-size:42px;z-index:8;
+}
+.crown{
+font-size:90px;text-align:center;
+opacity:0;
+background:linear-gradient(45deg,#fff,#ffd700,#ffb700,#fff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+filter:drop-shadow(0 0 20px gold);
+}
+h1{text-align:center;color:#6b4720;letter-spacing:5px;margin-bottom:20px}
+.content{
+opacity:0;text-align:center;line-height:2.1;
+font-size:20px;color:#5a3d1d;
+}
+.open .seal{animation:seal .8s forwards}
+.open .flap{animation:openflap 1.4s .5s forwards,hideenv 1s 4s forwards}
+.open .front,.open .back{animation:hideenv 1s 4s forwards}
+.open .letter{animation:rise 4.5s 1.2s forwards}
+.open .crown{animation:fade 1s 5.2s forwards}
+.open .content{animation:fade 1.2s 5.8s forwards}
+@keyframes seal{to{opacity:0;transform:translate(-50%,-120%) scale(.1) rotate(180deg)}}
+@keyframes openflap{to{transform:rotateX(-180deg)}}
+@keyframes hideenv{to{opacity:0;transform:translateY(400px)}}
+@keyframes rise{
+0%{opacity:0;transform:translateY(250px) scale(.1) rotateX(70deg)}
+30%{opacity:1}
+70%{transform:translateY(-220px) scale(1) rotateX(0)}
+100%{opacity:1;transform:translateY(-280px) scale(1.25) rotateX(0)}
+}
+@keyframes fade{to{opacity:1}}
+.gold{
+position:absolute;width:4px;height:4px;border-radius:50%;
+background:#ffd700;
+animation:fall 5s linear forwards;
+}
+@keyframes fall{
+from{opacity:1;transform:translateY(-100px)}
+to{opacity:0;transform:translateY(110vh)}
+}
+.fw{
+position:absolute;width:6px;height:6px;border-radius:50%;
+animation:boom 2s forwards;
+}
+@keyframes boom{
+to{opacity:0;transform:translate(var(--x),var(--y))}
+}
+.tip{
+position:absolute;bottom:20px;color:#ffe9a8;
+letter-spacing:3px;
+}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="chandelier">✦</div>
+<div class="particles" id="particles"></div>
+<div class="fireworks" id="fireworks"></div>
+
+<div class="envelope" id="env">
+<div class="back"></div>
+
+<div class="letter">
+<div class="crown">♔</div>
+<h1>3주년 기념 편지</h1>
+<div class="content">
+오빠미에게,<br><br>
+
+오빠가 이 편지를 언제 볼 수 있을지 모르겠네<br><br>
+
+저번 생일날 오빠가 난이도가 너무 쉽다고 해서<br>
+좀 어렵게 만들어봤어 ㅎㅎ<br><br>
+
+어려웠을까나?<br><br>
+
+훔<br><br>
+
+하여튼, 우리가 만난지 벌써 3년이 되었네<br><br>
+
+근데 난 뭐라고 할까나~<br><br>
+
+내 생각보다는 짧은 것 같기도 해. <br>
+그만큼 우리가 알차게 시간을 보낸게 아닐까?<br><br>
+
+오늘 우리는 맛있는 것을 먹고 있겠지? 아마도?<br><br>
+
+오빠에게 요즘 짜증을 많이 낸 것 같아 미안해ㅠㅠ<br><br>
+
+나도 요즘 많이 반성하고 있어!<br><br>
+
+착한 애기미도 돌아갈게미<br><br>
+
+오빠 우리 아직 즐길게 많아!<br>
+그 모든 걸 오빠랑 난 즐기도 싶은데 오빠는 어때?<br><br>
+
+해외여행도 더 가고 싶고 맛있는 것도 많이 먹고 싶고 ㅎㅎ<br><br>
+
+갑자기 오빠가 나한테 편지 써서<br>
+내 서랍 채워준다고 한게 생각난다 ㅎㅎ<br><br>
+
+아직도 기다리고 있어.......<br><br>
+
+언능 매일매일써줭<br><br>
+
+내가 얼른 취업해서 오빠 맛있는거 사줄게<br><br>
+
+뭐 먹고 싶어?<br><br><br>
+
+
+뭐 소고기? <br><br><br>
+
+
+알았엉 그거 사줄게 암암<br><br>
+
+오빠 우리 앞으로도 사이좋게 지내고<br><br>
+
+이뿌게 만나쟝~<br><br>
+
+-귀여운 애기미가-<br>
+</div>
+</div>
+
+<div class="front"></div>
+<div class="flap"></div>
+<div class="seal">♔</div>
+</div>
+
+<div class="tip">✨ 봉투를 클릭하세요 ✨</div>
+</div>
+
+<script>
+const env=document.getElementById('env');
+
+env.onclick=()=>{
+ if(env.classList.contains('open')) return;
+ env.classList.add('open');
+ goldRain();
+ setTimeout(fireworks,6000);
+}
+
+function goldRain(){
+ for(let i=0;i<700;i++){
+  setTimeout(()=>{
+   let p=document.createElement('div');
+   p.className='gold';
+   p.style.left=Math.random()*100+'vw';
+   p.style.animationDuration=(3+Math.random()*4)+'s';
+   document.body.appendChild(p);
+   setTimeout(()=>p.remove(),7000);
+  },i*8);
+ }
+}
+
+function fireworks(){
+ for(let b=0;b<15;b++){
+  setTimeout(()=>{
+   let x=Math.random()*innerWidth;
+   let y=Math.random()*innerHeight*0.4;
+   for(let i=0;i<120;i++){
+    let f=document.createElement('div');
+    f.className='fw';
+    f.style.left=x+'px';
+    f.style.top=y+'px';
+    let a=Math.random()*6.28;
+    let r=80+Math.random()*220;
+    f.style.setProperty('--x',Math.cos(a)*r+'px');
+    f.style.setProperty('--y',Math.sin(a)*r+'px');
+    f.style.background=['#ffd700','#fff4b0','#ffb700','#ffffff'][Math.floor(Math.random()*4)];
+    document.body.appendChild(f);
+    setTimeout(()=>f.remove(),2000);
+   }
+  },b*250);
+ }
+}
+</script>
+</body>
+</html>
