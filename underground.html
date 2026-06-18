@@ -36,7 +36,132 @@ body{
     display:block;
 }
 
-/* 기본 하단 설명창 */
+/* 지하문 오버레이 */
+.door-panel{
+    position:absolute;
+    inset:0;
+    background:url("images/underground_gate.png") center/cover no-repeat;
+    z-index:3;
+    transform-origin:center center;
+    transition:
+        transform 0.8s cubic-bezier(.2,.8,.2,1),
+        opacity 0.55s ease,
+        filter 0.55s ease;
+    pointer-events:none;
+}
+
+.door-panel.open{
+    transform:perspective(1100px) translateX(-18%) rotateY(-78deg) scaleX(0.62);
+    opacity:0.18;
+    filter:brightness(0.72);
+}
+
+/* 문 안쪽 열릴 때 보이는 빛 */
+.portal-glow{
+    position:absolute;
+    left:50%;
+    top:28%;
+    width:34%;
+    height:34%;
+    transform:translateX(-50%);
+    background:radial-gradient(circle at center,
+        rgba(140,120,255,0.35) 0%,
+        rgba(80,60,150,0.16) 38%,
+        rgba(0,0,0,0) 72%);
+    opacity:0;
+    transition:opacity 0.5s ease;
+    z-index:4;
+    pointer-events:none;
+}
+
+.portal-glow.on{
+    opacity:1;
+}
+
+/* 임벌레 */
+.imb{
+    position:absolute;
+    left:50%;
+    top:22%;
+    transform:translateX(-50%);
+    width:160px;
+    height:160px;
+    object-fit:contain;
+    z-index:7;
+    opacity:0;
+    transition:opacity 0.35s ease;
+    user-select:none;
+    pointer-events:none;
+}
+
+.imb.show{
+    opacity:1;
+    animation:imbAppear 0.45s ease;
+}
+
+@keyframes imbAppear{
+    0%{ transform:translateX(-50%) scale(0.7); }
+    100%{ transform:translateX(-50%) scale(1); }
+}
+
+.imb.bigspin{
+    opacity:1;
+    animation:bigSpin 0.9s ease forwards;
+}
+
+@keyframes bigSpin{
+    0%   { transform:translateX(-50%) scale(1) rotate(0deg); }
+    45%  { transform:translateX(-50%) scale(1.25) rotate(180deg); }
+    100% { transform:translateX(-50%) scale(1.7) rotate(360deg); }
+}
+
+.imb.spray{
+    animation:sprayHit 0.8s ease;
+    filter:drop-shadow(0 0 18px rgba(120,255,120,0.7));
+}
+
+@keyframes sprayHit{
+    0%   { transform:translateX(-50%) scale(1); }
+    35%  { transform:translateX(-50%) scale(1.08); }
+    70%  { transform:translateX(-50%) scale(0.96); }
+    100% { transform:translateX(-50%) scale(1); }
+}
+
+.hidden{
+    display:none;
+}
+
+/* 문 클릭 영역 */
+.door-zone{
+    position:absolute;
+    left:33%;
+    top:18%;
+    width:34%;
+    height:46%;
+    cursor:pointer;
+    z-index:8;
+}
+
+/* 안으로 들어가기 버튼 */
+.enter-btn{
+    position:absolute;
+    left:50%;
+    top:52%;
+    transform:translateX(-50%);
+    display:none;
+    z-index:20;
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:12px 28px;
+    font-size:18px;
+    color:#5b3719;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    font-family:'GmarketSans', sans-serif;
+}
+
+/* 하단 설명창 */
 .dialog-ui{
     position:absolute;
     left:0;
@@ -65,6 +190,7 @@ body{
     font-weight:900;
     line-height:1;
     margin-bottom:8px;
+    min-height:30px;
 }
 
 .dialog-text{
@@ -98,57 +224,7 @@ body{
     font-family:'GmarketSans', sans-serif;
 }
 
-/* 문 클릭 영역 */
-.door-zone{
-    position:absolute;
-    left:33%;
-    top:18%;
-    width:34%;
-    height:46%;
-    cursor:pointer;
-    z-index:8;
-}
-
-/* 임벌레 */
-.imb{
-    position:absolute;
-    left:50%;
-    top:20%;
-    transform:translateX(-50%);
-    font-size:92px;
-    z-index:9;
-    transition:transform 0.35s ease, opacity 0.35s ease;
-    user-select:none;
-}
-
-.imb.big{
-    transform:translateX(-50%) scale(1.45);
-}
-
-.hidden{
-    opacity:0;
-    pointer-events:none;
-}
-
-/* 마녀/안쪽으로 들어가기 버튼 */
-.enter-btn{
-    position:absolute;
-    left:50%;
-    top:52%;
-    transform:translateX(-50%);
-    display:none;
-    z-index:20;
-    background:#f9e9c8;
-    border:6px solid #c89b5d;
-    border-radius:30px;
-    padding:12px 28px;
-    font-size:18px;
-    color:#5b3719;
-    cursor:pointer;
-    box-shadow:0 8px 20px rgba(0,0,0,0.2);
-}
-
-/* 인벤토리 선택 팝업 */
+/* 선택 팝업 */
 .popup{
     position:fixed;
     inset:0;
@@ -226,23 +302,22 @@ body{
 
 <div class="game">
 
-    <img src="images/underground_gate.png" class="bg" alt="지하문">
+    <img src="images/underground_gate.png" class="bg" alt="지하문 배경">
 
-    <!-- 문 영역 -->
+    <div class="door-panel" id="doorPanel"></div>
+    <div class="portal-glow" id="portalGlow"></div>
+
     <div class="door-zone" onclick="openDoorScene()"></div>
 
-    <!-- 임벌레 -->
-    <div class="imb" id="imb">🐛</div>
+    <img src="images/imbure.png" class="imb hidden" id="imb" alt="임벌레">
 
-    <!-- 안으로 들어가기 -->
     <button class="enter-btn" id="enterBtn" onclick="location.href='underground_hi.html'">
         안으로 들어가기
     </button>
 
-    <!-- 하단 대사창 -->
     <div class="dialog-ui">
-        <div class="dialog-name" id="dialogName">혼잣말</div>
-        <div class="dialog-text" id="dialogText">여긴가? 드디어 다왔군.\n저 문으로 들어가면 되나?</div>
+        <div class="dialog-name" id="dialogName">&nbsp;</div>
+        <div class="dialog-text" id="dialogText">여긴가? 드디어 다왔군.<br>저 문으로 들어가면 되나?</div>
         <div class="dialog-actions" id="dialogActions">
             <button class="dialog-btn" onclick="nextIntro()">다음</button>
         </div>
@@ -250,7 +325,6 @@ body{
 
 </div>
 
-<!-- 인벤토리 선택 팝업 -->
 <div class="popup" id="popup">
     <div class="popup-box">
         <div class="popup-title" id="popupTitle"></div>
@@ -263,13 +337,61 @@ body{
 
 <script>
 let introStep = 0;
+let doorOpened = false;
 let battleMode = false;
 let cleared = localStorage.getItem("undergroundCleared") === "true";
+let introDone = false;
 
 function setDialog(name, text, actionsHtml){
-    document.getElementById("dialogName").innerText = name;
-    document.getElementById("dialogText").innerHTML = text;
-    document.getElementById("dialogActions").innerHTML = actionsHtml || "";
+    const nameEl = document.getElementById("dialogName");
+    const textEl = document.getElementById("dialogText");
+    const actEl = document.getElementById("dialogActions");
+
+    if(name && name.trim()){
+        nameEl.textContent = name;
+        nameEl.style.visibility = "visible";
+    }else{
+        nameEl.textContent = "";
+        nameEl.style.visibility = "hidden";
+    }
+
+    textEl.innerHTML = text;
+    actEl.innerHTML = actionsHtml || "";
+}
+
+function normalizeLabel(item){
+    if(item === "bugSpray" || item === "insectSpray" || item === "벌레퇴치제") return "벌레퇴치제";
+    if(item === "axe") return "도끼";
+    if(item === "shield") return "방패";
+    if(item === "key") return "열쇠";
+    if(item === "heart") return "하트 생명";
+    if(item === "bubbletea") return "흑당 버블티";
+    if(item === "jjamppong") return "짬뽕";
+    if(item === "flower") return "꽃";
+    return item;
+}
+
+function getInventorySafe(){
+    try{
+        if(typeof getInventory === "function"){
+            const inv = getInventory();
+            return Array.isArray(inv) ? inv : [];
+        }
+    }catch(e){}
+    return [];
+}
+
+function removeItemSafe(item){
+    try{
+        if(typeof removeItem === "function"){
+            removeItem(item);
+            return;
+        }
+    }catch(e){}
+}
+
+function hasBugSprayItem(item){
+    return item === "bugSpray" || item === "insectSpray" || item === "벌레퇴치제";
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -284,30 +406,48 @@ function nextIntro(){
     introStep++;
 
     if(introStep === 1){
-        setDialog("혼잣말", "여긴가? 드디어 다왔군.", `<button class="dialog-btn" onclick="nextIntro()">다음</button>`);
-    } else if(introStep === 2){
-        setDialog("혼잣말", "저 문으로 들어가면 되나?", `<button class="dialog-btn" onclick="nextIntro()">다음</button>`);
-    } else {
-        setDialog("혼잣말", "문을 클릭해보자.", "");
+        setDialog("", "여긴가? 드디어 다왔군.", `<button class="dialog-btn" onclick="nextIntro()">다음</button>`);
+    }else if(introStep === 2){
+        setDialog("", "저 문으로 들어가면 되나?", `<button class="dialog-btn" onclick="nextIntro()">다음</button>`);
+    }else{
+        introDone = true;
+        setDialog("", "문을 클릭해보자.", "");
     }
 }
 
 function openDoorScene(){
     if(cleared){
         document.getElementById("enterBtn").style.display = "block";
-        setDialog("혼잣말", "이미 길은 열려 있다.", "");
+        setDialog("", "이미 길은 열려 있다.", "");
         return;
     }
 
-    document.getElementById("imb").classList.remove("hidden");
-    setDialog(
-        "임벌레",
-        "여기는 무슨일이지?\n애기미를 구하려왔다.\n푸하하하, 이 바보같은 녀석.\n왜 비웃는거지?\n너의 모습을 보고 있으면 웃음이 나온다!\n머라는거야...\n걍 빨리 퇴치해버려야겠다.",
-        `
-            <button class="dialog-btn" onclick="fightMode()">퇴치하기</button>
-            <button class="dialog-btn" onclick="goHome()">집으로 돌아가기</button>
-        `
-    );
+    if(!introDone){
+        introDone = true;
+    }
+
+    if(doorOpened) return;
+    doorOpened = true;
+
+    const panel = document.getElementById("doorPanel");
+    const glow = document.getElementById("portalGlow");
+    const imb = document.getElementById("imb");
+
+    panel.classList.add("open");
+
+    setTimeout(() => {
+        glow.classList.add("on");
+        imb.classList.remove("hidden");
+        imb.classList.add("show");
+        setDialog(
+            "임벌레",
+            "여기는 무슨일이지?\n애기미를 구하려왔다.\n푸하하하, 이 바보같은 녀석.\n왜 비웃는거지?\n너의 모습을 보고 있으면 웃음이 나온다!\n머라는거야...\n걍 빨리 퇴치해버려야겠다.",
+            `
+                <button class="dialog-btn" onclick="fightMode()">퇴치하기</button>
+                <button class="dialog-btn" onclick="goHome()">집으로 돌아가기</button>
+            `
+        );
+    }, 550);
 }
 
 function goHome(){
@@ -317,106 +457,77 @@ function goHome(){
 function fightMode(){
     battleMode = true;
 
-    const inv = getInventory ? getInventory() : [];
-    const mapped = inv.map(item => {
-        if(item === "bugSpray" || item === "벌레퇴치제" || item === "insectSpray") return "벌레퇴치제";
-        if(item === "axe") return "도끼";
-        if(item === "shield") return "방패";
-        if(item === "key") return "열쇠";
-        if(item === "heart") return "하트 생명";
-        if(item === "bubbletea") return "흑당 버블티";
-        if(item === "jjamppong") return "짬뽕";
-        return item;
-    });
+    const items = getInventorySafe();
 
-    if(mapped.length === 0){
-        setDialog("혼잣말", "가지고 있는 도구가 없다...", `<button class="dialog-btn" onclick="openDoorScene()">뒤로</button>`);
+    if(items.length === 0){
+        setDialog("", "가지고 있는 도구가 없다...", `<button class="dialog-btn" onclick="openDoorScene()">뒤로</button>`);
         return;
     }
 
     document.getElementById("popup").style.display = "flex";
     document.getElementById("popupTitle").innerText = "도구 선택하기";
     document.getElementById("popupBody").innerText = "인벤토리에서 사용할 것을 고르자.";
-    document.getElementById("popupActions").innerHTML = "";
+
+    const actions = document.getElementById("popupActions");
+    actions.innerHTML = "";
 
     const list = document.createElement("div");
     list.className = "item-list";
 
-    const rawItems = getInventory ? getInventory() : [];
-    rawItems.forEach(item => {
+    items.forEach(item => {
         const btn = document.createElement("button");
         btn.className = "item-btn";
-
-        let label = item;
-        if(item === "bugSpray" || item === "벌레퇴치제" || item === "insectSpray") label = "벌레퇴치제";
-        else if(item === "axe") label = "도끼";
-        else if(item === "shield") label = "방패";
-        else if(item === "key") label = "열쇠";
-        else if(item === "heart") label = "하트 생명";
-
-        btn.innerText = label;
+        btn.innerText = normalizeLabel(item);
         btn.onclick = () => useItemForFight(item);
         list.appendChild(btn);
     });
 
-    const actions = document.getElementById("popupActions");
     actions.appendChild(list);
 
-    const backBtn = document.createElement("button");
-    backBtn.className = "choice-btn";
-    backBtn.innerText = "닫기";
-    backBtn.onclick = () => {
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "choice-btn";
+    closeBtn.innerText = "닫기";
+    closeBtn.onclick = () => {
         document.getElementById("popup").style.display = "none";
     };
-    actions.appendChild(backBtn);
+    actions.appendChild(closeBtn);
 }
 
 function useItemForFight(item){
     document.getElementById("popup").style.display = "none";
 
-    const isBugSpray = item === "bugSpray" || item === "벌레퇴치제" || item === "insectSpray";
+    const itemName = normalizeLabel(item);
+    setDialog("", `그래 ${itemName} 이걸로 널 처단한다`, "");
 
-    if(isBugSpray){
-        if(typeof removeItem === "function") removeItem(item === "벌레퇴치제" ? "bugSpray" : item);
-
-        const imb = document.getElementById("imb");
-        imb.style.opacity = "1";
-        imb.classList.add("sprayed");
-
-        setDialog("임벌레", "앙돼...... 내가 퇴치되다니!!!!!!!", "");
-        setTimeout(() => {
-            imb.classList.add("hidden");
-            document.getElementById("enterBtn").style.display = "block";
-            localStorage.setItem("undergroundCleared", "true");
-            setDialog("혼잣말", "길이 열렸다.", `<button class="dialog-btn" onclick="location.href='underground_hi.html'">안으로 들어가기</button>`);
-        }, 900);
-        return;
-    }
-
-    const imb = document.getElementById("imb");
-    imb.classList.add("big");
-
-    setDialog("임벌레", "음하하하하하하! 여긴 못들어간다!", "");
     setTimeout(() => {
-        location.href = "kitchen.html";
-    }, 1100);
-}
+        if(hasBugSprayItem(item)){
+            const imb = document.getElementById("imb");
+            imb.classList.remove("bigspin");
+            imb.classList.add("spray");
+            removeItemSafe(item);
 
-/* 퇴치제 효과 */
-const sprayStyle = document.createElement("style");
-sprayStyle.innerHTML = `
-    .sprayed{
-        animation:sprayPop 0.6s ease;
-        filter:drop-shadow(0 0 18px rgba(120,255,120,0.65));
-    }
-    @keyframes sprayPop{
-        0%{ transform:translateX(-50%) scale(1); opacity:1; }
-        35%{ transform:translateX(-50%) scale(1.25); }
-        70%{ transform:translateX(-50%) scale(0.95); }
-        100%{ transform:translateX(-50%) scale(1); opacity:1; }
-    }
-`;
-document.head.appendChild(sprayStyle);
+            setDialog("임벌레", "앙돼...... 내가 퇴치되다니!!!!!!!", "");
+
+            setTimeout(() => {
+                imb.classList.add("hidden");
+                document.getElementById("enterBtn").style.display = "block";
+                localStorage.setItem("undergroundCleared", "true");
+                cleared = true;
+                setDialog("", "길이 열렸다.", `<button class="dialog-btn" onclick="location.href='underground_hi.html'">안으로 들어가기</button>`);
+            }, 900);
+        }else{
+            const imb = document.getElementById("imb");
+            imb.classList.remove("spray");
+            imb.classList.add("bigspin");
+
+            setDialog("", "음하하하하하하! 여긴 못들어간다!", "");
+
+            setTimeout(() => {
+                location.href = "kitchen.html";
+            }, 1100);
+        }
+    }, 700);
+}
 </script>
 
 </body>
