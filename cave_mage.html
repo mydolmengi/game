@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>RPG MAP EDITOR PRO MAX</title>
+<title>RPG MAP EDITOR ULTIMATE</title>
 
 <style>
 body{
@@ -48,20 +48,34 @@ body{
     top:-25px;
     left:50%;
     transform:translateX(-50%);
-    width:30px;
-    height:30px;
+    width:28px;
+    height:28px;
     background:#fff;
-    border-radius:50%;
     border:2px solid #000;
+    border-radius:50%;
     cursor:grab;
 }
 
 .rotate-icon::after{
     content:"🔄";
-    font-size:18px;
     display:flex;
     justify-content:center;
     align-items:center;
+}
+
+/* ======================
+   RESIZE HANDLE
+====================== */
+.resize-handle{
+    position:absolute;
+    right:-8px;
+    bottom:-8px;
+    width:16px;
+    height:16px;
+    background:#fff;
+    border:2px solid #000;
+    border-radius:4px;
+    cursor:nwse-resize;
 }
 
 /* ======================
@@ -71,7 +85,7 @@ body{
     position:fixed;
     top:10px;
     left:10px;
-    width:320px;
+    width:340px;
     background:#fff;
     padding:10px;
     border-radius:10px;
@@ -82,6 +96,7 @@ textarea{
     width:100%;
     height:200px;
 }
+
 button{
     width:100%;
     margin-top:5px;
@@ -93,7 +108,7 @@ button{
 <body>
 
 <div id="panel">
-<b>MAP EDITOR PRO MAX</b>
+<b>RPG MAP EDITOR ULTIMATE</b>
 
 <button onclick="addBox()">+ 오브젝트 추가</button>
 <button onclick="saveMap()">저장</button>
@@ -110,9 +125,18 @@ button{
 
 let activeBox = null;
 let activeRotate = null;
+let activeResize = null;
 
 let offsetX = 0;
 let offsetY = 0;
+
+let startAngle = 0;
+let startRotate = 0;
+
+let startW = 0;
+let startH = 0;
+let startX = 0;
+let startY = 0;
 
 let zIndex = 10;
 
@@ -128,29 +152,36 @@ function addBox(){
     box.style.top = "100px";
     box.style.zIndex = zIndex++;
 
-    box.dataset.rotate = 0;
     box.dataset.name = prompt("이름") || "object";
+    box.dataset.rotate = 0;
 
     const rot = document.createElement("div");
     rot.className = "rotate-icon";
 
+    const resize = document.createElement("div");
+    resize.className = "resize-handle";
+
     box.appendChild(rot);
+    box.appendChild(resize);
+
     document.getElementById("map").appendChild(box);
 
     enableDrag(box);
     enableRotate(rot, box);
+    enableResize(resize, box);
 
     updateOutput();
 }
 
 /* ======================
-   DRAG (FIXED)
+   DRAG
 ====================== */
 function enableDrag(box){
 
     box.addEventListener("mousedown",(e)=>{
 
-        if(e.target.classList.contains("rotate-icon")) return;
+        if(e.target.classList.contains("rotate-icon") ||
+           e.target.classList.contains("resize-handle")) return;
 
         activeBox = box;
 
@@ -162,11 +193,8 @@ function enableDrag(box){
 }
 
 /* ======================
-   ROTATE FIXED
+   ROTATE
 ====================== */
-let startAngle = 0;
-let startRotate = 0;
-
 function enableRotate(icon, box){
 
     icon.addEventListener("mousedown",(e)=>{
@@ -180,6 +208,25 @@ function enableRotate(icon, box){
 
         startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
         startRotate = parseFloat(box.dataset.rotate);
+
+        e.stopPropagation();
+    });
+}
+
+/* ======================
+   RESIZE
+====================== */
+function enableResize(handle, box){
+
+    handle.addEventListener("mousedown",(e)=>{
+
+        activeResize = box;
+
+        startW = box.offsetWidth;
+        startH = box.offsetHeight;
+
+        startX = e.clientX;
+        startY = e.clientY;
 
         e.stopPropagation();
     });
@@ -218,8 +265,19 @@ document.addEventListener("mousemove",(e)=>{
         let deg = startRotate + (angle - startAngle) * 180 / Math.PI;
 
         activeRotate.style.transform = `rotate(${deg}deg)`;
-
         activeRotate.dataset.rotate = deg;
+
+        updateOutput();
+    }
+
+    /* RESIZE */
+    if(activeResize){
+
+        let dx = e.clientX - startX;
+        let dy = e.clientY - startY;
+
+        activeResize.style.width = (startW + dx) + "px";
+        activeResize.style.height = (startH + dy) + "px";
 
         updateOutput();
     }
@@ -229,14 +287,14 @@ document.addEventListener("mouseup",()=>{
 
     activeBox = null;
     activeRotate = null;
+    activeResize = null;
 });
 
 /* ======================
-   OUTPUT (FIXED)
+   OUTPUT
 ====================== */
 function updateOutput(){
 
-    const map = document.getElementById("map").getBoundingClientRect();
     const boxes = document.querySelectorAll(".box");
 
     let out = "";
@@ -245,34 +303,34 @@ function updateOutput(){
 
         let x = b.offsetLeft;
         let y = b.offsetTop;
-
         let w = b.offsetWidth;
         let h = b.offsetHeight;
-
-        let rot = b.dataset.rotate || 0;
+        let r = b.dataset.rotate;
         let name = b.dataset.name;
 
         out += `/* ${name} */\n`;
-        out += `.${name}{ left:${x}px; top:${y}px; width:${w}px; height:${h}px; transform:rotate(${rot}deg); }\n\n`;
+        out += `.${name}{ left:${x}px; top:${y}px; width:${w}px; height:${h}px; transform:rotate(${r}deg); }\n\n`;
     });
 
     document.getElementById("output").value = out;
 }
 
 /* ======================
-   SAVE / LOAD (NEW)
+   SAVE / LOAD
 ====================== */
 function saveMap(){
+
     const data = [];
 
     document.querySelectorAll(".box").forEach(b=>{
+
         data.push({
-            x: b.offsetLeft,
-            y: b.offsetTop,
-            w: b.offsetWidth,
-            h: b.offsetHeight,
-            r: b.dataset.rotate,
-            name: b.dataset.name
+            x:b.offsetLeft,
+            y:b.offsetTop,
+            w:b.offsetWidth,
+            h:b.offsetHeight,
+            r:b.dataset.rotate,
+            name:b.dataset.name
         });
     });
 
@@ -300,11 +358,17 @@ function loadMap(){
         const rot = document.createElement("div");
         rot.className = "rotate-icon";
 
+        const resize = document.createElement("div");
+        resize.className = "resize-handle";
+
         box.appendChild(rot);
+        box.appendChild(resize);
+
         document.getElementById("map").appendChild(box);
 
         enableDrag(box);
         enableRotate(rot, box);
+        enableResize(resize, box);
     });
 
     alert("불러오기 완료");
