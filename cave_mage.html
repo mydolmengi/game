@@ -1,631 +1,316 @@
 <!DOCTYPE html>
-
 <html lang="ko">
-
 <head>
-
 <meta charset="UTF-8">
-
-<title>RPG MAP EDITOR FINAL PRO</title>
-
-​
+<title>RPG MAP EDITOR PRO MAX</title>
 
 <style>
-
 body{
-
     margin:0;
-
     background:#111;
-
     display:flex;
-
     justify-content:center;
-
     font-family:sans-serif;
-
 }
-
-​
 
 /* ======================
-
-   MAP
-
+   STAGE
 ====================== */
-
 .wrapper{
-
     position:relative;
-
     width:900px;
-
-    margin-top:20px;
-
+    user-select:none;
 }
-
-​
 
 .wrapper img{
-
     width:100%;
-
     display:block;
-
 }
 
-​
-
 /* ======================
-
-   BOX (PX 안정 버전)
-
+   BOX
 ====================== */
-
 .box{
-
     position:absolute;
-
-​
-
     width:120px;
-
     height:120px;
-
-​
-
     background:rgba(255,0,0,0.25);
-
     border:2px dashed red;
-
-​
-
     cursor:grab;
-
-​
-
-    resize: both;
-
-    overflow: hidden;
-
-​
-
-    min-width:30px;
-
-    min-height:30px;
-
-​
-
     transform-origin:center;
-
-​
-
-    will-change: left, top, width, height, transform;
-
 }
-
-​
 
 /* ======================
-
-   🔄 ROTATE ICON (BIG FIX)
-
+   ROTATE HANDLE
 ====================== */
-
 .rotate-icon{
-
     position:absolute;
-
-​
-
-    top:-30px;
-
+    top:-25px;
     left:50%;
-
     transform:translateX(-50%);
-
-​
-
-    width:36px;
-
-    height:36px;
-
-​
-
-    background:white;
-
-    border:2px solid #333;
-
+    width:30px;
+    height:30px;
+    background:#fff;
     border-radius:50%;
-
-​
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-​
-
-    font-size:22px;
-
+    border:2px solid #000;
     cursor:grab;
-
-​
-
-    box-shadow:0 2px 8px rgba(0,0,0,0.4);
-
-    user-select:none;
-
 }
-
-​
 
 .rotate-icon::after{
-
     content:"🔄";
-
+    font-size:18px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
-
-​
 
 /* ======================
-
    PANEL
-
 ====================== */
-
 #panel{
-
     position:fixed;
-
-    top:20px;
-
-    left:20px;
-
-​
-
-    width:520px;
-
-    background:white;
-
-    padding:18px;
-
-    border-radius:12px;
-
-    z-index:999;
-
+    top:10px;
+    left:10px;
+    width:320px;
+    background:#fff;
+    padding:10px;
+    border-radius:10px;
+    z-index:9999;
 }
-
-​
 
 textarea{
-
     width:100%;
-
-    height:240px;
-
-    margin-top:10px;
-
+    height:200px;
 }
-
-​
-
 button{
-
     width:100%;
-
-    padding:10px;
-
-    margin-top:8px;
-
-    cursor:pointer;
-
+    margin-top:5px;
+    padding:8px;
 }
-
 </style>
-
 </head>
-
-​
 
 <body>
 
-​
-
-<!-- ======================
-
-   PANEL
-
-====================== -->
-
 <div id="panel">
+<b>MAP EDITOR PRO MAX</b>
 
-<b>🎮 RPG MAP EDITOR FINAL PRO</b>
-
-​
+<button onclick="addBox()">+ 오브젝트 추가</button>
+<button onclick="saveMap()">저장</button>
+<button onclick="loadMap()">불러오기</button>
 
 <textarea id="output"></textarea>
-
-​
-
-<button onclick="addBox()">➕ 오브젝트 추가</button>
-
-<button onclick="copyCode()">📋 복사</button>
-
 </div>
-
-​
-
-<!-- ======================
-
-   MAP
-
-====================== -->
 
 <div class="wrapper" id="map">
-
     <img src="images/cave_mage_bg.png">
-
 </div>
-
-​
 
 <script>
 
-​
-
 let activeBox = null;
-
-let activeRotateBox = null;
-
-​
+let activeRotate = null;
 
 let offsetX = 0;
-
 let offsetY = 0;
 
-​
+let zIndex = 10;
 
 /* ======================
-
-   CREATE
-
+   CREATE BOX
 ====================== */
-
 function addBox(){
 
-​
-
     const box = document.createElement("div");
-
     box.className = "box";
 
-​
-
     box.style.left = "100px";
-
     box.style.top = "100px";
-
-​
-
-    box.dataset.name = prompt("이름 입력") || "object";
+    box.style.zIndex = zIndex++;
 
     box.dataset.rotate = 0;
+    box.dataset.name = prompt("이름") || "object";
 
-​
+    const rot = document.createElement("div");
+    rot.className = "rotate-icon";
 
-    const icon = document.createElement("div");
-
-    icon.className = "rotate-icon";
-
-​
-
-    box.appendChild(icon);
-
+    box.appendChild(rot);
     document.getElementById("map").appendChild(box);
 
-​
-
     enableDrag(box);
+    enableRotate(rot, box);
 
-    enableRotate(icon, box);
-
+    updateOutput();
 }
 
-​
-
 /* ======================
-
-   DRAG (PX FIX)
-
+   DRAG (FIXED)
 ====================== */
-
 function enableDrag(box){
-
-​
 
     box.addEventListener("mousedown",(e)=>{
 
-​
-
         if(e.target.classList.contains("rotate-icon")) return;
-
-​
 
         activeBox = box;
 
-​
-
         const rect = box.getBoundingClientRect();
 
-​
-
         offsetX = e.clientX - rect.left;
-
         offsetY = e.clientY - rect.top;
-
     });
-
 }
 
-​
-
 /* ======================
-
-   ROTATE (STABLE FIX)
-
+   ROTATE FIXED
 ====================== */
-
 let startAngle = 0;
-
 let startRotate = 0;
-
-​
 
 function enableRotate(icon, box){
 
-​
-
     icon.addEventListener("mousedown",(e)=>{
 
-​
-
-        activeRotateBox = box;
-
-​
+        activeRotate = box;
 
         const r = box.getBoundingClientRect();
 
-​
+        const cx = r.left + r.width/2;
+        const cy = r.top + r.height/2;
 
-        const cx = r.left + r.width / 2;
-
-        const cy = r.top + r.height / 2;
-
-​
-
-        startAngle =
-
-        Math.atan2(e.clientY - cy, e.clientX - cx);
-
-​
-
-        startRotate =
-
-        parseFloat(box.dataset.rotate || 0);
-
-​
+        startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
+        startRotate = parseFloat(box.dataset.rotate);
 
         e.stopPropagation();
-
     });
-
 }
 
-​
-
 /* ======================
-
-   MOVE + ROTATE
-
+   MOVE ENGINE
 ====================== */
-
 document.addEventListener("mousemove",(e)=>{
 
-​
-
     const map = document.getElementById("map");
-
     const rect = map.getBoundingClientRect();
 
-​
-
     /* DRAG */
-
     if(activeBox){
 
-​
-
         let x = e.clientX - rect.left - offsetX;
-
         let y = e.clientY - rect.top - offsetY;
 
-​
-
         activeBox.style.left = x + "px";
-
         activeBox.style.top = y + "px";
 
-​
-
         updateOutput();
-
     }
-
-​
 
     /* ROTATE */
+    if(activeRotate){
 
-    if(activeRotateBox){
+        const r = activeRotate.getBoundingClientRect();
 
-​
+        const cx = r.left + r.width/2;
+        const cy = r.top + r.height/2;
 
-        const r = activeRotateBox.getBoundingClientRect();
+        const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
 
-​
+        let deg = startRotate + (angle - startAngle) * 180 / Math.PI;
 
-        const cx = r.left + r.width / 2;
+        activeRotate.style.transform = `rotate(${deg}deg)`;
 
-        const cy = r.top + r.height / 2;
-
-​
-
-        const currentAngle =
-
-        Math.atan2(e.clientY - cy, e.clientX - cx);
-
-​
-
-        let delta = currentAngle - startAngle;
-
-​
-
-        let finalAngle =
-
-        startRotate + delta * (180 / Math.PI);
-
-​
-
-        activeRotateBox.style.transform =
-
-        `rotate(${finalAngle}deg)`;
-
-​
-
-        activeRotateBox.dataset.rotate = finalAngle;
-
-​
+        activeRotate.dataset.rotate = deg;
 
         updateOutput();
-
     }
-
 });
-
-​
 
 document.addEventListener("mouseup",()=>{
 
-​
-
     activeBox = null;
-
-    activeRotateBox = null;
-
+    activeRotate = null;
 });
 
-​
-
 /* ======================
-
-   OUTPUT
-
+   OUTPUT (FIXED)
 ====================== */
-
 function updateOutput(){
 
-​
-
+    const map = document.getElementById("map").getBoundingClientRect();
     const boxes = document.querySelectorAll(".box");
 
-    const map = document.getElementById("map").getBoundingClientRect();
+    let out = "";
 
-​
+    boxes.forEach(b=>{
 
-    let result = "";
+        let x = b.offsetLeft;
+        let y = b.offsetTop;
 
-​
-
-    boxes.forEach((b)=>{
-
-​
-
-        const rect = b.getBoundingClientRect();
-
-​
-
-        let x = rect.left - map.left;
-
-        let y = rect.top - map.top;
-
-        let w = rect.width;
-
-        let h = rect.height;
-
-​
+        let w = b.offsetWidth;
+        let h = b.offsetHeight;
 
         let rot = b.dataset.rotate || 0;
-
         let name = b.dataset.name;
 
-​
-
-        result += `/* ${name} */\n`;
-
-        result += `.${name}{
-
-  left:${x}px;
-
-  top:${y}px;
-
-  width:${w}px;
-
-  height:${h}px;
-
-  transform:rotate(${rot}deg);
-
-}\n\n`;
-
+        out += `/* ${name} */\n`;
+        out += `.${name}{ left:${x}px; top:${y}px; width:${w}px; height:${h}px; transform:rotate(${rot}deg); }\n\n`;
     });
 
-​
-
-    document.getElementById("output").value = result;
-
+    document.getElementById("output").value = out;
 }
-
-​
 
 /* ======================
-
-   COPY
-
+   SAVE / LOAD (NEW)
 ====================== */
+function saveMap(){
+    const data = [];
 
-function copyCode(){
+    document.querySelectorAll(".box").forEach(b=>{
+        data.push({
+            x: b.offsetLeft,
+            y: b.offsetTop,
+            w: b.offsetWidth,
+            h: b.offsetHeight,
+            r: b.dataset.rotate,
+            name: b.dataset.name
+        });
+    });
 
-​
-
-    const t = document.getElementById("output");
-
-    t.select();
-
-    document.execCommand("copy");
-
-​
-
-    alert("복사 완료!");
-
+    localStorage.setItem("mapData", JSON.stringify(data));
+    alert("저장 완료");
 }
 
-​
+function loadMap(){
+
+    const data = JSON.parse(localStorage.getItem("mapData") || "[]");
+
+    data.forEach(d=>{
+
+        const box = document.createElement("div");
+        box.className = "box";
+
+        box.style.left = d.x + "px";
+        box.style.top = d.y + "px";
+        box.style.width = d.w + "px";
+        box.style.height = d.h + "px";
+        box.dataset.rotate = d.r;
+        box.dataset.name = d.name;
+        box.style.transform = `rotate(${d.r}deg)`;
+
+        const rot = document.createElement("div");
+        rot.className = "rotate-icon";
+
+        box.appendChild(rot);
+        document.getElementById("map").appendChild(box);
+
+        enableDrag(box);
+        enableRotate(rot, box);
+    });
+
+    alert("불러오기 완료");
+}
 
 </script>
 
-​
-
 </body>
-
 </html>
