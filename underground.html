@@ -82,10 +82,10 @@ body{
 .imb{
     position:absolute;
     left:50%;
-    top:22%;
+    top:28%;
     transform:translateX(-50%);
-    width:160px;
-    height:160px;
+    width:240px;
+    height:240px;
     object-fit:contain;
     z-index:7;
     opacity:0;
@@ -100,21 +100,34 @@ body{
 }
 
 @keyframes imbAppear{
-    0%{ transform:translateX(-50%) scale(0.7); }
+    0%{ transform:translateX(-50%) scale(0.75); }
     100%{ transform:translateX(-50%) scale(1); }
 }
 
+/* 실패 시: 더 크게 + 더 많이 회전 */
 .imb.bigspin{
     opacity:1;
-    animation:bigSpin 0.9s ease forwards;
+    animation:bigSpin 1.15s ease forwards;
 }
 
 @keyframes bigSpin{
-    0%   { transform:translateX(-50%) scale(1) rotate(0deg); }
-    45%  { transform:translateX(-50%) scale(1.25) rotate(180deg); }
-    100% { transform:translateX(-50%) scale(1.7) rotate(360deg); }
+    0%{
+        transform:translateX(-50%) scale(1) rotate(0deg);
+        filter:brightness(1);
+    }
+    30%{
+        transform:translateX(-50%) scale(1.8) rotate(360deg);
+    }
+    60%{
+        transform:translateX(-50%) scale(3.2) rotate(720deg);
+    }
+    100%{
+        transform:translateX(-50%) scale(5.2) rotate(1080deg);
+        filter:brightness(1.05);
+    }
 }
 
+/* 퇴치제 효과 */
 .imb.spray{
     animation:sprayHit 0.8s ease;
     filter:drop-shadow(0 0 18px rgba(120,255,120,0.7));
@@ -258,6 +271,7 @@ body{
     color:#5b3719;
     line-height:1.6;
     margin-bottom:12px;
+    white-space:pre-line;
 }
 
 .choice-btn{
@@ -296,26 +310,25 @@ body{
     font-family:'GmarketSans', sans-serif;
 }
 
-     @media (max-width: 600px){
-
-    .title{
-        font-size:30px;
+@media (max-width: 600px){
+    .dialog-name{
+        font-size:22px;
     }
 
-    .story{
+    .dialog-text{
         font-size:18px;
-        line-height:1.8;
+        line-height:1.6;
     }
 
-    .story-box{
-        padding:25px 20px;
+    .dialog-ui{
+        height:34%;
     }
 
-    .start-btn{
-        padding:12px 30px;
-        font-size:18px;
+    .imb{
+        width:190px;
+        height:190px;
+        top:30%;
     }
-
 }
 </style>
 </head>
@@ -360,9 +373,10 @@ body{
 <script>
 let introStep = 0;
 let doorOpened = false;
-let battleMode = false;
 let cleared = localStorage.getItem("undergroundCleared") === "true";
 let introDone = false;
+let encounterStep = 0;
+let currentEncounterLines = [];
 
 function setDialog(name, text, actionsHtml){
     const nameEl = document.getElementById("dialogName");
@@ -390,6 +404,9 @@ function normalizeLabel(item){
     if(item === "bubbletea") return "흑당 버블티";
     if(item === "jjamppong") return "짬뽕";
     if(item === "flower") return "꽃";
+    if(item === "iceAmericano") return "아이스 아메리카노";
+    if(item === "tiramisu") return "티라미슈";
+    if(item === "goldenApple") return "황금사과";
     return item;
 }
 
@@ -414,6 +431,17 @@ function removeItemSafe(item){
 
 function hasBugSprayItem(item){
     return item === "bugSpray" || item === "insectSpray" || item === "벌레퇴치제";
+}
+
+function openPopup(title, bodyHtml, actionsHtml = ""){
+    document.getElementById("popupTitle").innerHTML = title || "";
+    document.getElementById("popupBody").innerHTML = bodyHtml || "";
+    document.getElementById("popupActions").innerHTML = actionsHtml || "";
+    document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup(){
+    document.getElementById("popup").style.display = "none";
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -461,15 +489,49 @@ function openDoorScene(){
         glow.classList.add("on");
         imb.classList.remove("hidden");
         imb.classList.add("show");
-        setDialog(
-            "임벌레",
-            "여기는 무슨일이지?\n애기미를 구하려왔다.\n푸하하하, 이 바보같은 녀석.\n왜 비웃는거지?\n너의 모습을 보고 있으면 웃음이 나온다!\n머라는거야...\n걍 빨리 퇴치해버려야겠다.",
-            `
-                <button class="dialog-btn" onclick="fightMode()">퇴치하기</button>
-                <button class="dialog-btn" onclick="goHome()">집으로 돌아가기</button>
-            `
-        );
+
+        currentEncounterLines = [
+            { speaker:"임벌레", text:"여기는 무슨일이지?" },
+            { speaker:"나", text:"애기미를 구하려왔다" },
+            { speaker:"임벌레", text:"푸하하하, 이 바보같은 녀석." },
+            { speaker:"나", text:"왜 비웃는거지?" },
+            { speaker:"임벌레", text:"너의 모습을 보고 있으면 웃음이 나온다!" },
+            { speaker:"나", text:"머라는거야..." },
+            { speaker:"나", text:"걍 빨리 퇴치해버려야겠다" }
+        ];
+        encounterStep = 0;
+        showEncounterLine();
     }, 550);
+}
+
+function showEncounterLine(){
+    if(encounterStep >= currentEncounterLines.length){
+        showEncounterChoices();
+        return;
+    }
+
+    const line = currentEncounterLines[encounterStep];
+    setDialog(
+        line.speaker,
+        line.text,
+        `<button class="dialog-btn" onclick="nextEncounterLine()">다음</button>`
+    );
+}
+
+function nextEncounterLine(){
+    encounterStep++;
+    showEncounterLine();
+}
+
+function showEncounterChoices(){
+    setDialog(
+        "",
+        "",
+        `
+            <button class="dialog-btn" onclick="fightMode()">퇴치하기</button>
+            <button class="dialog-btn" onclick="goHome()">집으로 돌아가기</button>
+        `
+    );
 }
 
 function goHome(){
@@ -477,18 +539,18 @@ function goHome(){
 }
 
 function fightMode(){
-    battleMode = true;
-
     const items = getInventorySafe();
 
     if(items.length === 0){
-        setDialog("", "가지고 있는 도구가 없다...", `<button class="dialog-btn" onclick="openDoorScene()">뒤로</button>`);
+        setDialog("", "가지고 있는 도구가 없다...", `<button class="dialog-btn" onclick="showEncounterChoices()">뒤로</button>`);
         return;
     }
 
-    document.getElementById("popup").style.display = "flex";
-    document.getElementById("popupTitle").innerText = "도구 선택하기";
-    document.getElementById("popupBody").innerText = "인벤토리에서 사용할 것을 고르자.";
+    openPopup(
+        "도구 선택하기",
+        "인벤토리에서 사용할 것을 고르자.",
+        ""
+    );
 
     const actions = document.getElementById("popupActions");
     actions.innerHTML = "";
@@ -509,14 +571,12 @@ function fightMode(){
     const closeBtn = document.createElement("button");
     closeBtn.className = "choice-btn";
     closeBtn.innerText = "닫기";
-    closeBtn.onclick = () => {
-        document.getElementById("popup").style.display = "none";
-    };
+    closeBtn.onclick = () => closePopup();
     actions.appendChild(closeBtn);
 }
 
 function useItemForFight(item){
-    document.getElementById("popup").style.display = "none";
+    closePopup();
 
     const itemName = normalizeLabel(item);
     setDialog("", `그래 ${itemName} 이걸로 널 처단한다`, "");
