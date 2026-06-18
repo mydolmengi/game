@@ -8,35 +8,61 @@
 <link rel="stylesheet" href="css/style.css">
 
 <style>
-.inventory-page{
-    display:flex;
-    justify-content:center;
-    padding:40px;
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
     font-family:'GmarketSans', sans-serif;
 }
 
+.inventory-page{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px 16px;
+}
+
 .inventory-box{
-    width:90%;
-    max-width:500px;
+    width:100%;
+    max-width:520px;
     background:#f9e9c8;
     border:6px solid #c89b5d;
     border-radius:30px;
-    padding:20px;
+    padding:22px;
     text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+
+.inventory-box h2{
+    color:#5b3719;
+    margin-bottom:16px;
+    font-size:28px;
 }
 
 .inventory-item{
     background:#fff;
     margin:10px 0;
-    padding:10px;
+    padding:12px;
     border-radius:15px;
     border:2px solid #c89b5d;
     font-size:18px;
+    color:#5b3719;
+    text-align:left;
 }
 
 .choice-btn{
     width:100%;
-    margin-top:20px;
+    margin-top:18px;
     padding:12px;
     border:none;
     border-radius:20px;
@@ -44,6 +70,8 @@
     color:white;
     cursor:pointer;
     font-size:18px;
+    font-family:'GmarketSans', sans-serif;
+    box-shadow:0 8px 18px rgba(0,0,0,0.12);
 }
 </style>
 </head>
@@ -69,16 +97,15 @@
 <script src="js/inventory.js"></script>
 
 <script>
-
 /* =========================
-   ITEM RENDER FIX
+   인벤토리 렌더링
 ========================= */
 function renderInventory(){
 
     const list = document.getElementById("inventoryItems");
     const items = getInventory();
 
-    if(items.length === 0){
+    if(!items || items.length === 0){
         list.innerHTML = "<div class='inventory-item'>비어있음</div>";
         return;
     }
@@ -90,7 +117,9 @@ function renderInventory(){
         axe : "🪓 도끼",
         shield : "🛡 방패",
         key : "🔑 열쇠",
-        heart : "💖 하트 생명"
+        heart : "💖 하트 생명",
+        iceAmericano : "🧊 아이스 아메리카노",
+        tiramisu : "🍰 티라미수"
     };
 
     list.innerHTML = items.map(item => {
@@ -103,26 +132,32 @@ function renderInventory(){
 }
 
 /* =========================
-   돌아가기 FIX (핵심)
+   돌아가기
 ========================= */
 function goBack(){
 
-    const last = localStorage.getItem("lastPage");
+    const returnPage = localStorage.getItem("returnPage");
+    const lastPage = localStorage.getItem("lastPage");
 
-    if(last){
-        location.href = last;
-    }else{
-        location.href = "room1.html";
+    if(returnPage && returnPage !== "null" && returnPage !== "undefined" && returnPage !== ""){
+        location.href = returnPage;
+        return;
     }
+
+    if(lastPage && lastPage !== "null" && lastPage !== "undefined" && lastPage !== ""){
+        location.href = lastPage;
+        return;
+    }
+
+    location.href = "room1.html";
 }
 
 /* =========================
-   START
+   시작
 ========================= */
 window.addEventListener("DOMContentLoaded", () => {
     renderInventory();
 });
-
 </script>
 
 </body>
