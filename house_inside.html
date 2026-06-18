@@ -6,6 +6,11 @@
 <title>집 내부</title>
 
 <style>
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
+
 *{
     margin:0;
     padding:0;
@@ -32,16 +37,28 @@ body{
 .zone{
     position:absolute;
     cursor:pointer;
+    background:rgba(255,255,255,0);
 }
 
-/* zones */
+/* 침대 */
 .bed{ left:4%; top:48%; width:27%; height:14%; }
+
+/* 옷장 */
 .closet{ left:24%; top:29%; width:18%; height:20%; }
+
+/* 책장 */
 .bookshelf{ left:43%; top:33%; width:8%; height:13%; }
+
+/* 액자 */
 .frame{ left:53%; top:29%; width:11%; height:8%; }
+
+/* 주방 */
 .kitchen{ left:66%; top:23%; width:33%; height:25%; }
+
+/* 상자 */
 .box{ left:89%; top:49%; width:13%; height:9%; }
 
+/* 돌아가기 */
 .back-btn{
     position:absolute;
     bottom:3%;
@@ -52,8 +69,12 @@ body{
     border:5px solid #c89b5d;
     border-radius:25px;
     cursor:pointer;
+    font-size:18px;
+    color:#5b3719;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
+/* 인벤토리 */
 .inventory-btn{
     position:fixed;
     top:15px;
@@ -65,6 +86,8 @@ body{
     background:#ff9fd2;
     font-size:24px;
     cursor:pointer;
+    z-index:999;
+    box-shadow:0 8px 18px rgba(0,0,0,0.2);
 }
 
 /* popup */
@@ -75,6 +98,7 @@ body{
     display:none;
     justify-content:center;
     align-items:center;
+    z-index:1000;
 }
 
 .popup-box{
@@ -85,6 +109,48 @@ body{
     border:5px solid #c89b5d;
     padding:20px;
     text-align:center;
+    position:relative;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+
+.close-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:35px;
+    height:35px;
+    border:none;
+    border-radius:50%;
+    background:#ff9fd2;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.popup-title{
+    font-size:22px;
+    color:#5b3719;
+    margin-bottom:10px;
+    line-height:1.6;
+}
+
+.popup-body{
+    font-size:18px;
+    color:#5b3719;
+    margin-bottom:10px;
+    line-height:1.7;
+}
+
+.choice-btn{
+    width:100%;
+    padding:12px;
+    margin-top:8px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    color:white;
+    cursor:pointer;
+    font-size:18px;
 }
 
 .keypad{
@@ -100,16 +166,15 @@ body{
     border:5px solid #c89b5d;
     border-radius:20px;
     cursor:pointer;
+    font-size:18px;
+    color:#5b3719;
 }
 
-.choice-btn{
-    margin-top:10px;
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:20px;
-    background:#ff9fd2;
-    color:white;
+.code-display{
+    font-size:22px;
+    letter-spacing:8px;
+    margin-bottom:10px;
+    color:#5b3719;
 }
 </style>
 </head>
@@ -118,9 +183,9 @@ body{
 
 <div class="game">
 
-    <img src="images/house_inside.png" class="bg">
+    <img src="images/house_inside.png" class="bg" alt="집 내부">
 
-    <!-- 🛏 버블티 (FIXED) -->
+    <!-- 🛏 침대 -->
     <div class="zone bed"
     onclick="getItem('bubbletea','bubbletea','흑당 버블티','꿀맛도리 흑당 버블버블티~~~')"></div>
 
@@ -144,20 +209,24 @@ body{
     <div class="zone box"
     onclick="openBox()"></div>
 
+    <!-- ↩ 돌아가기 -->
     <button class="back-btn" onclick="location.href='room1.html'">
         돌아가기
     </button>
 
 </div>
 
+<!-- 🎒 인벤토리 -->
 <button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
 
-<!-- popup -->
+<!-- POPUP -->
 <div class="popup" id="popup">
     <div class="popup-box">
 
-        <div id="title"></div>
-        <div id="body"></div>
+        <button class="close-btn" onclick="closePopup()">✕</button>
+
+        <div class="popup-title" id="title"></div>
+        <div class="popup-body" id="body"></div>
         <div id="actions"></div>
 
     </div>
@@ -170,26 +239,26 @@ body{
 /* =========================
    LAST PAGE FIX
 ========================= */
-window.onload = () => {
+window.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("lastPage","house_inside.html");
-};
+});
 
 /* =========================
    POPUP
 ========================= */
 function openPopup(t,b,a){
-    document.getElementById("title").innerHTML=t;
-    document.getElementById("body").innerHTML=b;
-    document.getElementById("actions").innerHTML=a;
-    document.getElementById("popup").style.display="flex";
+    document.getElementById("title").innerHTML = t;
+    document.getElementById("body").innerHTML = b;
+    document.getElementById("actions").innerHTML = a;
+    document.getElementById("popup").style.display = "flex";
 }
 
 function closePopup(){
-    document.getElementById("popup").style.display="none";
+    document.getElementById("popup").style.display = "none";
 }
 
 /* =========================
-   ITEM FIX (핵심)
+   ITEM
 ========================= */
 function getItem(id,img,title,desc){
 
@@ -199,7 +268,7 @@ function getItem(id,img,title,desc){
 
     openPopup(
         title,
-        `<img src="images/${img}.png" style="width:180px;"><br>${desc}`,
+        `<img src="images/${img}.png" style="width:180px; display:block; margin:10px auto;"><br>${desc}`,
         `<button class="choice-btn" onclick="closePopup()">확인</button>`
     );
 }
@@ -211,7 +280,7 @@ function showPhoto(img,title,desc){
 
     openPopup(
         title,
-        `<img src="images/${img}.png" style="width:200px;"><br>${desc}`,
+        `<img src="images/${img}.png" style="width:200px; display:block; margin:10px auto;"><br>${desc}`,
         `<button class="choice-btn" onclick="closePopup()">확인</button>`
     );
 }
@@ -219,15 +288,15 @@ function showPhoto(img,title,desc){
 /* =========================
    KEYPAD BOX
 ========================= */
-let code="";
+let code = "";
 
 function openBox(){
 
-    code="";
+    code = "";
 
     openPopup(
         "비밀번호",
-        `<div id="code">____</div>`,
+        `<div class="code-display" id="code">____</div>`,
         `
         <div class="keypad">
             <button onclick="press(1)">1</button>
@@ -248,25 +317,25 @@ function openBox(){
 }
 
 function press(n){
-    if(code.length>=4) return;
-    code+=n;
-    document.getElementById("code").innerText=code.padEnd(4,"_");
+    if(code.length >= 4) return;
+    code += n;
+    document.getElementById("code").innerText = code.padEnd(4, "_");
 }
 
 function clearC(){
-    code="";
-    document.getElementById("code").innerText="____";
+    code = "";
+    document.getElementById("code").innerText = "____";
 }
 
 function check(){
 
-    if(code==="8297"){
+    if(code === "8297"){
 
         addItem("key");
 
         openPopup(
             "성공",
-            `<img src="images/key.png" style="width:120px;"><br>열쇠 획득`,
+            `<img src="images/key.png" style="width:120px; display:block; margin:10px auto;"><br>열쇠 획득`,
             `<button class="choice-btn" onclick="closePopup()">확인</button>`
         );
 
