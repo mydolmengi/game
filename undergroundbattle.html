@@ -86,6 +86,43 @@ canvas{
     color:#dfe8ff;
     font-weight:700;
     box-shadow:0 8px 22px rgba(0,0,0,.25);
+    text-align:right;
+}
+
+#secretWin{
+    position:fixed;
+    top:8px;
+    right:8px;
+    width:24px;
+    height:24px;
+    padding:0;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,170,210,0.45);
+    box-shadow:0 0 0 1px rgba(255,180,220,0.22), 0 0 12px rgba(255,170,210,0.12);
+    z-index:10;
+    cursor:pointer;
+    opacity:0.7;
+}
+
+#secretWin:hover{
+    opacity:1;
+}
+
+#clearSkipBtn{
+    position:fixed;
+    top:40px;
+    right:8px;
+    z-index:10;
+    display:none;
+    background:#f9e9c8;
+    border:4px solid #c89b5d;
+    border-radius:18px;
+    padding:8px 12px;
+    font-size:14px;
+    color:#5b3719;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(0,0,0,.18);
 }
 
 #resultScreen{
@@ -151,22 +188,6 @@ canvas{
     border:1px solid rgba(255,255,255,.08);
 }
 
-#secretWin{
-    position:fixed;
-    top:10px;
-    right:10px;
-    width:18px;
-    height:18px;
-    padding:0;
-    border:none;
-    border-radius:50%;
-    background:rgba(255,170,210,0.18);
-    box-shadow:0 0 0 1px rgba(255,180,220,0.22), 0 0 12px rgba(255,170,210,0.06);
-    z-index:10;
-    cursor:pointer;
-    opacity:0.35;
-}
-
 #controls{
     position:fixed;
     bottom:8px;
@@ -214,7 +235,8 @@ button.ctrl:active{
 </div>
 
 <div id="hint">이동 ⬅️➡️⬆️⬇️ · 공격 ⚔️ · 대시 💨</div>
-<button id="secretWin" aria-label="secret win" title=""></button>
+<button id="secretWin" aria-label="secret win" title="개발자용 즉시 성공"></button>
+<button id="clearSkipBtn">underground 바로가기</button>
 
 <div id="resultScreen">
     <div id="resultCard">
@@ -252,11 +274,14 @@ button.ctrl:active{
     const resultMessage = document.getElementById("resultMessage");
     const resultButtons = document.getElementById("resultButtons");
 
+    const secretWin = document.getElementById("secretWin");
+    const clearSkipBtn = document.getElementById("clearSkipBtn");
+
     const keys = { left:false, right:false, up:false, down:false };
 
     let gameEnd = false;
-    let hearts = parseInt(localStorage.getItem("heart") || "0", 10);
-    if (Number.isNaN(hearts) || hearts < 0) hearts = 0;
+    let facingX = 0;
+    let facingY = -1;
 
     const state = {
         running: true,
@@ -305,6 +330,7 @@ button.ctrl:active{
     };
 
     const projectiles = [];
+    const slashProjectiles = [];
     const particles = [];
     const clones = [];
     const hazards = [];
@@ -312,6 +338,44 @@ button.ctrl:active{
     function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
     function dist(ax, ay, bx, by) { return Math.hypot(ax - bx, ay - by); }
     function rand(a, b) { return a + Math.random() * (b - a); }
+
+    function hasHeart(){
+        try{
+            if (typeof hasItem === "function" && hasItem("heart")) return true;
+        }catch(e){}
+
+        const raw = localStorage.getItem("heart");
+        if (raw === "true") return true;
+        if (raw === "1") return true;
+
+        const n = Number(raw);
+        if (!Number.isNaN(n) && n > 0) return true;
+
+        return false;
+    }
+
+    function consumeHeart(){
+        try{
+            if (typeof hasItem === "function" && typeof removeItem === "function" && hasItem("heart")) {
+                removeItem("heart");
+                return true;
+            }
+        }catch(e){}
+
+        const raw = localStorage.getItem("heart");
+        if (raw === "true" || raw === "1") {
+            localStorage.removeItem("heart");
+            return true;
+        }
+
+        const n = Number(raw);
+        if (!Number.isNaN(n) && n > 0) {
+            localStorage.setItem("heart", String(n - 1));
+            return true;
+        }
+
+        return false;
+    }
 
     function showResult(title, message, buttonsHtml) {
         state.running = false;
@@ -322,19 +386,63 @@ button.ctrl:active{
         resultScreen.style.display = "flex";
     }
 
-    function hasHeart(){
-        return hasItem("heart");
+    function resetBattle(){
+        state.running = true;
+        state.victory = false;
+        state.gameOver = false;
+        gameEnd = false;
+
+        resultScreen.style.display = "none";
+        resultTitle.textContent = "RESULT";
+        resultMessage.textContent = "";
+        resultButtons.innerHTML = "";
+
+        player.x = 180;
+        player.y = 560;
+        player.hp = 100;
+        player.vx = 0;
+        player.vy = 0;
+        player.atk = 0;
+        player.dash = 0;
+        player.inv = 0;
+        player.atkCooldown = 0;
+        player.dashCooldown = 0;
+
+        boss.x = 200;
+        boss.y = 135;
+        boss.hp = 240;
+        boss.vx = 0;
+        boss.vy = 0;
+        boss.flash = 0;
+        boss.invis = 0;
+        boss.orbitA = 0;
+        boss.orbitR = 110;
+        boss.targetX = 200;
+        boss.targetY = 135;
+        boss.moveBias = 0;
+        boss.lastPattern = -1;
+        boss.phase2Trigger = false;
+
+        projectiles.length = 0;
+        slashProjectiles.length = 0;
+        particles.length = 0;
+        clones.length = 0;
+        hazards.length = 0;
+
+        state.shake = 0;
+        state.frame = 0;
+        state.phase = 1;
+        state.patternClock = 0;
+        state.pattern = 0;
     }
 
-    function useHeart(){
-        if (hasItem("heart")) {
-            removeItem("heart");
-            return true;
-        }
-        return false;
+    function setClearState(){
+        localStorage.setItem("bossClear", "true");
+        clearSkipBtn.style.display = "block";
     }
 
     function showVictory() {
+        setClearState();
         showResult(
             "VICTORY",
             "분하다...! 날 이기다니! 하지만 절대 도달할 수 없을거다!",
@@ -357,8 +465,8 @@ button.ctrl:active{
         );
 
         document.getElementById("retryHeart").addEventListener("click", () => {
-            if (useHeart()) {
-                location.reload();
+            if (hasHeart() && consumeHeart()) {
+                resetBattle();
             } else {
                 resultMessage.textContent = "하트가 없구만 돌아가라";
                 resultButtons.innerHTML = `<button id="backKitchenOnly" class="secondary">돌아가기</button>`;
@@ -390,9 +498,12 @@ button.ctrl:active{
 
     document.getElementById("atk").addEventListener("pointerdown", (e) => {
         e.preventDefault();
-        if (!state.running || player.atk > 0) return;
+        if (!state.running || player.atk > 0 || player.atkCooldown > 0) return;
+
         player.atk = 12;
         player.atkCooldown = 10;
+
+        spawnSlashShot();
         spawnBurst(player.x + player.w / 2, player.y + player.h / 2, 6, "#ffffff");
     });
 
@@ -422,16 +533,20 @@ button.ctrl:active{
         spawnBurst(player.x + player.w / 2, player.y + player.h / 2, 10, "#c8ffff");
     });
 
-    const secretWin = document.getElementById("secretWin");
     secretWin.addEventListener("pointerdown", (e) => {
         e.preventDefault();
         if (state.running) {
             state.victory = true;
             state.gameOver = false;
+            setClearState();
             showVictory();
             state.shake = 0;
             spawnBurst(200, 150, 24, "#ffd1e8");
         }
+    });
+
+    clearSkipBtn.addEventListener("click", () => {
+        location.href = "underground.html";
     });
 
     function choosePattern(phase) {
@@ -473,6 +588,29 @@ button.ctrl:active{
 
     function spawnShadowDashMarker(x, y) {
         hazards.push({ x, y, life: 32, kind: "dashMarker" });
+    }
+
+    function spawnSlashShot(){
+        const len = Math.hypot(facingX, facingY) || 1;
+        const fx = facingX / len;
+        const fy = facingY / len;
+
+        slashProjectiles.push({
+            x: player.x + player.w / 2 + fx * 18,
+            y: player.y + player.h / 2 + fy * 18,
+            vx: fx * 8.5,
+            vy: fy * 8.5,
+            life: 24,
+            damage: 10,
+            angle: Math.atan2(fy, fx)
+        });
+
+        spawnBurst(
+            player.x + player.w / 2 + fx * 10,
+            player.y + player.h / 2 + fy * 10,
+            6,
+            "#ffffff"
+        );
     }
 
     function patternOrbit() {
@@ -610,6 +748,11 @@ button.ctrl:active{
         if (ax !== 0 && ay !== 0) {
             const len = Math.hypot(ax, ay);
             ax /= len; ay /= len;
+        }
+
+        if (ax !== 0 || ay !== 0) {
+            facingX = ax;
+            facingY = ay;
         }
 
         if (ax !== 0) {
@@ -767,6 +910,28 @@ button.ctrl:active{
         }
     }
 
+    function updateSlashProjectiles() {
+        for (let i = slashProjectiles.length - 1; i >= 0; i--) {
+            const s = slashProjectiles[i];
+            s.x += s.vx;
+            s.y += s.vy;
+            s.life--;
+
+            if (s.life <= 0 || s.x < -40 || s.x > canvas.width + 40 || s.y < -40 || s.y > canvas.height + 40) {
+                slashProjectiles.splice(i, 1);
+                continue;
+            }
+
+            if (dist(s.x, s.y, boss.x, boss.y) < boss.r + 8) {
+                boss.hp -= s.damage;
+                boss.flash = 4;
+                state.shake = Math.max(state.shake, 4);
+                spawnBurst(boss.x, boss.y, 8, "#fff3aa");
+                slashProjectiles.splice(i, 1);
+            }
+        }
+    }
+
     function updateHazards() {
         for (let i = hazards.length - 1; i >= 0; i--) {
             const h = hazards[i];
@@ -861,6 +1026,7 @@ button.ctrl:active{
         updatePlayer();
         updateBoss();
         updateProjectiles();
+        updateSlashProjectiles();
         updateHazards();
         updateParticles();
         updateClones();
@@ -1087,6 +1253,30 @@ button.ctrl:active{
         });
     }
 
+    function drawSlashProjectiles() {
+        slashProjectiles.forEach((s) => {
+            ctx.save();
+            ctx.translate(s.x, s.y);
+            ctx.rotate(s.angle);
+
+            ctx.strokeStyle = "rgba(255,255,255,.95)";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(-8, 0);
+            ctx.lineTo(14, 0);
+            ctx.stroke();
+
+            ctx.strokeStyle = "rgba(160,220,255,.75)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-10, -3);
+            ctx.lineTo(16, -3);
+            ctx.stroke();
+
+            ctx.restore();
+        });
+    }
+
     function drawHazards() {
         hazards.forEach((h) => {
             if (h.kind === "dashMarker") {
@@ -1193,6 +1383,7 @@ button.ctrl:active{
         drawParticles();
         drawHazards();
         drawProjectiles();
+        drawSlashProjectiles();
         drawClones();
         drawBoss();
         drawPlayer();
@@ -1220,6 +1411,10 @@ button.ctrl:active{
         if (e.key === "ArrowUp") keys.up = false;
         if (e.key === "ArrowDown") keys.down = false;
     });
+
+    if (localStorage.getItem("bossClear") === "true") {
+        clearSkipBtn.style.display = "block";
+    }
 
     loop();
 })();
