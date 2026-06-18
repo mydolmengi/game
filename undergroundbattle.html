@@ -468,7 +468,7 @@ button.ctrl:active{
             if (hasHeart() && consumeHeart()) {
                 resetBattle();
             } else {
-                resultMessage.textContent = "하트가 없구만 돌아가라";
+                resultMessage.textContent = "훼이크다! 임마!";
                 resultButtons.innerHTML = `<button id="backKitchenOnly" class="secondary">돌아가기</button>`;
                 document.getElementById("backKitchenOnly").addEventListener("click", () => {
                     location.href = "kitchen.html";
