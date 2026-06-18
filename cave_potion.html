@@ -1,1 +1,507 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>물약 제조대</title>
+
+<style>
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#000;
+    font-family:'GmarketSans', sans-serif;
+    display:flex;
+    justify-content:center;
+    overflow-x:hidden;
+}
+
+.game{
+    position:relative;
+    width:min(100%,900px);
+}
+
+.bg{
+    width:100%;
+    display:block;
+}
+
+/* 가마솥 클릭 영역 */
+.cauldron-zone{
+    position:absolute;
+    left:36%;
+    top:58%;
+    width:28%;
+    height:26%;
+    cursor:pointer;
+    z-index:8;
+}
+
+/* 물약만들기 버튼 */
+.make-btn{
+    position:absolute;
+    left:50%;
+    top:52%;
+    transform:translateX(-50%);
+    z-index:10;
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:12px 28px;
+    font-size:18px;
+    color:#5b3719;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    font-family:'GmarketSans', sans-serif;
+}
+
+/* 돌아가기 버튼 */
+.back-btn{
+    position:absolute;
+    left:50%;
+    bottom:3%;
+    transform:translateX(-50%);
+    z-index:20;
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:30px;
+    padding:12px 30px;
+    font-size:18px;
+    color:#5b3719;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    font-family:'GmarketSans', sans-serif;
+}
+
+/* 효과 레이어 */
+.effect-layer{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:15;
+    overflow:hidden;
+}
+
+/* 버블 */
+.bubble{
+    position:absolute;
+    bottom:22%;
+    left:50%;
+    border-radius:50%;
+    background:rgba(180, 245, 255, 0.8);
+    box-shadow:0 0 12px rgba(180,245,255,0.45);
+    animation:bubbleRise 1.2s ease-in forwards;
+}
+
+.bubble.small{ width:12px; height:12px; }
+.bubble.mid{ width:18px; height:18px; }
+.bubble.big{ width:26px; height:26px; }
+
+@keyframes bubbleRise{
+    0%{
+        transform:translate(-50%, 0) scale(0.7);
+        opacity:0.2;
+    }
+    35%{
+        opacity:1;
+    }
+    100%{
+        transform:translate(-50%, -180px) scale(1.8);
+        opacity:0;
+    }
+}
+
+/* 검은 연기 */
+.smoke{
+    position:absolute;
+    bottom:22%;
+    left:50%;
+    border-radius:50%;
+    background:rgba(25,25,25,0.88);
+    filter:blur(1px);
+    animation:smokeRise 1.1s ease-in forwards;
+    box-shadow:0 0 20px rgba(0,0,0,0.45);
+}
+
+.smoke.small{ width:18px; height:18px; }
+.smoke.mid{ width:28px; height:28px; }
+.smoke.big{ width:42px; height:42px; }
+
+@keyframes smokeRise{
+    0%{
+        transform:translate(-50%, 0) scale(0.7);
+        opacity:0.3;
+    }
+    40%{
+        opacity:0.95;
+    }
+    100%{
+        transform:translate(-50%, -140px) scale(3.2);
+        opacity:0;
+    }
+}
+
+/* 팝업 */
+.popup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.68);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+    padding:18px;
+}
+
+.popup-box{
+    width:100%;
+    max-width:560px;
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:28px;
+    padding:22px 20px 18px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    position:relative;
+}
+
+.close-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:50%;
+    background:#ff9fd2;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+    font-family:'GmarketSans', sans-serif;
+}
+
+.popup-title{
+    font-size:22px;
+    color:#5b3719;
+    margin-bottom:12px;
+    line-height:1.5;
+}
+
+.popup-body{
+    font-size:18px;
+    color:#5b3719;
+    line-height:1.7;
+    margin-bottom:12px;
+    white-space:pre-line;
+}
+
+.choice-btn{
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    color:white;
+    cursor:pointer;
+    font-size:18px;
+    font-family:'GmarketSans', sans-serif;
+    box-shadow:0 6px 14px rgba(0,0,0,0.12);
+}
+
+.choice-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.choice-row .choice-btn{
+    flex:1 1 160px;
+}
+
+.bottle-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:10px;
+    margin-top:12px;
+}
+
+.bottle-btn{
+    padding:12px 8px;
+    border:none;
+    border-radius:18px;
+    cursor:pointer;
+    font-family:'GmarketSans', sans-serif;
+    font-size:15px;
+    color:#fff;
+    box-shadow:0 6px 14px rgba(0,0,0,0.12);
+}
+
+.bottle-btn.sel{
+    outline:4px solid #5b3719;
+    transform:translateY(-2px);
+}
+
+.b1{ background:#e74c4c; }
+.b2{ background:#f39c12; }
+.b3{ background:#f1c40f; color:#5b3719; }
+.b4{ background:#76c043; }
+.b5{ background:#2f86ff; }
+.b6{ background:#8e44ad; }
+.b7{ background:#f5f2ea; color:#5b3719; border:2px solid #c9c2b4; }
+
+.selected-line{
+    margin-top:10px;
+    font-size:16px;
+    color:#5b3719;
+    line-height:1.6;
+}
+
+.reward-img{
+    width:min(100%, 240px);
+    display:block;
+    margin:8px auto 0;
+    border-radius:16px;
+    box-shadow:0 8px 16px rgba(0,0,0,0.12);
+}
+
+.result-big{
+    font-size:22px;
+    font-weight:800;
+    color:#5b3719;
+    margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <!-- 배경 -->
+    <img src="images/potion_workbench.png" class="bg" alt="물약 제조대">
+
+    <!-- 가마솥 -->
+    <div class="cauldron-zone" onclick="openCauldronMenu()"></div>
+
+    <!-- 물약 만들기 버튼 -->
+    <button class="make-btn" id="makeBtn" onclick="openCombinationBoard()" style="display:none;">
+        물약만들기
+    </button>
+
+    <!-- 돌아가기 -->
+    <button class="back-btn" onclick="location.href='cave_mage.html'">
+        돌아가기
+    </button>
+
+    <!-- 효과 레이어 -->
+    <div class="effect-layer" id="effectLayer"></div>
+
+</div>
+
+<!-- 팝업 -->
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <button class="close-btn" onclick="closePopup()">✕</button>
+        <div class="popup-title" id="popupTitle"></div>
+        <div class="popup-body" id="popupBody"></div>
+        <div id="popupActions"></div>
+    </div>
+</div>
+
+<script src="js/inventory.js"></script>
+
+<script>
+let selected = [];
+let brewing = false;
+
+window.addEventListener("DOMContentLoaded", () => {
+    localStorage.setItem("lastPage", "cave_potion.html");
+});
+
+function openPopup(title, bodyHtml, actionsHtml = ""){
+    document.getElementById("popupTitle").innerHTML = title || "";
+    document.getElementById("popupBody").innerHTML = bodyHtml || "";
+    document.getElementById("popupActions").innerHTML = actionsHtml || "";
+    document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup(){
+    document.getElementById("popup").style.display = "none";
+}
+
+function openCauldronMenu(){
+    openPopup(
+        "가마솥",
+        "물약을 만들어볼까?",
+        `
+            <button class="choice-btn" onclick="openCombinationBoard()">물약만들기</button>
+            <button class="choice-btn" onclick="closePopup()">닫기</button>
+        `
+    );
+}
+
+function openCombinationBoard(){
+    selected = [];
+    closePopup();
+
+    const itemsHtml = `
+        <div style="font-size:18px; color:#5b3719; margin-bottom:8px;">선반 위 7개 중 2개를 선택해줘</div>
+        <div class="bottle-grid">
+            <button class="bottle-btn b1" onclick="toggleBottle(1, this)">1</button>
+            <button class="bottle-btn b2" onclick="toggleBottle(2, this)">2</button>
+            <button class="bottle-btn b3" onclick="toggleBottle(3, this)">3</button>
+            <button class="bottle-btn b4" onclick="toggleBottle(4, this)">4</button>
+            <button class="bottle-btn b5" onclick="toggleBottle(5, this)">5</button>
+            <button class="bottle-btn b6" onclick="toggleBottle(6, this)">6</button>
+            <button class="bottle-btn b7" onclick="toggleBottle(7, this)">7</button>
+        </div>
+        <div class="selected-line" id="selectedLine">선택: 없음</div>
+    `;
+
+    openPopup(
+        "물약 조합대",
+        itemsHtml,
+        `
+            <button class="choice-btn" onclick="brewPotion()">조합하기</button>
+            <button class="choice-btn" onclick="openCauldronMenu()">뒤로</button>
+        `
+    );
+}
+
+function toggleBottle(n, btn){
+    if(brewing) return;
+
+    const idx = selected.indexOf(n);
+    if(idx >= 0){
+        selected.splice(idx, 1);
+        btn.classList.remove("sel");
+    }else{
+        if(selected.length >= 2) return;
+        selected.push(n);
+        btn.classList.add("sel");
+    }
+
+    const line = document.getElementById("selectedLine");
+    if(line){
+        line.innerHTML = selected.length ? `선택: ${selected.join("번, ")}번` : "선택: 없음";
+    }
+}
+
+function clearEffectLayer(){
+    document.getElementById("effectLayer").innerHTML = "";
+}
+
+function spawnBubbles(){
+    const layer = document.getElementById("effectLayer");
+    clearEffectLayer();
+
+    for(let i = 0; i < 18; i++){
+        const b = document.createElement("div");
+        const sizeClass = i % 3 === 0 ? "big" : (i % 2 === 0 ? "mid" : "small");
+        b.className = `bubble ${sizeClass}`;
+        b.style.left = `calc(50% + ${Math.random() * 120 - 60}px)`;
+        b.style.bottom = `calc(28% + ${Math.random() * 40 - 20}px)`;
+        b.style.animationDelay = `${Math.random() * 0.2}s`;
+        layer.appendChild(b);
+    }
+}
+
+function spawnSmoke(){
+    const layer = document.getElementById("effectLayer");
+    clearEffectLayer();
+
+    for(let i = 0; i < 14; i++){
+        const s = document.createElement("div");
+        const sizeClass = i % 3 === 0 ? "big" : (i % 2 === 0 ? "mid" : "small");
+        s.className = `smoke ${sizeClass}`;
+        s.style.left = `calc(50% + ${Math.random() * 110 - 55}px)`;
+        s.style.bottom = `calc(28% + ${Math.random() * 35 - 15}px)`;
+        s.style.animationDelay = `${Math.random() * 0.15}s`;
+        layer.appendChild(s);
+    }
+}
+
+function brewPotion(){
+    if(brewing) return;
+
+    if(selected.length !== 2){
+        openPopup(
+            "조합대",
+            "물약 2개를 골라야 해.",
+            `
+                <button class="choice-btn" onclick="closePopup(); openCombinationBoard();">확인</button>
+            `
+        );
+        return;
+    }
+
+    brewing = true;
+
+    const pair = [...selected].sort((a, b) => a - b).join(",");
+    const success = pair === "1,7";
+
+    closePopup();
+
+    if(success){
+        spawnBubbles();
+
+        setTimeout(() => {
+            clearEffectLayer();
+            safeAddItem("bugSpray");
+
+            openPopup(
+                "성공!",
+                `
+                    <img class="reward-img" src="images/bug_spray.png" alt="벌레 퇴치제">
+                    <div class="result-big">벌레 퇴치제 획득!</div>
+                `,
+                `
+                    <button class="choice-btn" onclick="closePopup()">확인</button>
+                `
+            );
+
+            brewing = false;
+        }, 1100);
+
+    }else{
+        spawnSmoke();
+
+        setTimeout(() => {
+            clearEffectLayer();
+
+            openPopup(
+                "실패",
+                `
+                    <div class="result-big">실패</div>
+                `,
+                `
+                    <button class="choice-btn" onclick="closePopup()">확인</button>
+                `
+            );
+
+            brewing = false;
+        }, 1100);
+    }
+}
+
+function safeAddItem(id){
+    try{
+        if(typeof addItem === "function") addItem(id);
+    }catch(e){}
+}
+</script>
+
+</body>
+</html>
