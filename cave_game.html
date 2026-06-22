@@ -384,7 +384,7 @@
     <button class="tool" data-tool="scrub"><div class="emoji">🧽</div><div class="name">수세미</div><div class="desc">병 위에서 문지르기</div></button>
     <button class="tool" data-tool="heat"><div class="emoji">🔥</div><div class="name">버너</div><div class="desc">병에 닿으면 불</div></button>
     <button class="tool" data-tool="cool"><div class="emoji">❄️</div><div class="name">냉각 수정</div><div class="desc">병에 닿으면 정리</div></button>
-    <div id="helpBar"><strong>목표:</strong> 200점 이상이면 성공, 그 아래는 실패. <strong>조작:</strong> 도구를 선택한 뒤 병 위로 움직이면 바로 적용됩니다.</div>
+    <div id="helpBar"><strong>목표:</strong> 200점 이상이면 성공, 그 아래는 실패. <strong>조작:</strong> 도구를 선택한 뒤 병을 클릭하면 바로 적용됩니다.</div>
   </div>
 
   <div id="overlay">
@@ -663,7 +663,7 @@
     state.combo += 1;
     saveBest();
     hud();
-    if (state.score >= GOAL && !state.over) endGame(true, '성공!', '목표 점수 200점을 달성했어요.');
+    if (state.score >= GOAL && !state.over) endGame(true, '성공!', '설거지를 다 했어요!','가마솥 비밀번호는 1010');
   }
 
   function resetCombo() {
