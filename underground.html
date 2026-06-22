@@ -352,7 +352,7 @@ body{
 
     <div class="dialog-ui">
         <div class="dialog-name" id="dialogName">&nbsp;</div>
-        <div class="dialog-text" id="dialogText">여긴가? 드디어 다왔군.<br>저 문으로 들어가면 되나?</div>
+        <div class="dialog-text" id="dialogText">겨우 이겼군.<br>나의 애기미는 어디있지?</div>
         <div class="dialog-actions" id="dialogActions">
             <button class="dialog-btn" onclick="nextIntro()">다음</button>
         </div>
@@ -456,9 +456,9 @@ function nextIntro(){
     introStep++;
 
     if(introStep === 1){
-        setDialog("", "여긴가? 드디어 다왔군.", `<button class="dialog-btn" onclick="nextIntro()">다음</button>`);
+        setDialog("", "여기 이 문인가?", `<button class="dialog-btn" onclick="nextIntro()">다음</button>`);
     }else if(introStep === 2){
-        setDialog("", "저 문으로 들어가면 되나?", `<button class="dialog-btn" onclick="nextIntro()">다음</button>`);
+        setDialog("", "애기미 기다룡!!!", `<button class="dialog-btn" onclick="nextIntro()">다음</button>`);
     }else{
         introDone = true;
         setDialog("", "문을 클릭해보자.", "");
