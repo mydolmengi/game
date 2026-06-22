@@ -31,7 +31,10 @@ body{
     width:min(100%,900px);
 }
 
-.bg{ width:100%; display:block; }
+.bg{
+    width:100%;
+    display:block;
+}
 
 /* 클릭 영역 */
 .hotspot{
@@ -88,6 +91,8 @@ body{
     font-size:18px;
     color:white;
     cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    font-family:'GmarketSans', sans-serif;
 }
 
 /* 인벤토리 */
@@ -103,6 +108,8 @@ body{
     font-size:30px;
     cursor:pointer;
     z-index:9999;
+    box-shadow:0 8px 18px rgba(0,0,0,0.2);
+    display:block;
 }
 
 /* 팝업 */
@@ -126,6 +133,7 @@ body{
     padding:22px 20px 18px;
     text-align:center;
     position:relative;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 /* 닫기 = 파란색 */
@@ -141,6 +149,30 @@ body{
     color:white;
     font-size:20px;
     cursor:pointer;
+    font-family:'GmarketSans', sans-serif;
+}
+
+.popup-title{
+    font-size:22px;
+    color:#5b3719;
+    margin-bottom:12px;
+    line-height:1.5;
+}
+
+.popup-body{
+    font-size:18px;
+    color:#5b3719;
+    line-height:1.7;
+    margin-bottom:12px;
+    white-space:pre-line;
+}
+
+.popup-img{
+    width:min(100%, 320px);
+    border-radius:18px;
+    display:block;
+    margin:0 auto 10px;
+    box-shadow:0 8px 16px rgba(0,0,0,0.12);
 }
 
 /* 공용 버튼 */
@@ -154,18 +186,46 @@ body{
     color:white;
     cursor:pointer;
     font-size:18px;
-}
-
-/* 이미지 */
-.popup-img{
-    width:min(100%, 320px);
-    border-radius:18px;
-    margin:0 auto 10px;
+    font-family:'GmarketSans', sans-serif;
+    box-shadow:0 6px 14px rgba(0,0,0,0.12);
 }
 
 /* 파란 버튼 */
 .choice-btn.blue{
     background:#6b5bff;
+}
+
+.choice-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.choice-row .choice-btn{
+    flex:1 1 160px;
+}
+
+.input-box{
+    width:100%;
+    padding:12px 14px;
+    border:3px solid #c89b5d;
+    border-radius:16px;
+    font-size:18px;
+    font-family:'GmarketSans', sans-serif;
+    outline:none;
+    background:#fffef9;
+    color:#5b3719;
+    margin-top:8px;
+}
+
+.dialog-flow{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.dialog-flow button{
+    width:100%;
 }
 </style>
 </head>
@@ -174,13 +234,16 @@ body{
 
 <div class="game">
 
-    <img src="images/cave_mage_bg.png" class="bg">
+    <img src="images/cave_mage_bg.png" class="bg" alt="마녀의 집">
 
     <div class="hotspot cauldron-zone" onclick="openCauldron()"></div>
     <div class="hotspot left-crystal-zone" onclick="openDish()"></div>
     <div class="hotspot right-crystal-zone" onclick="openHint()"></div>
     <div class="hotspot 대화" onclick="openWitch()"></div>
 
+    <button class="back-btn" onclick="location.href='cave.html'">
+        돌아가기
+    </button>
 </div>
 
 <button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
@@ -191,7 +254,8 @@ body{
 
         <button class="close-btn" onclick="closePopup()">✕</button>
 
-        <div id="popupBody"></div>
+        <div class="popup-title" id="popupTitle"></div>
+        <div class="popup-body" id="popupBody"></div>
         <div id="popupBtns"></div>
 
     </div>
@@ -200,10 +264,13 @@ body{
 <script src="js/inventory.js"></script>
 
 <script>
+const FLAG_TALK_UNLOCKED = "caveMageTalkUnlocked";
+const FLAG_DISH_DONE = "caveMageDishDone";
 
-function openPopup(html, btns=""){
-    document.getElementById("popupBody").innerHTML = html;
-    document.getElementById("popupBtns").innerHTML = btns;
+function openPopup(title, bodyHtml, btnsHtml=""){
+    document.getElementById("popupTitle").innerHTML = title || "";
+    document.getElementById("popupBody").innerHTML = bodyHtml || "";
+    document.getElementById("popupBtns").innerHTML = btnsHtml || "";
     document.getElementById("popup").style.display = "flex";
 }
 
@@ -211,39 +278,325 @@ function closePopup(){
     document.getElementById("popup").style.display = "none";
 }
 
-/* =====================
-   마녀 데이트 쿠폰 FIX
-===================== */
-function giveDateCoupon(){
-    addItem("dateCoupon");
+function safeAddItem(id){
+    try{
+        if(typeof addItem === "function") addItem(id);
+    }catch(e){}
+}
+
+function normalizeText(v){
+    return String(v || "").replace(/\s+/g, "").toLowerCase();
+}
+
+function getInventorySafe(){
+    try{
+        if(typeof getInventory === "function"){
+            const inv = getInventory();
+            return Array.isArray(inv) ? inv : [];
+        }
+    }catch(e){}
+    return [];
+}
+
+function resolveGiftId(raw){
+    const t = normalizeText(raw);
+
+    if(["흑당버블티","흑당버블버블티","bubbletea"].includes(t)) return "bubbletea";
+    if(["티라미슈","티라미수","tiramisu"].includes(t)) return "tiramisu";
+    if(["짬뽕","jjamppong"].includes(t)) return "jjamppong";
+    if(["아이스아메리카노","iceamericano"].includes(t)) return "iceAmericano";
+    if(["황금사과","goldenapple"].includes(t)) return "goldenApple";
+    if(["도끼","axe"].includes(t)) return "axe";
+    if(["방패","shield"].includes(t)) return "shield";
+    if(["꽃","flower"].includes(t)) return "flower";
+
+    return null;
+}
+
+function openCauldron(){
+    openPopup(
+        "가마솥",
+        `
+            <div>비밀번호를 입력하시오</div>
+            <input class="input-box" id="cauldronInput" inputmode="numeric" maxlength="4" placeholder="뭘까용?">
+        `,
+        `
+            <button class="choice-btn" onclick="submitCauldron()">확인</button>
+            <button class="choice-btn blue" onclick="closePopup()">닫기</button>
+        `
+    );
+    setTimeout(() => {
+        const input = document.getElementById("cauldronInput");
+        if(input) input.focus();
+    }, 50);
+}
+
+function submitCauldron(){
+    const input = document.getElementById("cauldronInput");
+    const value = normalizeText(input?.value);
+
+    if(value === "1010"){
+        location.href = "cave_potion.html";
+        return;
+    }
 
     openPopup(
+        "가마솥",
+        "비밀번호가 틀렸어.",
         `
-        <img class="popup-img" src="images/date_coupon.png">
-        <div>...뭐야? 어이없네 ㅋ 풉</div>
-        <div>💌 마녀와 데이트 쿠폰 획득!</div>
-        `,
-        `<button class="choice-btn" onclick="closePopup()">확인</button>`
+            <button class="choice-btn" onclick="openCauldron()">다시 입력</button>
+            <button class="choice-btn blue" onclick="closePopup()">닫기</button>
+        `
     );
 }
 
-/* =====================
-   선물 예시
-===================== */
+function openDish(){
+    if(localStorage.getItem(FLAG_DISH_DONE) === "true"){
+        location.href = "cave_game.html";
+        return;
+    }
+
+    openPopup(
+        "마녀가 시킨 일은?",
+        `
+            <div>마녀가 시킨 일은?</div>
+            <input class="input-box" id="dishInput" placeholder="뭔지 알지?">
+        `,
+        `
+            <button class="choice-btn" onclick="submitDish()">확인</button>
+            <button class="choice-btn blue" onclick="closePopup()">닫기</button>
+        `
+    );
+    setTimeout(() => {
+        const input = document.getElementById("dishInput");
+        if(input) input.focus();
+    }, 50);
+}
+
+function submitDish(){
+    const input = document.getElementById("dishInput");
+    const value = normalizeText(input?.value);
+
+    if(value === "설거지"){
+        localStorage.setItem(FLAG_DISH_DONE, "true");
+        openPopup(
+            "성공",
+            "설거지하러 가자!",
+            `<button class="choice-btn" onclick="location.href='cave_game.html'">바로 가기</button>`
+        );
+        return;
+    }
+
+    openPopup(
+        "마녀",
+        "잉순이? 아닌뎅",
+        `
+            <button class="choice-btn" onclick="openDish()">다시</button>
+            <button class="choice-btn blue" onclick="closePopup()">닫기</button>
+        `
+    );
+}
+
+function openHint(){
+    openPopup(
+        "힌트 사진",
+        `
+            <img class="popup-img" src="images/cave_mage_hint.png" alt="힌트 사진">
+            <div>마녀가 남긴 힌트다.</div>
+        `,
+        `<button class="choice-btn blue" onclick="closePopup()">확인</button>`
+    );
+}
+
 function openWitch(){
     openPopup(
+        "마녀 사진",
         `
-        <div>마녀와 대화</div>
-        <img class="popup-img" src="images/witch.png">
+            <img class="popup-img" src="images/cave_mage_witch.png" alt="마녀 사진">
+            <div>마녀를 바라본다.</div>
         `,
         `
-        <button class="choice-btn" onclick="alert('대화')">대화하기</button>
-        <button class="choice-btn" onclick="alert('선물')">선물주기</button>
-        <button class="choice-btn blue" onclick="closePopup()">닫기</button>
+            <div class="choice-row">
+                <button class="choice-btn" onclick="openTalkMenu()">대화하기</button>
+                <button class="choice-btn" onclick="openGiftMenu()">선물주기</button>
+            </div>
+            <button class="choice-btn blue" onclick="closePopup()">닫기</button>
         `
     );
 }
 
+function openTalkMenu(){
+    const unlocked = localStorage.getItem(FLAG_TALK_UNLOCKED) === "true";
+
+    const buttons = unlocked
+        ? `
+            <div class="choice-row">
+                <button class="choice-btn" onclick="startTalk1()">1번 대화하기</button>
+                <button class="choice-btn" onclick="startTalk2()">2번 대화하기</button>
+                <button class="choice-btn" onclick="startTalk3()">3번 대화하기</button>
+                <button class="choice-btn" onclick="startTalk4()">4번 대화하기</button>
+            </div>
+          `
+        : `
+            <div class="choice-row">
+                <button class="choice-btn" onclick="startTalk1()">1번 대화하기</button>
+            </div>
+          `;
+
+    openPopup(
+        "마녀와 대화",
+        `
+            <img class="popup-img" src="images/cave_mage_witch.png" alt="마녀 사진">
+            <div>마녀와 이야기해보자.</div>
+        `,
+        buttons + `<button class="choice-btn blue" onclick="openWitch()">돌아가기</button>`
+    );
+}
+
+function startTalk1(){
+    openPopup(
+        "마녀",
+        "너 뭐야??, 왜 들어왔어?",
+        `<button class="choice-btn" onclick="nextTalk1()">다음</button>`
+    );
+}
+
+function nextTalk1(){
+    openPopup(
+        "마녀",
+        "뭐? 누굴 구하러 왔다고? 흠...",
+        `<button class="choice-btn" onclick="nextTalk2()">다음</button>`
+    );
+}
+
+function nextTalk2(){
+    openPopup(
+        "마녀",
+        "누군지 모르겠지만 부럽네",
+        `
+            <button class="choice-btn" onclick="showCauldronPasswordReply()">가마솥 비밀번호 알려줘</button>
+            <button class="choice-btn blue" onclick="openTalkMenu()">돌아가기</button>
+        `
+    );
+}
+
+function showCauldronPasswordReply(){
+    openPopup(
+        "마녀",
+        `
+            이야~ 개 뻔뻔하네. 그냥알려달라고 하고
+            참놰~ 그냥 알려줄 수는 없지
+            난 설거지가 제일 싫으니까. 설거지 다 하면 알려주지
+        `,
+        `<button class="choice-btn blue" onclick="unlockTalk()">확인</button>`
+    );
+}
+
+function unlockTalk(){
+    localStorage.setItem(FLAG_TALK_UNLOCKED, "true");
+    openTalkMenu();
+}
+
+function startTalk2(){
+    openPopup("마녀", "뭐...? 왜 부럽냐고?\n그냥.\n나도 내가 왜 여기 있는지 몰라", `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`);
+    localStorage.setItem(FLAG_TALK_UNLOCKED, "true");
+}
+
+function startTalk3(){
+    openPopup("마녀", "뭐, 왜 어쩔티비", `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`);
+    localStorage.setItem(FLAG_TALK_UNLOCKED, "true");
+}
+
+function startTalk4(){
+    openPopup("마녀", "이상형?\n.....설거지 잘하는 사람이 좋더라 ㅋㅋ", `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`);
+    localStorage.setItem(FLAG_TALK_UNLOCKED, "true");
+}
+
+function openGiftMenu(){
+    openPopup(
+        "선물주기",
+        `
+            <div>갖고 있는 물건 중에서<br>주고 싶은 선물을 입력해줘</div>
+            <input class="input-box" id="giftInput" placeholder="뭘 주고 싶을까~?">
+        `,
+        `
+            <button class="choice-btn" onclick="submitGift()">선물하기</button>
+            <button class="choice-btn blue" onclick="closePopup()">닫기</button>
+        `
+    );
+    setTimeout(() => {
+        const input = document.getElementById("giftInput");
+        if(input) input.focus();
+    }, 50);
+}
+
+function submitGift(){
+    const raw = document.getElementById("giftInput")?.value || "";
+    const giftId = resolveGiftId(raw);
+    const inv = getInventorySafe();
+
+    if(!giftId || !inv.includes(giftId)){
+        openPopup(
+            "마녀",
+            "흠... 어디있어? 없잖아",
+            `
+                <button class="choice-btn" onclick="openGiftMenu()">다시</button>
+                <button class="choice-btn blue" onclick="closePopup()">닫기</button>
+            `
+        );
+        return;
+    }
+
+    if(giftId === "bubbletea" || giftId === "tiramisu"){
+        openPopup(
+            "마녀",
+            "개맛도리~ 감사용",
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+    }
+
+    if(giftId === "jjamppong" || giftId === "iceAmericano"){
+        openPopup(
+            "마녀",
+            "아니 난 괜찮아. 너 먹어",
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+    }
+
+    if(giftId === "goldenApple"){
+        safeAddItem("dateCoupon");
+        openPopup(
+            "마녀",
+            `
+                <img class="popup-img" src="images/date_coupon.png" alt="마녀 데이트 쿠폰">
+                <div>...뭐야? 어이없네 ㅋ 풉</div>
+                <div style="margin-top:8px; font-weight:bold;">💌 마녀와 데이트 쿠폰을 받았다!</div>
+            `,
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+    }
+
+    if(giftId === "axe" || giftId === "shield" || giftId === "flower"){
+        openPopup(
+            "마녀",
+            "이걸 왜 줌?",
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+    }
+
+    openPopup(
+        "마녀",
+        "흠... 어디있어? 없잖아",
+        `
+            <button class="choice-btn" onclick="openGiftMenu()">다시</button>
+            <button class="choice-btn blue" onclick="closePopup()">닫기</button>
+        `
+    );
+}
 </script>
 
 </body>
