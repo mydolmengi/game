@@ -216,6 +216,109 @@ body{
     cursor:pointer;
     z-index:999;
 }
+
+/* =========================
+   팝업
+========================= */
+.popup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.68);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+    padding:18px;
+}
+
+.popup-box{
+    width:100%;
+    max-width:560px;
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:28px;
+    padding:22px 20px 18px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    position:relative;
+}
+
+.close-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:50%;
+    background:#ff9fd2;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+    font-family:'GmarketSans', sans-serif;
+}
+
+.popup-title{
+    font-size:22px;
+    color:#5b3719;
+    margin-bottom:12px;
+    line-height:1.5;
+}
+
+.popup-body{
+    font-size:18px;
+    color:#5b3719;
+    line-height:1.7;
+    margin-bottom:12px;
+    white-space:pre-line;
+}
+
+.choice-btn{
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    color:white;
+    cursor:pointer;
+    font-size:18px;
+    font-family:'GmarketSans', sans-serif;
+    box-shadow:0 6px 14px rgba(0,0,0,0.12);
+}
+
+.choice-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.choice-row .choice-btn{
+    flex:1 1 160px;
+}
+
+.notice-img{
+    width:min(100%, 260px);
+    display:block;
+    margin:8px auto 10px;
+    border-radius:16px;
+    box-shadow:0 8px 16px rgba(0,0,0,0.12);
+}
+
+.reward-img{
+    width:min(100%, 240px);
+    display:block;
+    margin:8px auto 0;
+    border-radius:16px;
+    box-shadow:0 8px 16px rgba(0,0,0,0.12);
+}
+
+.result-big{
+    font-size:22px;
+    font-weight:800;
+    color:#5b3719;
+    margin-top:8px;
+}
 </style>
 </head>
 
@@ -249,15 +352,50 @@ body{
 
 <button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
 
+<!-- 팝업 -->
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <button class="close-btn" onclick="closePopup()">✕</button>
+        <div class="popup-title" id="popupTitle"></div>
+        <div class="popup-body" id="popupBody"></div>
+        <div id="popupActions"></div>
+    </div>
+</div>
+
 <script>
 let selected = [];
 let brewing = false;
 
+function openPopup(title, bodyHtml, actionsHtml = ""){
+    document.getElementById("popupTitle").innerHTML = title || "";
+    document.getElementById("popupBody").innerHTML = bodyHtml || "";
+    document.getElementById("popupActions").innerHTML = actionsHtml || "";
+    document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup(){
+    document.getElementById("popup").style.display = "none";
+}
+
+function showNotice(){
+    openPopup(
+        "물약 만들기 안내",
+        `
+            <img class="notice-img" src="images/potion_workbench.png" alt="물약 안내">
+            <div>1. 물약 만들기 버튼을 누르세요.</div>
+            <div>2. 물약 두 개를 선택하세요.</div>
+            <div>3. 올바른 조합이면 성공!</div>
+        `,
+        `<button class="choice-btn" onclick="closePopup()">확인</button>`
+    );
+}
+
 function startGame(){
     selected = [];
+    brewing = false;
     document.querySelectorAll(".bottle").forEach(b => b.classList.remove("selected"));
     document.getElementById("fx").innerHTML = "";
-    alert("물약 2개를 선택해라!");
+    showNotice();
 }
 
 function pick(n, el){
@@ -312,6 +450,37 @@ function smokeEffect(){
     }
 }
 
+function safeAddItem(id){
+    try{
+        if(typeof addItem === "function") addItem(id);
+    }catch(e){}
+}
+
+function showSuccessPopup(){
+    openPopup(
+        "성공",
+        `
+            <img class="reward-img" src="images/bug_spray.png" alt="벌레 퇴치제">
+            <div class="result-big">벌레퇴치제를 얻었다!</div>
+        `,
+        `
+            <button class="choice-btn" onclick="location.href='cave_mage.html'">확인</button>
+        `
+    );
+}
+
+function showFailPopup(){
+    openPopup(
+        "실패",
+        `
+            <div class="result-big">실패!</div>
+        `,
+        `
+            <button class="choice-btn" onclick="closePopup()">확인</button>
+        `
+    );
+}
+
 /* =========================
    조합
 ========================= */
@@ -326,17 +495,18 @@ function brew(){
 
     if(success){
         bubbleEffect();
+        safeAddItem("bugSpray");
 
         setTimeout(() => {
-            alert("성공! 벌레 퇴치제 획득!");
-            location.href = "cave_mage.html";
+            showSuccessPopup();
+            brewing = false;
         }, 4400);
 
     }else{
         smokeEffect();
 
         setTimeout(() => {
-            alert("실패!");
+            showFailPopup();
             brewing = false;
         }, 4600);
     }
