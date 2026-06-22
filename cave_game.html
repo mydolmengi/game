@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -194,6 +193,12 @@
   }
   .plaque strong{color:#ffe7a7}
 
+  .bottleCard{flex:0 0 auto;width:82px;height:102px;border-radius:16px;border:2px solid rgba(255,255,255,.08);background:linear-gradient(180deg,var(--panelA),var(--panelB));box-shadow:0 8px 16px rgba(0,0,0,.24);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px;position:relative;color:#fff;overflow:hidden}
+  .bottleCard.selected{outline:3px solid var(--gold);transform:translateY(-2px)}
+  .bottleCard .badge{position:absolute;top:6px;right:6px;font-size:10px;font-weight:900;background:rgba(0,0,0,.25);padding:3px 7px;border-radius:999px}
+  .bottleCard .name{margin-top:4px;font-size:12px;font-weight:900}
+  .bottleCard .dirty{margin-top:2px;font-size:11px;opacity:.96}
+
   #tools{position:relative;z-index:2;padding:0 10px 10px;margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .tool{min-height:90px;border:none;border-radius:20px;color:#fff;background:linear-gradient(180deg,#4f2c62,#341d43);border:3px solid #a56acc;box-shadow:0 10px 18px rgba(0,0,0,.23), inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;gap:2px;font-weight:900}
   .tool .emoji{font-size:28px;line-height:1}
@@ -205,56 +210,11 @@
 
   #toast{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:rgba(0,0,0,.56);padding:8px 12px;border-radius:999px;font-size:13px;font-weight:900;opacity:0;transition:.18s;pointer-events:none;z-index:20}
   #toast.show{opacity:1}
-
-  #overlay{
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,.72);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:30;
-    padding:20px;
-  }
-  #overlay .panel{
-    width:min(92vw,430px);
-    background:linear-gradient(180deg,#392547,#211729);
-    border:3px solid #9d6bcb;
-    border-radius:24px;
-    padding:20px;
-    text-align:center;
-    box-shadow:0 18px 40px rgba(0,0,0,.35);
-  }
+  #overlay{position:absolute;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:30;padding:20px}
+  #overlay .panel{width:min(92vw,430px);background:linear-gradient(180deg,#392547,#211729);border:3px solid #9d6bcb;border-radius:24px;padding:20px;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.35)}
   #overlay h2{margin:0 0 10px;font-size:28px}
   #overlay p{margin:8px 0;color:#dccdf0;line-height:1.5;white-space:pre-line}
-  .endActions{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    margin-top:14px;
-  }
-  .endActions button{
-    width:100%;
-    border:none;
-    border-radius:16px;
-    padding:14px 16px;
-    font-size:16px;
-    font-weight:900;
-    cursor:pointer;
-  }
-  #successBtn{
-    background:linear-gradient(180deg,#f2c15d,#e3a440);
-    color:#281b07;
-  }
-  #retryBtn{
-    background:linear-gradient(180deg,#ff6b6b,#e94b4b);
-    color:#fff;
-  }
-  #backBtn{
-    background:linear-gradient(180deg,#7c5cff,#5b3fe0);
-    color:#fff;
-  }
-
+  #restart{margin-top:14px;width:100%;border:none;border-radius:16px;padding:14px 16px;background:linear-gradient(180deg,#f2c15d,#e3a440);color:#281b07;font-size:16px;font-weight:900}
   .spark{position:absolute;width:10px;height:10px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0%,rgba(255,255,255,.1) 70%,rgba(255,255,255,0) 100%);animation:spark .65s ease-out forwards;z-index:20}
   @keyframes spark{from{transform:scale(.6);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(2.4);opacity:0}}
 
@@ -356,13 +316,14 @@
       <div id="toast"></div>
       <div id="cursorToken"></div>
       <div class="arch"></div>
+      
       <div class="workbench"></div>
 
       <div class="centerArea">
         <div class="bottleStage" id="bottleStage">
           <div class="centerGlow"></div>
           <div class="bottleShell"></div>
-          <div class="titleBar" id="centerInfo">병을 선택하세요</div>
+          <div class="bottleLabel" id="centerInfo">병을 선택하세요</div>
           <div class="subBar" id="centerSub">병을 선택하세요</div>
           <div class="needBar" id="centerNeed">도구 선택 → 병 터치</div>
           <div class="centerBottleWrap">
@@ -374,6 +335,7 @@
               <div id="centerIconWrap" style="width:100%;height:100%;"></div>
             </div>
           </div>
+          
         </div>
       </div>
     </div>
@@ -384,14 +346,14 @@
     <button class="tool" data-tool="scrub"><div class="emoji">🧽</div><div class="name">수세미</div><div class="desc">병 위에서 문지르기</div></button>
     <button class="tool" data-tool="heat"><div class="emoji">🔥</div><div class="name">버너</div><div class="desc">병에 닿으면 불</div></button>
     <button class="tool" data-tool="cool"><div class="emoji">❄️</div><div class="name">냉각 수정</div><div class="desc">병에 닿으면 정리</div></button>
-    <div id="helpBar"><strong>목표:</strong> 200점 이상이면 성공, 그 아래는 실패. <strong>조작:</strong> 도구를 선택한 뒤 병을 클릭하면 바로 적용됩니다.</div>
+    <div id="helpBar"><strong>목표:</strong> 200점 이상이면 성공, 그 아래는 실패. <strong>조작:</strong> 도구를 선택한 뒤 병 위로 움직이면 바로 적용됩니다.</div>
   </div>
 
   <div id="overlay">
     <div class="panel">
       <h2 id="endTitle">게임 오버</h2>
       <p id="endText">-</p>
-      <div class="endActions" id="endActions"></div>
+      <button id="restart">다시 시작</button>
     </div>
   </div>
 </div>
@@ -420,8 +382,8 @@
   const overlay = document.getElementById('overlay');
   const endTitle = document.getElementById('endTitle');
   const endText = document.getElementById('endText');
-  const endActions = document.getElementById('endActions');
   const restartBtn = document.getElementById('restartBtn');
+  const restart = document.getElementById('restart');
   const toolBtns = [...document.querySelectorAll('.tool')];
   const cursorToken = document.getElementById('cursorToken');
 
@@ -467,7 +429,7 @@
   function weightedDirty(list){
     const pool = [];
     list.forEach(d=>{
-      const w = d === '점액' ? 1 : 3;
+      const w = d === '점액' ? 1 : 3; // 점액 등장률 대폭 감소
       for(let i=0;i<w;i++) pool.push(d);
     });
     return rand(pool);
@@ -625,7 +587,7 @@
   function createBottle() {
     if (state.over) return;
     if (state.bottles.length >= 8) {
-      endGame(false, '선반 가득!', '더는 둘 자리가 없어요.');
+      endGame('선반 가득!', '더는 둘 자리가 없어요.');
       return;
     }
     const spec = rand(bottleTypes);
@@ -663,7 +625,7 @@
     state.combo += 1;
     saveBest();
     hud();
-    if (state.score >= GOAL && !state.over) endGame(true, '성공!', '설거지를 다 했어요!','가마솥 비밀번호는 1010');
+    if (state.score >= GOAL && !state.over) endGame('성공!', '목표 점수 200점을 달성했어요.');
   }
 
   function resetCombo() {
@@ -731,40 +693,15 @@
     state.tickTimer = null;
   }
 
-  function goMageHome() {
-    location.href = "cave_mage.html";
-  }
-
-  function endGame(isWin, title, text) {
+  function endGame(title, text) {
     state.over = true;
     clearTimers();
     saveBest();
-
-    endTitle.textContent = isWin ? "🎉 성공" : "💀 실패";
-    endText.innerHTML = `
-      ${text}<br><br>
-      <b>결과:</b> ${isWin ? "성공" : "실패"}<br>
-      <b>최종 점수:</b> ${state.score}<br>
-      <b>최고 점수:</b> ${state.best}
-    `;
-
-    endActions.innerHTML = isWin
-      ? `<button id="successBtn">성공</button>`
-      : `
-          <button id="retryBtn">다시하기</button>
-          <button id="backBtn">돌아가기</button>
-        `;
-
-    overlay.style.display = "flex";
-
-    const successBtn = document.getElementById("successBtn");
-    if (successBtn) successBtn.onclick = goMageHome;
-
-    const retryBtn = document.getElementById("retryBtn");
-    if (retryBtn) retryBtn.onclick = resetGame;
-
-    const backBtn = document.getElementById("backBtn");
-    if (backBtn) backBtn.onclick = goMageHome;
+    const result = state.score >= GOAL ? '성공' : '실패';
+    const goalLine = state.score >= GOAL ? '목표를 달성했어요.' : '목표 점수에 도달하지 못했어요.';
+    endTitle.textContent = title;
+    endText.textContent = `${text}\n결과: ${result}\n${goalLine}\n최종 점수: ${state.score}\n최고 점수: ${state.best}`;
+    overlay.style.display = 'flex';
   }
 
   function resetGame() {
@@ -777,30 +714,28 @@
     state.bottles = [];
     state.over = false;
     state.spawnMs = 2400;
-
-    overlay.style.display = "none";
+    overlay.style.display = 'none';
+    shelf.innerHTML = '';
+    selectedCard.style.display = 'none';
     toast.classList.remove('show');
-    scrubMeter.style.width = "0%";
+    scrubMeter.style.width = '0%';
     scrubMeterWrap.classList.remove('show');
-    shelf.innerHTML = "";
-    selectedCard.style.display = "none";
     hud();
-
     for (let i = 0; i < 4; i++) createBottle();
     renderShelf();
     renderCenter();
-    toastMsg("다시 시작!", true);
-
-    state.spawnTimer = setInterval(() => {
-      if (!state.over) createBottle();
-    }, state.spawnMs);
-
+    toastMsg('다시 시작!', true);
+    state.spawnTimer = setInterval(() => { if (!state.over) createBottle(); }, state.spawnMs);
     state.tickTimer = setInterval(() => {
       if (state.over) return;
       state.time--;
       hud();
-      if (state.time <= 0) endGame(false, '시간 종료', '마녀의 작업 시간이 끝났어요.');
+      if (state.time <= 0) endGame('시간 종료', '마녀의 작업 시간이 끝났어요.');
     }, 1000);
+  }
+
+  function getStageRect(){
+    return bottleStage.getBoundingClientRect();
   }
 
   function getCenterBottleRect() {
@@ -814,7 +749,6 @@
       if (activeToken) activeToken.remove();
       activeToken = document.createElement('div');
       activeToken.id = 'cursorToken';
-      activeToken.dataset.tool = tool;
       activeToken.style.display = 'block';
       activeToken.innerHTML = `<div class="token ${tool}">${tool==='water'?'💧':tool==='scrub'?'🧽':tool==='heat'?'🔥':'❄️'}<div class="tokenLine"></div></div>`;
       document.body.appendChild(activeToken);
@@ -875,14 +809,14 @@
     pointer.x = e.clientX;
     pointer.y = e.clientY;
     if (state.activeTool) updateCursorToken(state.activeTool, pointer.x, pointer.y);
-    toolLogicFromPointer(pointer.x, pointer.y);
+    // hover apply disabled
   });
 
   window.addEventListener('pointermove', (e) => {
     pointer.x = e.clientX;
     pointer.y = e.clientY;
     if (state.activeTool) updateCursorToken(state.activeTool, pointer.x, pointer.y);
-    toolLogicFromPointer(pointer.x, pointer.y);
+    // hover apply disabled
   });
 
   window.addEventListener('pointerup', () => {
@@ -899,6 +833,7 @@
     clearCursorToken();
   });
 
+  
   mainStage.addEventListener('click', (e) => {
     if (!state.activeTool || !state.selected || state.over) return;
     const rect = getCenterBottleRect();
@@ -913,11 +848,13 @@
     }
   });
 
+
   let secretTapCount = 0;
   let secretTapTimer = null;
 
   scoreEl.addEventListener('click', () => {
     secretTapCount++;
+
     clearTimeout(secretTapTimer);
     secretTapTimer = setTimeout(() => {
       secretTapCount = 0;
@@ -928,11 +865,13 @@
       if (!state.over) {
         state.score = 200;
         hud();
-        endGame(true, '성공!', '개발자 치트키가 사용되었습니다.');
+        endGame('성공!', '설거지를 다 했어요!');
       }
     }
   });
 
+
+restart.addEventListener('click', resetGame);
   restartBtn.addEventListener('click', resetGame);
 
   resetGame();
