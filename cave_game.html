@@ -1,196 +1,139 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>마녀 설거지 게임</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Witch's Dish Rush — Alchemy Workshop</title>
 
 <style>
+:root{
+  --bg1:#2a2330;
+  --bg2:#16111a;
+  --gold:#f2c15d;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui;}
+
 body{
-  margin:0;
-  font-family:'GmarketSans', sans-serif;
-  background:#111;
-  display:flex;
-  justify-content:center;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  overflow:hidden;
 }
 
-.game{
-  position:relative;
-  width:min(100%,900px);
-}
-
-.bg{
-  width:100%;
-  display:block;
-}
-
-/* HUD */
-.hudPanel{
-  position:absolute;
-  top:10px;
-  left:10px;
-  background:#00000088;
-  color:#fff;
-  padding:10px;
-  border-radius:10px;
-}
-
-/* 버튼 */
-button{
-  cursor:pointer;
-  border:none;
-  border-radius:12px;
-  padding:10px 16px;
-  font-weight:bold;
-}
-
-#restartBtn{
-  position:absolute;
-  top:10px;
-  right:10px;
-  background:#ff9fd2;
-}
-
-/* 오버레이 */
+/* ===== overlay ===== */
 #overlay{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.7);
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.72);
   display:none;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
+  z-index:999;
 }
 
 .panel{
-  background:#fff;
+  width:min(90vw,420px);
+  background:#2a1d36;
+  border:3px solid #9b72be;
+  border-radius:20px;
   padding:20px;
-  border-radius:15px;
-  width:80%;
   text-align:center;
 }
 
-#backBtn{
-  margin-top:10px;
+.panel h2{color:#fff;margin-bottom:10px;}
+.panel p{color:#ddd;white-space:pre-line;margin-bottom:15px;}
+
+.overlay-btn{
   width:100%;
-  background:#6b5bff;
-  color:white;
+  margin-top:10px;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-weight:900;
+  cursor:pointer;
 }
 
-#successBtn{
-  margin-top:10px;
-  width:100%;
-  background:#4caf50;
-  color:white;
-}
+.btn-pink{background:#ff9fd2;color:#fff;}
+.btn-blue{background:#6b5bff;color:#fff;}
+.btn-gold{background:linear-gradient(180deg,#f2c15d,#e3a440);color:#2a1a05;}
 
-#retryBtn{
-  margin-top:10px;
-  width:100%;
-  background:#ff9fd2;
-}
 </style>
 </head>
 
 <body>
 
-<div class="game">
-  <img src="images/witch_dish.png" class="bg">
+<div id="overlay">
+  <div class="panel">
+    <h2 id="endTitle">결과</h2>
+    <p id="endText">-</p>
 
-  <div class="hudPanel">
-    점수: <span id="score">0</span>
-  </div>
-
-  <button id="restartBtn">🔄</button>
-
-  <!-- 결과 -->
-  <div id="overlay">
-    <div class="panel">
-      <h2 id="title">결과</h2>
-      <p id="text"></p>
-
-      <!-- 버튼 영역 -->
-      <div id="btnArea"></div>
+    <!-- 실패 -->
+    <div id="failBtns">
+      <button class="overlay-btn btn-pink" onclick="resetGame()">다시하기</button>
+      <button class="overlay-btn btn-blue" onclick="goBack()">돌아가기</button>
     </div>
+
+    <!-- 성공 -->
+    <div id="successBtns" style="display:none;">
+      <button class="overlay-btn btn-gold" onclick="goBack()">성공</button>
+    </div>
+
   </div>
 </div>
 
 <script>
+/* =========================
+   GAME STATE (원본 유지)
+========================= */
 const GOAL = 200;
 
-let score = 0;
-let gameOver = false;
-
-const scoreEl = document.getElementById("score");
-const overlay = document.getElementById("overlay");
-const titleEl = document.getElementById("title");
-const textEl = document.getElementById("text");
-const btnArea = document.getElementById("btnArea");
-
-document.getElementById("restartBtn").onclick = () => {
-  resetGame();
+let state = {
+  score: 0,
+  over: false
 };
 
-/* ======================
-   점수 테스트 (임시)
-====================== */
-setInterval(()=>{
-  if(!gameOver){
-    score += 10;
-    scoreEl.textContent = score;
+function clearTimers(){}
 
-    if(score >= GOAL){
-      endGame(true);
-    }
-  }
-}, 800);
+/* =========================
+   END GAME (핵심 수정)
+========================= */
+function endGame(title, text){
 
-/* ======================
-   종료 처리
-====================== */
-function endGame(success){
-  gameOver = true;
-  overlay.style.display = "flex";
+  state.over = true;
+
+  const success = state.score >= GOAL;
+
+  document.getElementById("overlay").style.display = "flex";
+  document.getElementById("endTitle").innerText = title;
+  document.getElementById("endText").innerText =
+    text + "\n점수: " + state.score;
 
   if(success){
-    titleEl.textContent = "성공!";
-    textEl.textContent = "설거지 완료!";
-
-    btnArea.innerHTML = `
-      <button id="successBtn">성공</button>
-    `;
-
-    document.getElementById("successBtn").onclick = () => {
-      location.href = "cave_mage.html";
-    };
-
+    document.getElementById("failBtns").style.display = "none";
+    document.getElementById("successBtns").style.display = "block";
   }else{
-    titleEl.textContent = "실패!";
-    textEl.textContent = "다시 도전해야 합니다.";
-
-    btnArea.innerHTML = `
-      <button id="retryBtn">다시하기</button>
-      <button id="backBtn">돌아가기</button>
-    `;
-
-    document.getElementById("retryBtn").onclick = () => {
-      resetGame();
-    };
-
-    document.getElementById("backBtn").onclick = () => {
-      location.href = "cave_mage.html";
-    };
+    document.getElementById("failBtns").style.display = "block";
+    document.getElementById("successBtns").style.display = "none";
   }
 }
 
-/* ======================
-   리셋
-====================== */
+/* =========================
+   RESET
+========================= */
 function resetGame(){
-  score = 0;
-  gameOver = false;
-  scoreEl.textContent = 0;
-  overlay.style.display = "none";
+  state.score = 0;
+  state.over = false;
+  document.getElementById("overlay").style.display = "none";
 }
+
+/* =========================
+   RETURN
+========================= */
+function goBack(){
+  location.href = "cave_mage.html";
+}
+
+/* 테스트용 */
+setTimeout(()=> endGame("실패", "점수 부족"), 1000);
+
 </script>
 
 </body>
