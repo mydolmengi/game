@@ -301,10 +301,10 @@ function getInventorySafe(){
 function resolveGiftId(raw){
     const t = normalizeText(raw);
 
-    if(["흑당버블티","흑당버블버블티","bubbletea"].includes(t)) return "bubbletea";
+    if(["흑당버블티","버블티","bubbletea"].includes(t)) return "bubbletea";
     if(["티라미슈","티라미수","tiramisu"].includes(t)) return "tiramisu";
     if(["짬뽕","jjamppong"].includes(t)) return "jjamppong";
-    if(["아이스아메리카노","iceamericano"].includes(t)) return "iceAmericano";
+    if(["아이스아메리카노","iceamericano","아메리카노"].includes(t)) return "iceAmericano";
     if(["황금사과","goldenapple"].includes(t)) return "goldenApple";
     if(["도끼","axe"].includes(t)) return "axe";
     if(["방패","shield"].includes(t)) return "shield";
