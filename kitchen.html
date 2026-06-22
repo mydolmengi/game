@@ -252,12 +252,12 @@ function openFridge(){
     }, 600);
 
     show(`
-        냉장고
+        냉장고 안
         <br><br>
         <img src="images/fridge.png"
         class="popup-img"
         onclick="getHeart()">
-        <br>이미지를 클릭
+        <br>헐, 맛있는 갈비당!
     `,
     `<button class='choice-btn' onclick='closePopup()'>닫기</button>`);
 }
@@ -294,7 +294,7 @@ function openRug(){
         <img src="images/rug1.png"
         class="popup-img"
         onclick="rug2()">
-        <br>이미지 클릭
+        <br>이 러그 매우 수상한 걸....?
     `,
     `<button class='choice-btn' onclick='closePopup()'>닫기</button>`);
 }
@@ -307,7 +307,7 @@ function rug2(){
         <img src="images/rug2.png"
         class="popup-img"
         onclick="checkDoor()">
-        <br>자물쇠 클릭
+        <br>아니 이게 뭐야????!!!
     `,
     `<button class='choice-btn' onclick='closePopup()'>닫기</button>`);
 }
@@ -318,7 +318,7 @@ function checkDoor(){
         localStorage.setItem("basementOpened","true");
         location.href="undergroundbattle.html";
     } else {
-        show("열쇠 필요",
+        show("문 잠김",
         `<button class='choice-btn' onclick='closePopup()'>확인</button>`);
     }
 }
