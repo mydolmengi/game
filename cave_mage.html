@@ -95,6 +95,23 @@ body{
     font-family:'GmarketSans', sans-serif;
 }
 
+/* 인벤토리 버튼 */
+.inventory-btn{
+    position:fixed;
+    top:15px;
+    right:15px;
+    width:65px;
+    height:65px;
+    border:none;
+    border-radius:20px;
+    background:#ff9fd2;
+    font-size:30px;
+    cursor:pointer;
+    z-index:9999;
+    box-shadow:0 8px 18px rgba(0,0,0,0.2);
+    display:block;
+}
+
 /* 하단 설명창 */
 .footer-hint{
     position:absolute;
@@ -232,8 +249,7 @@ body{
     width:100%;
 }
 
- @media (max-width: 600px){
-
+@media (max-width: 600px){
     .title{
         font-size:30px;
     }
@@ -252,7 +268,6 @@ body{
         font-size:18px;
     }
 }
-
 </style>
 </head>
 
@@ -279,6 +294,11 @@ body{
     <button class="back-btn" onclick="location.href='cave.html'">
         돌아가기
     </button>
+
+</div>
+
+<!-- 인벤토리 -->
+<button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
 
 <!-- 팝업 -->
 <div class="popup" id="popup">
