@@ -2,281 +2,314 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>물약 제조대</title>
+<title>RPG MAP EDITOR FINAL PRO</title>
 
 <style>
-@font-face {
-    font-family: 'GmarketSans';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
 body{
-    margin:0;
-    background:#000;
-    font-family:'GmarketSans', sans-serif;
-    display:flex;
-    justify-content:center;
-    overflow:hidden;
+margin:0;
+background:#111;
+display:flex;
+justify-content:center;
+font-family:sans-serif;
 }
 
-.game{
-    position:relative;
-    width:min(100%,900px);
+/* ======================
+MAP
+====================== */
+.wrapper{
+position:relative;
+width:900px;
+margin-top:20px;
 }
 
-.bg{
-    width:100%;
-    display:block;
+.wrapper img{
+width:100%;
+display:block;
 }
 
-/* =========================
-   물약 버튼 (항상 표시)
-========================= */
-.make-btn{
-    position:absolute;
-    left:50%;
-    top:8%;
-    transform:translateX(-50%);
-    z-index:10;
+/* ======================
+BOX (PX 안정 버전)
+====================== */
+.box{
+position:absolute;
 
-    background:#f9e9c8;
-    border:6px solid #c89b5d;
-    border-radius:30px;
-    padding:14px 30px;
-    font-size:20px;
-    color:#5b3719;
-    cursor:pointer;
+width:120px;
+height:120px;
+
+background:rgba(255,0,0,0.25);
+border:2px dashed red;
+
+cursor:grab;
+
+resize: both;
+overflow: hidden;
+
+min-width:30px;
+min-height:30px;
+
+transform-origin:center;
+
+will-change: left, top, width, height, transform;
 }
 
-/* =========================
-   선반 물약 (배경 클릭 방식)
-========================= */
-.bottle{
-    position:absolute;
-    width:70px;
-    height:90px;
-    border-radius:15px;
-    cursor:pointer;
-    transition:0.2s;
+/* ======================
+🔄 ROTATE ICON (BIG FIX)
+====================== */
+.rotate-icon{
+position:absolute;
+
+top:-30px;
+left:50%;
+transform:translateX(-50%);
+
+width:36px;
+height:36px;
+
+background:white;
+border:2px solid #333;
+border-radius:50%;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-size:22px;
+cursor:grab;
+
+box-shadow:0 2px 8px rgba(0,0,0,0.4);
+user-select:none;
 }
 
-.bottle:hover{
-    transform:scale(1.1);
+.rotate-icon::after{
+content:"🔄";
 }
 
-.b1{ left:18%; top:18%; background:red; }
-.b2{ left:28%; top:18%; background:orange; }
-.b3{ left:38%; top:18%; background:yellow; }
-.b4{ left:48%; top:18%; background:green; }
-.b5{ left:58%; top:18%; background:blue; }
-.b6{ left:68%; top:18%; background:purple; }
-.b7{ left:78%; top:18%; background:white; }
+/* ======================
+PANEL
+====================== */
+#panel{
+position:fixed;
+top:20px;
+left:20px;
 
-/* 선택 효과 */
-.selected{
-    outline:4px solid gold;
-    transform:scale(1.2);
+width:520px;
+background:white;
+padding:18px;
+border-radius:12px;
+z-index:999;
 }
 
-/* =========================
-   효과 레이어 (대폭 강화)
-========================= */
-.effect-layer{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
+textarea{
+width:100%;
+height:240px;
+margin-top:10px;
 }
 
-/* 버블 */
-.bubble{
-    position:absolute;
-    bottom:30%;
-    left:50%;
-    border-radius:50%;
-    background:rgba(180,255,255,0.85);
-    animation:bubble 2.2s ease-out forwards;
-}
-
-@keyframes bubble{
-    0%{ transform:translate(-50%,0) scale(0.6); opacity:0.2; }
-    40%{ opacity:1; }
-    100%{ transform:translate(-50%,-320px) scale(3.5); opacity:0; }
-}
-
-/* 연기 */
-.smoke{
-    position:absolute;
-    bottom:30%;
-    left:50%;
-    border-radius:50%;
-    background:rgba(20,20,20,0.9);
-    animation:smoke 2.4s ease-out forwards;
-}
-
-@keyframes smoke{
-    0%{ transform:translate(-50%,0) scale(0.6); opacity:0.3; }
-    50%{ opacity:1; }
-    100%{ transform:translate(-50%,-260px) scale(4.5); opacity:0; }
-}
-
-/* =========================
-   버튼
-========================= */
-.back-btn{
-    position:absolute;
-    left:50%;
-    bottom:3%;
-    transform:translateX(-50%);
-
-    background:#6b5bff;
-    border:6px solid #3b2fff;
-    border-radius:30px;
-    padding:12px 30px;
-    color:white;
-    cursor:pointer;
-    font-size:18px;
-}
-
-.inventory-btn{
-    position:fixed;
-    top:15px;
-    right:15px;
-    width:65px;
-    height:65px;
-    border:none;
-    border-radius:20px;
-    background:#ff9fd2;
-    font-size:30px;
-    cursor:pointer;
-    z-index:999;
+button{
+width:100%;
+padding:10px;
+margin-top:8px;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="game">
+<!-- ======================
+PANEL
+====================== -->
+<div id="panel">
+<b>🎮 RPG MAP EDITOR FINAL PRO</b>
 
-    <img src="images/potion_workbench.png" class="bg">
+<textarea id="output"></textarea>
 
-    <!-- 항상 표시 -->
-    <button class="make-btn" onclick="startGame()">
-        물약 만들기
-    </button>
-
-    <!-- 물약 -->
-    <div class="bottle b1" onclick="pick(1)"></div>
-    <div class="bottle b2" onclick="pick(2)"></div>
-    <div class="bottle b3" onclick="pick(3)"></div>
-    <div class="bottle b4" onclick="pick(4)"></div>
-    <div class="bottle b5" onclick="pick(5)"></div>
-    <div class="bottle b6" onclick="pick(6)"></div>
-    <div class="bottle b7" onclick="pick(7)"></div>
-
-    <div class="effect-layer" id="fx"></div>
-
-    <button class="back-btn" onclick="location.href='cave_mage.html'">
-        돌아가기
-    </button>
-
+<button onclick="addBox()">➕ 오브젝트 추가</button>
+<button onclick="copyCode()">📋 복사</button>
 </div>
 
-<button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
+<!-- ======================
+MAP
+====================== -->
+<div class="wrapper" id="map">
+<img src="images/potion_workbench.png">
+</div>
 
 <script>
-let selected = [];
 
-function startGame(){
-    selected = [];
-    document.querySelectorAll(".bottle").forEach(b=>{
-        b.classList.remove("selected");
-    });
-    alert("물약 2개를 선택해라!");
+let activeBox = null;
+let activeRotateBox = null;
+
+let offsetX = 0;
+let offsetY = 0;
+
+/* ======================
+CREATE
+====================== */
+function addBox(){
+
+const box = document.createElement("div");
+box.className = "box";
+
+box.style.left = "100px";
+box.style.top = "100px";
+
+box.dataset.name = prompt("이름 입력") || "object";
+box.dataset.rotate = 0;
+
+const icon = document.createElement("div");
+icon.className = "rotate-icon";
+
+box.appendChild(icon);
+document.getElementById("map").appendChild(box);
+
+enableDrag(box);
+enableRotate(icon, box);
 }
 
-function pick(n){
+/* ======================
+DRAG (PX FIX)
+====================== */
+function enableDrag(box){
 
-    if(selected.includes(n)){
-        selected = selected.filter(x=>x!==n);
-    }else{
-        if(selected.length >= 2) return;
-        selected.push(n);
-    }
+box.addEventListener("mousedown",(e)=>{
 
-    document.querySelectorAll(".bottle").forEach((b,i)=>{
-        b.classList.toggle("selected", selected.includes(i+1));
-    });
+if(e.target.classList.contains("rotate-icon")) return;
 
-    if(selected.length === 2){
-        brew();
-    }
+activeBox = box;
+
+const rect = box.getBoundingClientRect();
+
+offsetX = e.clientX - rect.left;
+offsetY = e.clientY - rect.top;
+});
 }
 
-/* =========================
-   효과 강화
-========================= */
-function bubbleEffect(){
-    const fx = document.getElementById("fx");
-    fx.innerHTML = "";
+/* ======================
+ROTATE (STABLE FIX)
+====================== */
+let startAngle = 0;
+let startRotate = 0;
 
-    for(let i=0;i<25;i++){
-        const b = document.createElement("div");
-        b.className = "bubble";
-        b.style.width = (10 + Math.random()*30)+"px";
-        b.style.height = b.style.width;
-        b.style.left = (50 + (Math.random()*120-60))+"%";
-        b.style.bottom = "30%";
-        fx.appendChild(b);
-    }
+function enableRotate(icon, box){
+
+icon.addEventListener("mousedown",(e)=>{
+
+activeRotateBox = box;
+
+const r = box.getBoundingClientRect();
+
+const cx = r.left + r.width / 2;
+const cy = r.top + r.height / 2;
+
+startAngle =
+Math.atan2(e.clientY - cy, e.clientX - cx);
+
+startRotate =
+parseFloat(box.dataset.rotate || 0);
+
+e.stopPropagation();
+});
 }
 
-function smokeEffect(){
-    const fx = document.getElementById("fx");
-    fx.innerHTML = "";
+/* ======================
+MOVE + ROTATE
+====================== */
+document.addEventListener("mousemove",(e)=>{
 
-    for(let i=0;i<25;i++){
-        const s = document.createElement("div");
-        s.className = "smoke";
-        s.style.width = (15 + Math.random()*40)+"px";
-        s.style.height = s.style.width;
-        s.style.left = (50 + (Math.random()*120-60))+"%";
-        fx.appendChild(s);
-    }
+const map = document.getElementById("map");
+const rect = map.getBoundingClientRect();
+
+/* DRAG */
+if(activeBox){
+
+let x = e.clientX - rect.left - offsetX;
+let y = e.clientY - rect.top - offsetY;
+
+activeBox.style.left = x + "px";
+activeBox.style.top = y + "px";
+
+updateOutput();
 }
 
-/* =========================
-   조합
-========================= */
-function brew(){
+/* ROTATE */
+if(activeRotateBox){
 
-    const pair = selected.sort().join(",");
-    const success = (pair === "1,7");
+const r = activeRotateBox.getBoundingClientRect();
 
-    selected = [];
+const cx = r.left + r.width / 2;
+const cy = r.top + r.height / 2;
 
-    if(success){
-        bubbleEffect();
+const currentAngle =
+Math.atan2(e.clientY - cy, e.clientX - cx);
 
-        setTimeout(()=>{
-            alert("성공! 벌레 퇴치제 획득!");
-            location.href = "cave_mage.html";
-        }, 2200);
+let delta = currentAngle - startAngle;
 
-    }else{
-        smokeEffect();
+let finalAngle =
+startRotate + delta * (180 / Math.PI);
 
-        setTimeout(()=>{
-            alert("실패!");
-        }, 2200);
-    }
+activeRotateBox.style.transform =
+`rotate(${finalAngle}deg)`;
+
+activeRotateBox.dataset.rotate = finalAngle;
+
+updateOutput();
 }
+});
+
+document.addEventListener("mouseup",()=>{
+
+activeBox = null;
+activeRotateBox = null;
+});
+
+/* ======================
+OUTPUT
+====================== */
+function updateOutput(){
+
+const boxes = document.querySelectorAll(".box");
+const map = document.getElementById("map").getBoundingClientRect();
+
+let result = "";
+
+boxes.forEach((b)=>{
+
+const rect = b.getBoundingClientRect();
+
+let x = rect.left - map.left;
+let y = rect.top - map.top;
+let w = rect.width;
+let h = rect.height;
+
+let rot = b.dataset.rotate || 0;
+let name = b.dataset.name;
+
+result += `/* ${name} */\n`;
+result += `.${name}{
+left:${x}px;
+top:${y}px;
+width:${w}px;
+height:${h}px;
+transform:rotate(${rot}deg);
+}\n\n`;
+});
+
+document.getElementById("output").value = result;
+}
+
+/* ======================
+COPY
+====================== */
+function copyCode(){
+
+const t = document.getElementById("output");
+t.select();
+document.execCommand("copy");
+
+alert("복사 완료!");
+}
+
 </script>
 
 </body>
