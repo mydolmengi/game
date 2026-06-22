@@ -450,7 +450,7 @@ function smokeEffect(){
     }
 }
 
-function safeAddItem(id){
+function addItem(id){
     try{
         if(typeof addItem === "function") addItem(id);
     }catch(e){}
@@ -495,7 +495,7 @@ function brew(){
 
     if(success){
         bubbleEffect();
-        safeAddItem("bugSpray");
+        addItem("bugSpray");
 
         setTimeout(() => {
             showSuccessPopup();
