@@ -1,181 +1,4 @@
-
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>데이트 선택</title>
-
-<style>
-
-@font-face{
-    font-family:'GmarketSans';
-    src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family:'GmarketSans',sans-serif;
-    overflow:hidden;
-}
-
-.bg{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
-
-.popup-wrap{
-    position:fixed;
-    inset:0;
-
-    background:rgba(0,0,0,0.35);
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-.popup{
-
-    width:min(92vw,650px);
-
-    background:#fff7e6;
-
-    border:6px solid #d6a65c;
-
-    border-radius:30px;
-
-    padding:24px;
-
-    text-align:center;
-
-    box-shadow:0 10px 40px rgba(0,0,0,0.25);
-}
-
-.title{
-
-    font-size:30px;
-
-    color:#6b4318;
-
-    margin-bottom:20px;
-}
-
-.ticket-list{
-
-    display:flex;
-
-    flex-wrap:wrap;
-
-    justify-content:center;
-
-    gap:20px;
-
-    margin-bottom:25px;
-}
-
-.ticket{
-
-    width:180px;
-
-    cursor:pointer;
-
-    transition:.2s;
-}
-
-.ticket:hover{
-
-    transform:scale(1.05);
-}
-
-.ticket img{
-
-    width:100%;
-
-    border-radius:18px;
-
-    background:white;
-
-    padding:10px;
-}
-
-.ticket-name{
-
-    margin-top:10px;
-
-    color:#5b3719;
-
-    font-size:18px;
-}
-
-.back-btn{
-
-    border:none;
-
-    background:#f1d8a8;
-
-    color:#5b3719;
-
-    font-size:18px;
-
-    padding:12px 28px;
-
-    border-radius:16px;
-
-    cursor:pointer;
-}
-
-.empty{
-
-    color:#7a5b36;
-
-    font-size:18px;
-
-    margin-bottom:20px;
-}
-
-</style>
-</head>
-<body>
-
-<img
-src="images/date_bg.png"
-class="bg"
-alt="카페">
-
-<div class="popup-wrap">
-
-    <div class="popup">
-
-        <div class="title">
-            💕 데이트권을 선택하시오 💕
-        </div>
-
-        <div
-        class="ticket-list"
-        id="ticketList">
-        </div>
-
-        <button
-        class="back-btn"
-        onclick="location.href='room1.html'">
-
-            돌아가기
-
-        </button>
-
-    </div>
-
-</div>
+<script src="js/inventory.js"></script>
 
 <script>
 
@@ -198,7 +21,9 @@ try{
         || "[]");
     }
 
-}catch(e){}
+}catch(e){
+    console.log(e);
+}
 
 function addTicket(
     img,
@@ -225,7 +50,7 @@ function addTicket(
     `;
 }
 
-/* 공주 */
+/* 💌 공주와 데이트 쿠폰 */
 
 if(
 inventory.includes("pdateCoupon")
@@ -241,10 +66,10 @@ inventory.includes("pdateCoupon")
     );
 }
 
-/* 마녀 */
+/* 💌 마녀와 데이트 쿠폰 */
 
 if(
-inventory.includes("adateCoupon")
+inventory.includes("dateCoupon")
 ){
 
     addTicket(
@@ -256,6 +81,8 @@ inventory.includes("adateCoupon")
         "adate.html"
     );
 }
+
+/* 데이트권 없음 */
 
 if(
 ticketList.innerHTML.trim() === ""
@@ -274,6 +101,3 @@ ticketList.innerHTML.trim() === ""
 }
 
 </script>
-
-</body>
-</html>
