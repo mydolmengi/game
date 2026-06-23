@@ -328,12 +328,10 @@ body{
 
     <img src="images/potion_workbench.png" class="bg" alt="물약 제조대">
 
-    <!-- 항상 표시 -->
     <button class="make-btn" onclick="startGame()">
         물약 만들기
     </button>
 
-    <!-- 물약 클릭 영역 -->
     <div class="bottle b1" onclick="pick(1, this)"></div>
     <div class="bottle b2" onclick="pick(2, this)"></div>
     <div class="bottle b3" onclick="pick(3, this)"></div>
@@ -352,7 +350,6 @@ body{
 
 <button class="inventory-btn" onclick="openInventory()">🎒</button>
 
-<!-- 팝업 -->
 <div class="popup" id="popup">
     <div class="popup-box">
         <button class="close-btn" onclick="closePopup()">✕</button>
@@ -368,8 +365,11 @@ body{
 let selected = [];
 let brewing = false;
 
+window.addEventListener("DOMContentLoaded", () => {
+    localStorage.setItem("lastPage", "cave_potion.html");
+});
+
 function openInventory(){
-    localStorage.setItem("returnPage", "cave_potion.html");
     localStorage.setItem("lastPage", "cave_potion.html");
     location.href = "inventory.html";
 }
