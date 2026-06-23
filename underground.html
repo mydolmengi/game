@@ -488,7 +488,8 @@ function openDoorScene(){
 
     setTimeout(() => {
         glow.classList.add("on");
-        imb.classList.remove("hidden");
+        imb.src = "images/imbure.png";
+        imb.classList.remove("hidden", "bigspin", "spray");
         imb.classList.add("show");
 
         currentEncounterLines = [
@@ -583,23 +584,31 @@ function useItemForFight(item){
     setDialog("", `그래 ${itemName} 이걸로 널 처단한다`, "");
 
     setTimeout(() => {
+        const imb = document.getElementById("imb");
+
         if(hasBugSprayItem(item)){
-            const imb = document.getElementById("imb");
-            imb.classList.remove("bigspin");
-            imb.classList.add("spray");
             removeItemSafe(item);
 
-            setDialog("임벌레", "앙돼...... 내가 퇴치되다니!!!!!!!", "");
+            imb.classList.remove("bigspin");
+            imb.classList.add("spray");
 
             setTimeout(() => {
-                imb.classList.add("hidden");
-                document.getElementById("enterBtn").style.display = "block";
-                localStorage.setItem("undergroundCleared", "true");
-                cleared = true;
-                setDialog("", "길이 열렸다.", `<button class="dialog-btn" onclick="location.href='underground_hi.html'">안으로 들어가기</button>`);
-            }, 900);
+                imb.src = "images/imburedown.png";
+                imb.classList.remove("spray");
+                imb.classList.add("show");
+
+                setDialog("임벌레", "앙돼...... 내가 퇴치되다니!!!!!!!", "");
+
+                setTimeout(() => {
+                    imb.classList.add("hidden");
+                    document.getElementById("enterBtn").style.display = "block";
+                    localStorage.setItem("undergroundCleared", "true");
+                    cleared = true;
+                    setDialog("", "길이 열렸다.", `<button class="dialog-btn" onclick="location.href='underground_hi.html'">안으로 들어가기</button>`);
+                }, 1400);
+            }, 500);
+
         }else{
-            const imb = document.getElementById("imb");
             imb.classList.remove("spray");
             imb.classList.add("bigspin");
 
