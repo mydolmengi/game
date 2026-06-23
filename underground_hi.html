@@ -273,7 +273,7 @@ body{
 <div class="scene">
     <img class="bg" src="images/pmeet.png" alt="공주를 만나는 방" />
 
-    <div class="princess-hint" id="princessHint">공주를 눌러보자</div>
+    <div class="princess-hint" id="princessHint">드디어, 공주다...!</div>
     <div class="princess-zone" id="princessZone" title="공주"></div>
 </div>
 
@@ -309,6 +309,8 @@ body{
     </div>
 </div>
 
+<script src="js/inventory.js"></script>
+
 <script>
 const princessZone = document.getElementById("princessZone");
 const princessHint = document.getElementById("princessHint");
@@ -336,25 +338,20 @@ function setActions(html){
     dialogActions.innerHTML = html;
 }
 
-function normalizeLabel(item){
-    if(item === "dateCoupon") return "💌 공주와 데이트 쿠폰";
-    return item;
-}
-
-function addItemSafe(item){
+function safeAddItem(id){
     try{
         if(typeof addItem === "function"){
-            addItem(item);
-            return;
+            if(typeof getInventory === "function"){
+                const inv = getInventory();
+                if(Array.isArray(inv) && inv.includes(id)){
+                    return;
+                }
+            }
+            addItem(id);
         }
-    }catch(e){}
-    try{
-        const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
-        if(!inv.includes(item)){
-            inv.push(item);
-            localStorage.setItem("inventory", JSON.stringify(inv));
-        }
-    }catch(e){}
+    }catch(e){
+        console.log(e);
+    }
 }
 
 function playTalkIntro(){
@@ -402,7 +399,7 @@ function finishTalk(){
     talkDone = true;
     localStorage.setItem("princessDateCleared", "true");
 
-    addItemSafe("dateCoupon");
+    safeAddItem("dateCoupon");
 
     dialogHero.src = "images/p_date_coupon.png";
     dialogText.textContent = "💌 공주와 데이트 쿠폰을 받았다!";
