@@ -1,45 +1,81 @@
 const INVENTORY_KEY = "inventoryItems";
 
+/* =========================
+   인벤토리 불러오기
+========================= */
 function getInventory(){
     const data = localStorage.getItem(INVENTORY_KEY);
     return data ? JSON.parse(data) : [];
 }
 
+/* =========================
+   아이템 추가
+========================= */
 function addItem(item){
+
     const items = getInventory();
+
     if(!items.includes(item)){
         items.push(item);
-        localStorage.setItem(INVENTORY_KEY, JSON.stringify(items));
+        localStorage.setItem(
+            INVENTORY_KEY,
+            JSON.stringify(items)
+        );
     }
 }
 
+/* =========================
+   아이템 제거
+========================= */
 function removeItem(item){
-    const items = getInventory().filter(i => i !== item);
-    localStorage.setItem(INVENTORY_KEY, JSON.stringify(items));
+
+    const items = getInventory().filter(
+        i => i !== item
+    );
+
+    localStorage.setItem(
+        INVENTORY_KEY,
+        JSON.stringify(items)
+    );
 }
 
+/* =========================
+   아이템 보유 여부
+========================= */
 function hasItem(item){
     return getInventory().includes(item);
 }
 
 /* =========================
-   🔥 수정된 goBack (핵심)
+   인벤토리 열기
+   모든 페이지 공통 사용
 ========================= */
+function openInventory(){
 
+    localStorage.setItem(
+        "returnPage",
+        location.pathname.split("/").pop()
+    );
+
+    location.href = "inventory.html";
+}
+
+/* =========================
+   인벤토리에서 돌아가기
+========================= */
 function goBack(){
 
-    let lastPage = localStorage.getItem("lastPage");
+    const returnPage =
+        localStorage.getItem("returnPage");
 
-    // ❗ 안전장치 (혹시 값 이상할 때)
-    const validPages = [
-        "forest.html",
-        "house.html",
-        "cave.html"
-    ];
-
-    if(validPages.includes(lastPage)){
-        location.href = lastPage;
-    } else {
-        location.href = "room1.html";
+    if(
+        returnPage &&
+        returnPage !== "null" &&
+        returnPage !== "undefined"
+    ){
+        location.href = returnPage;
+        return;
     }
+
+    location.href = "room1.html";
 }
