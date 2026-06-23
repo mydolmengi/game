@@ -350,7 +350,7 @@ body{
 
 </div>
 
-<button class="inventory-btn" onclick="location.href='inventory.html'">🎒</button>
+<button class="inventory-btn" onclick="openInventory()">🎒</button>
 
 <!-- 팝업 -->
 <div class="popup" id="popup">
@@ -362,9 +362,17 @@ body{
     </div>
 </div>
 
+<script src="js/inventory.js"></script>
+
 <script>
 let selected = [];
 let brewing = false;
+
+function openInventory(){
+    localStorage.setItem("returnPage", "cave_potion.html");
+    localStorage.setItem("lastPage", "cave_potion.html");
+    location.href = "inventory.html";
+}
 
 function openPopup(title, bodyHtml, actionsHtml = ""){
     document.getElementById("popupTitle").innerHTML = title || "";
