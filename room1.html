@@ -2,168 +2,315 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>갈림길</title>
+<title>RPG MAP EDITOR FINAL PRO</title>
 
 <style>
-
-@font-face {
-    font-family: 'GmarketSans';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
 body{
-    background:#000;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    font-family:'GmarketSans', sans-serif;
+margin:0;
+background:#111;
+display:flex;
+justify-content:center;
+font-family:sans-serif;
 }
 
-.game{
-    position:relative;
-    width:100%;
-    max-width:900px;
+/* ======================
+MAP
+====================== */
+.wrapper{
+position:relative;
+width:900px;
+margin-top:20px;
 }
 
-.bg{
-    width:100%;
-    display:block;
+.wrapper img{
+width:100%;
+display:block;
 }
 
-/* 🌳 숲 */
+/* ======================
+BOX (PX 안정 버전)
+====================== */
+.box{
+position:absolute;
 
-.forest{
-    position:absolute;
+width:120px;
+height:120px;
 
-    left:0%;
-    top:10%;
+background:rgba(255,0,0,0.25);
+border:2px dashed red;
 
-    width:33%;
-    height:40%;
+cursor:grab;
 
-    cursor:pointer;
+resize: both;
+overflow: hidden;
 
-   
+min-width:30px;
+min-height:30px;
+
+transform-origin:center;
+
+will-change: left, top, width, height, transform;
 }
 
-/* 🏠 집 */
+/* ======================
+🔄 ROTATE ICON (BIG FIX)
+====================== */
+.rotate-icon{
+position:absolute;
 
-.house{
-    position:absolute;
+top:-30px;
+left:50%;
+transform:translateX(-50%);
 
-    left:33%;
-    top:15%;
+width:36px;
+height:36px;
 
-    width:34%;
-    height:50%;
+background:white;
+border:2px solid #333;
+border-radius:50%;
 
-    cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
 
- 
+font-size:22px;
+cursor:grab;
+
+box-shadow:0 2px 8px rgba(0,0,0,0.4);
+user-select:none;
 }
 
-/* 🕳️ 동굴 */
-
-.cave{
-    position:absolute;
-
-    right:0%;
-    top:15%;
-
-    width:33%;
-    height:50%;
-
-    cursor:pointer;
-
-  
+.rotate-icon::after{
+content:"🔄";
 }
 
-/* 하단 대화창 */
+/* ======================
+PANEL
+====================== */
+#panel{
+position:fixed;
+top:20px;
+left:20px;
 
-.choice-box{
-
-    position:absolute;
-
-    bottom:15%;
-
-    left:50%;
-
-    transform:translateX(-50%);
-
-    width:80%;
-
-    max-width:650px;
-
-    background:#f9e9c8;
-
-    border:6px solid #c89b5d;
-
-    border-radius:30px;
-
-    padding:18px;
-
-    text-align:center;
-
-    font-size:28px;
-
-    color:#5b3719;
-
-    box-shadow:
-        0 8px 20px rgba(0,0,0,0.2);
+width:520px;
+background:white;
+padding:18px;
+border-radius:12px;
+z-index:999;
 }
 
-@media (max-width:600px){
-
-    .choice-box{
-        font-size:20px;
-        padding:12px;
-    }
-
+textarea{
+width:100%;
+height:240px;
+margin-top:10px;
 }
 
+button{
+width:100%;
+padding:10px;
+margin-top:8px;
+cursor:pointer;
+}
 </style>
 </head>
+
 <body>
 
-<div class="game">
+<!-- ======================
+PANEL
+====================== -->
+<div id="panel">
+<b>🎮 RPG MAP EDITOR FINAL PRO</b>
 
-    <img
-    src="images/room1.png"
-    class="bg"
-    alt="갈림길">
+<textarea id="output"></textarea>
 
-    <div
-    class="forest"
-    onclick="location.href='forest.html'"
-    title="숲">
-    </div>
-
-    <div
-    class="house"
-    onclick="location.href='house.html'"
-    title="집">
-    </div>
-
-    <div
-    class="cave"
-    onclick="location.href='cave.html'"
-    title="동굴">
-    </div>
-
-    <div class="choice-box">
-        🌿 어디로 갈까? 🌿
-    </div>
-
+<button onclick="addBox()">➕ 오브젝트 추가</button>
+<button onclick="copyCode()">📋 복사</button>
 </div>
+
+<!-- ======================
+MAP
+====================== -->
+<div class="wrapper" id="map">
+<img src="images/room1.png">
+</div>
+
+<script>
+
+let activeBox = null;
+let activeRotateBox = null;
+
+let offsetX = 0;
+let offsetY = 0;
+
+/* ======================
+CREATE
+====================== */
+function addBox(){
+
+const box = document.createElement("div");
+box.className = "box";
+
+box.style.left = "100px";
+box.style.top = "100px";
+
+box.dataset.name = prompt("이름 입력") || "object";
+box.dataset.rotate = 0;
+
+const icon = document.createElement("div");
+icon.className = "rotate-icon";
+
+box.appendChild(icon);
+document.getElementById("map").appendChild(box);
+
+enableDrag(box);
+enableRotate(icon, box);
+}
+
+/* ======================
+DRAG (PX FIX)
+====================== */
+function enableDrag(box){
+
+box.addEventListener("mousedown",(e)=>{
+
+if(e.target.classList.contains("rotate-icon")) return;
+
+activeBox = box;
+
+const rect = box.getBoundingClientRect();
+
+offsetX = e.clientX - rect.left;
+offsetY = e.clientY - rect.top;
+});
+}
+
+/* ======================
+ROTATE (STABLE FIX)
+====================== */
+let startAngle = 0;
+let startRotate = 0;
+
+function enableRotate(icon, box){
+
+icon.addEventListener("mousedown",(e)=>{
+
+activeRotateBox = box;
+
+const r = box.getBoundingClientRect();
+
+const cx = r.left + r.width / 2;
+const cy = r.top + r.height / 2;
+
+startAngle =
+Math.atan2(e.clientY - cy, e.clientX - cx);
+
+startRotate =
+parseFloat(box.dataset.rotate || 0);
+
+e.stopPropagation();
+});
+}
+
+/* ======================
+MOVE + ROTATE
+====================== */
+document.addEventListener("mousemove",(e)=>{
+
+const map = document.getElementById("map");
+const rect = map.getBoundingClientRect();
+
+/* DRAG */
+if(activeBox){
+
+let x = e.clientX - rect.left - offsetX;
+let y = e.clientY - rect.top - offsetY;
+
+activeBox.style.left = x + "px";
+activeBox.style.top = y + "px";
+
+updateOutput();
+}
+
+/* ROTATE */
+if(activeRotateBox){
+
+const r = activeRotateBox.getBoundingClientRect();
+
+const cx = r.left + r.width / 2;
+const cy = r.top + r.height / 2;
+
+const currentAngle =
+Math.atan2(e.clientY - cy, e.clientX - cx);
+
+let delta = currentAngle - startAngle;
+
+let finalAngle =
+startRotate + delta * (180 / Math.PI);
+
+activeRotateBox.style.transform =
+`rotate(${finalAngle}deg)`;
+
+activeRotateBox.dataset.rotate = finalAngle;
+
+updateOutput();
+}
+});
+
+document.addEventListener("mouseup",()=>{
+
+activeBox = null;
+activeRotateBox = null;
+});
+
+/* ======================
+OUTPUT
+====================== */
+function updateOutput(){
+
+const boxes = document.querySelectorAll(".box");
+const map = document.getElementById("map").getBoundingClientRect();
+
+let result = "";
+
+boxes.forEach((b)=>{
+
+const rect = b.getBoundingClientRect();
+
+let x = rect.left - map.left;
+let y = rect.top - map.top;
+let w = rect.width;
+let h = rect.height;
+
+let rot = b.dataset.rotate || 0;
+let name = b.dataset.name;
+
+result += `/* ${name} */\n`;
+result += `.${name}{
+left:${x}px;
+top:${y}px;
+width:${w}px;
+height:${h}px;
+transform:rotate(${rot}deg);
+}\n\n`;
+});
+
+document.getElementById("output").value = result;
+}
+
+/* ======================
+COPY
+====================== */
+function copyCode(){
+
+const t = document.getElementById("output");
+t.select();
+document.execCommand("copy");
+
+alert("복사 완료!");
+}
+
+</script>
 
 </body>
 </html>
