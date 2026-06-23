@@ -363,7 +363,7 @@ function playTalkIntro(){
     rewardBox.classList.remove("show");
     talkStep = 0;
     setActions(`
-        <button class="btn primary" onclick="startTalk()">대화하기</button>
+        <button class="btn primary" onclick="startTalk()">당연한 말을</button>
         <button class="btn secondary" onclick="closePopup()">닫기</button>
     `);
 }
@@ -373,7 +373,7 @@ function startTalk(){
     dialogHero.src = "images/ps.png";
     dialogName.textContent = "공주";
     dialogSub.textContent = "공주와 대화를 나누고 있다.";
-    dialogText.textContent = "날 구해줘서 고마워!";
+    dialogText.textContent = "태도 레전드네;;!";
     setActions(`<button class="btn gold" onclick="nextTalk()">다음</button>`);
 }
 
@@ -382,7 +382,7 @@ function nextTalk(){
 
     if(talkStep === 2){
         dialogHero.src = "images/psb.png";
-        dialogText.textContent = "덕분에 이 곳에서 벗어날 수 있겠네!";
+        dialogText.textContent = "하여튼, 덕분에 이 곳에서 벗어날 수 있겠네!";
         setActions(`<button class="btn gold" onclick="nextTalk()">다음</button>`);
         return;
     }
