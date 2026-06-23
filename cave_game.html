@@ -215,6 +215,7 @@
   #overlay h2{margin:0 0 10px;font-size:28px}
   #overlay p{margin:8px 0;color:#dccdf0;line-height:1.5;white-space:pre-line}
   #restart{margin-top:14px;width:100%;border:none;border-radius:16px;padding:14px 16px;background:linear-gradient(180deg,#f2c15d,#e3a440);color:#281b07;font-size:16px;font-weight:900}
+  .choice-btn.blue{width:100%;border:none;border-radius:16px;padding:14px 16px;background:linear-gradient(180deg,#7c5cff,#5b3fe0);color:#fff;font-size:16px;font-weight:900;box-shadow:0 10px 18px rgba(0,0,0,.2)}
   .spark{position:absolute;width:10px;height:10px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0%,rgba(255,255,255,.1) 70%,rgba(255,255,255,0) 100%);animation:spark .65s ease-out forwards;z-index:20}
   @keyframes spark{from{transform:scale(.6);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(2.4);opacity:0}}
 
@@ -697,11 +698,45 @@
     state.over = true;
     clearTimers();
     saveBest();
-    const result = state.score >= GOAL ? '성공' : '실패';
-    const goalLine = state.score >= GOAL ? '목표를 달성했어요.' : '목표 점수에 도달하지 못했어요.';
-    endTitle.textContent = title;
-    endText.textContent = `${text}\n결과: ${result}\n${goalLine}\n최종 점수: ${state.score}\n최고 점수: ${state.best}`;
+
+    const success = state.score >= GOAL;
+    endTitle.textContent = success ? '성공' : '실패';
+    endText.textContent = `${text}
+결과: ${success ? '성공' : '실패'}
+${success ? '목표를 달성했어요.' : '목표 점수에 도달하지 못했어요.'}
+최종 점수: ${state.score}
+최고 점수: ${state.best}`;
+
     overlay.style.display = 'flex';
+
+    const backBtn = document.getElementById('backBtn');
+
+    if (success) {
+      restart.style.display = 'block';
+      restart.textContent = '성공';
+      restart.onclick = () => location.href = 'cave_mage.html';
+
+      if (backBtn) {
+        backBtn.style.display = 'none';
+      }
+    } else {
+      restart.style.display = 'block';
+      restart.textContent = '다시하기';
+      restart.onclick = resetGame;
+
+      let btn = backBtn;
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'backBtn';
+        btn.className = 'choice-btn blue';
+        btn.style.marginTop = '10px';
+        btn.textContent = '돌아가기';
+        btn.onclick = () => location.href = 'cave_mage.html';
+        document.querySelector('#overlay .panel').appendChild(btn);
+      } else {
+        btn.style.display = 'block';
+      }
+    }
   }
 
   function resetGame() {
@@ -715,6 +750,8 @@
     state.over = false;
     state.spawnMs = 2400;
     overlay.style.display = 'none';
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) backBtn.style.display = 'none';
     shelf.innerHTML = '';
     selectedCard.style.display = 'none';
     toast.classList.remove('show');
@@ -870,12 +907,8 @@
     }
   });
 
- <button onclick="location.href='cave_mage.html'">
-        마녀의 집으로 바로가기
-    </button>
-  
-restart.addEventListener('click', resetGame);
-  restartBtn.addEventListener('click', resetGame);
+
+restartBtn.addEventListener('click', resetGame);
 
   resetGame();
 })();
