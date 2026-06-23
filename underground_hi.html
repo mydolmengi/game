@@ -1,1 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>지하통로 - 공주 만남</title>
+<style>
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
 
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    min-height:100vh;
+    background:#161106;
+    font-family:'GmarketSans', sans-serif;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+}
+
+.scene{
+    position:relative;
+    width:min(100vw, 768px);
+    height:100vh;
+    overflow:hidden;
+    background:#000;
+}
+
+.bg{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    user-select:none;
+    pointer-events:none;
+}
+
+/* 공주 클릭 영역 */
+.princess-zone{
+    position:absolute;
+    left:34%;
+    top:26%;
+    width:30%;
+    height:28%;
+    z-index:5;
+    cursor:pointer;
+    border-radius:50%;
+}
+
+.princess-hint{
+    position:absolute;
+    left:50%;
+    top:25%;
+    transform:translateX(-50%);
+    z-index:6;
+    color:#fff8d8;
+    font-size:18px;
+    text-shadow:0 2px 6px rgba(0,0,0,0.5);
+    background:rgba(70,40,20,0.35);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:999px;
+    padding:8px 14px;
+    backdrop-filter: blur(4px);
+    animation:hintFloat 1.5s ease-in-out infinite;
+    pointer-events:none;
+}
+
+@keyframes hintFloat{
+    0%,100%{ transform:translateX(-50%) translateY(0); }
+    50%{ transform:translateX(-50%) translateY(-4px); }
+}
+
+/* 팝업 */
+.popup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.66);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+    padding:18px;
+}
+
+.popup.show{
+    display:flex;
+}
+
+.dialog-card{
+    width:min(92vw, 560px);
+    background:linear-gradient(180deg, #fff9e9 0%, #f7e8c7 100%);
+    border:6px solid #c79554;
+    border-radius:30px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.35);
+    overflow:hidden;
+    position:relative;
+}
+
+.dialog-top{
+    padding:18px 18px 10px;
+    border-bottom:3px solid rgba(184,140,73,0.35);
+}
+
+.dialog-title{
+    font-size:24px;
+    color:#5f3717;
+    font-weight:900;
+    margin-bottom:8px;
+}
+
+.dialog-sub{
+    font-size:16px;
+    color:#7b5730;
+    line-height:1.5;
+}
+
+.dialog-hero{
+    width:100%;
+    aspect-ratio:1 / 1;
+    object-fit:contain;
+    display:block;
+    background:radial-gradient(circle at 50% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.55) 55%, rgba(255,255,255,0));
+}
+
+.dialog-body{
+    padding:16px 18px 18px;
+}
+
+.dialog-name{
+    font-size:22px;
+    color:#2a58a0;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+.dialog-text{
+    min-height:92px;
+    font-size:22px;
+    line-height:1.65;
+    color:#6a4a25;
+    white-space:pre-line;
+}
+
+.dialog-actions{
+    padding:0 18px 18px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.btn{
+    border:none;
+    border-radius:18px;
+    padding:12px 18px;
+    font-family:'GmarketSans', sans-serif;
+    font-size:17px;
+    cursor:pointer;
+    box-shadow:0 6px 14px rgba(0,0,0,0.12);
+}
+
+.btn.primary{
+    background:#ff8fc7;
+    color:#fff;
+}
+
+.btn.secondary{
+    background:#f7f1e1;
+    color:#5f3717;
+    border:3px solid #c79554;
+}
+
+.btn.gold{
+    background:#ffd86a;
+    color:#6b430f;
+    border:3px solid #cc9d33;
+}
+
+.reward{
+    display:none;
+    padding:16px 18px 18px;
+    border-top:3px solid rgba(184,140,73,0.35);
+    background:rgba(255,255,255,0.28);
+}
+
+.reward.show{
+    display:block;
+}
+
+.reward-title{
+    font-size:20px;
+    color:#5f3717;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+.reward-card{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    background:rgba(255,255,255,0.55);
+    border:2px solid rgba(199,149,84,0.55);
+    border-radius:22px;
+    padding:12px;
+}
+
+.reward-card img{
+    width:94px;
+    height:94px;
+    object-fit:contain;
+    flex:0 0 auto;
+}
+
+.reward-card p{
+    font-size:18px;
+    color:#6a4a25;
+    line-height:1.55;
+}
+
+.hidden{
+    display:none !important;
+}
+
+@media (max-width: 600px){
+    .scene{
+        width:100vw;
+    }
+
+    .princess-hint{
+        font-size:14px;
+        padding:6px 12px;
+    }
+
+    .dialog-title{
+        font-size:21px;
+    }
+
+    .dialog-name{
+        font-size:20px;
+    }
+
+    .dialog-text{
+        font-size:18px;
+        min-height:78px;
+    }
+
+    .btn{
+        font-size:15px;
+        padding:11px 15px;
+    }
+
+    .reward-card img{
+        width:78px;
+        height:78px;
+    }
+
+    .reward-card p{
+        font-size:16px;
+    }
+}
+</style>
+</head>
+<body>
+<div class="scene">
+    <img class="bg" src="images/pmeet.png" alt="공주를 만나는 방" />
+
+    <div class="princess-hint" id="princessHint">공주를 눌러보자</div>
+    <div class="princess-zone" id="princessZone" title="공주"></div>
+</div>
+
+<div class="popup" id="popup">
+    <div class="dialog-card">
+        <div class="dialog-top">
+            <div class="dialog-title">공주와의 대화</div>
+            <div class="dialog-sub" id="dialogSub">공주가 미소를 짓고 있다.</div>
+        </div>
+
+        <img class="dialog-hero" id="dialogHero" src="images/ps.png" alt="공주 이미지" />
+
+        <div class="dialog-body">
+            <div class="dialog-name" id="dialogName">공주</div>
+            <div class="dialog-text" id="dialogText">날 구해줘서 고마워!</div>
+        </div>
+
+        <div class="dialog-actions" id="dialogActions">
+            <button class="btn primary" onclick="startTalk()">대화하기</button>
+            <button class="btn secondary" onclick="closePopup()">닫기</button>
+        </div>
+
+        <div class="reward" id="rewardBox">
+            <div class="reward-title">보상 획득!</div>
+            <div class="reward-card">
+                <img src="images/공주 데이트.png" alt="공주와 데이트 쿠폰" />
+                <p>
+                    <b>💌 공주와 데이트 쿠폰</b><br />
+                    공주가 고마움의 표시로 선물을 주었다.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const princessZone = document.getElementById("princessZone");
+const princessHint = document.getElementById("princessHint");
+const popup = document.getElementById("popup");
+const dialogHero = document.getElementById("dialogHero");
+const dialogName = document.getElementById("dialogName");
+const dialogText = document.getElementById("dialogText");
+const dialogSub = document.getElementById("dialogSub");
+const dialogActions = document.getElementById("dialogActions");
+const rewardBox = document.getElementById("rewardBox");
+
+let talkStep = 0;
+let talkDone = localStorage.getItem("princessDateCleared") === "true";
+
+function openPopup(){
+    popup.classList.add("show");
+    princessHint.classList.add("hidden");
+}
+
+function closePopup(){
+    popup.classList.remove("show");
+}
+
+function setActions(html){
+    dialogActions.innerHTML = html;
+}
+
+function normalizeLabel(item){
+    if(item === "dateCoupon") return "💌 공주와 데이트 쿠폰";
+    return item;
+}
+
+function addItemSafe(item){
+    try{
+        if(typeof addItem === "function"){
+            addItem(item);
+            return;
+        }
+    }catch(e){}
+    try{
+        const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+        if(!inv.includes(item)){
+            inv.push(item);
+            localStorage.setItem("inventory", JSON.stringify(inv));
+        }
+    }catch(e){}
+}
+
+function playTalkIntro(){
+    openPopup();
+    dialogHero.src = "images/ps.png";
+    dialogName.textContent = "공주";
+    dialogSub.textContent = "공주가 당신을 반갑게 맞이한다.";
+    dialogText.textContent = "날 구해줘서 고마워!";
+    rewardBox.classList.remove("show");
+    talkStep = 0;
+    setActions(`
+        <button class="btn primary" onclick="startTalk()">대화하기</button>
+        <button class="btn secondary" onclick="closePopup()">닫기</button>
+    `);
+}
+
+function startTalk(){
+    talkStep = 1;
+    dialogHero.src = "images/ps.png";
+    dialogName.textContent = "공주";
+    dialogSub.textContent = "공주와 대화를 나누고 있다.";
+    dialogText.textContent = "날 구해줘서 고마워!";
+    setActions(`<button class="btn gold" onclick="nextTalk()">다음</button>`);
+}
+
+function nextTalk(){
+    talkStep++;
+
+    if(talkStep === 2){
+        dialogHero.src = "images/psb.png";
+        dialogText.textContent = "덕분에 이 곳에서 벗어날 수 있겠네!";
+        setActions(`<button class="btn gold" onclick="nextTalk()">다음</button>`);
+        return;
+    }
+
+    if(talkStep === 3){
+        dialogHero.src = "images/ps.png";
+        dialogText.textContent = "자, 이건 내 선물이야~!";
+        setActions(`<button class="btn gold" onclick="finishTalk()">선물 받기</button>`);
+        return;
+    }
+}
+
+function finishTalk(){
+    talkDone = true;
+    localStorage.setItem("princessDateCleared", "true");
+
+    addItemSafe("dateCoupon");
+
+    dialogHero.src = "images/p_date_coupon.png";
+    dialogText.textContent = "💌 공주와 데이트 쿠폰을 받았다!";
+    rewardBox.classList.add("show");
+    dialogSub.textContent = "공주가 선물을 건넸다.";
+
+    setActions(`
+        <button class="btn primary" onclick="location.href='room1.html'">데이트하러 가기</button>
+    `);
+
+    princessHint.textContent = "이미 대화를 마쳤다";
+    princessHint.classList.remove("hidden");
+}
+
+princessZone.addEventListener("click", () => {
+    if(talkDone){
+        openPopup();
+        dialogHero.src = "images/ps.png";
+        dialogName.textContent = "공주";
+        dialogSub.textContent = "이미 선물을 받은 상태다.";
+        dialogText.textContent = "데이트하러 가기 버튼을 눌러보자!";
+        rewardBox.classList.add("show");
+        setActions(`<button class="btn primary" onclick="location.href='room1.html'">데이트하러 가기</button>`);
+        return;
+    }
+
+    playTalkIntro();
+});
+</script>
+</body>
+</html>
