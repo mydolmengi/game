@@ -231,6 +231,99 @@ body{
     display:none !important;
 }
 
+/* 선물 선택 팝업 */
+.gift-popup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.70);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1100;
+    padding:18px;
+}
+
+.gift-popup.show{
+    display:flex;
+}
+
+.gift-box{
+    width:min(92vw, 560px);
+    background:#f9e9c8;
+    border:6px solid #c89b5d;
+    border-radius:28px;
+    padding:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    text-align:center;
+}
+
+.gift-title{
+    font-size:24px;
+    color:#5b3719;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+.gift-sub{
+    font-size:16px;
+    color:#7b5730;
+    line-height:1.5;
+    margin-bottom:14px;
+}
+
+.gift-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:42vh;
+    overflow:auto;
+    padding-right:4px;
+    margin-bottom:12px;
+}
+
+.gift-item{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:18px;
+    background:#fff;
+    color:#5b3719;
+    font-size:17px;
+    cursor:pointer;
+    border:2px solid #c89b5d;
+    font-family:'GmarketSans', sans-serif;
+    text-align:left;
+}
+
+.gift-item:hover{
+    background:#fff8ea;
+}
+
+.gift-item-emoji{
+    margin-right:8px;
+}
+
+.gift-empty{
+    font-size:17px;
+    color:#6a4a25;
+    line-height:1.6;
+    padding:18px 8px;
+}
+
+.gift-close{
+    width:100%;
+    margin-top:6px;
+    padding:12px;
+    border:none;
+    border-radius:18px;
+    background:#ff9fd2;
+    color:#fff;
+    cursor:pointer;
+    font-size:18px;
+    font-family:'GmarketSans', sans-serif;
+    box-shadow:0 6px 14px rgba(0,0,0,0.12);
+}
+
 @media (max-width: 600px){
     .scene{
         width:100vw;
@@ -265,6 +358,18 @@ body{
     }
 
     .reward-card p{
+        font-size:16px;
+    }
+
+    .gift-title{
+        font-size:21px;
+    }
+
+    .gift-item{
+        font-size:15px;
+    }
+
+    .gift-close{
         font-size:16px;
     }
 }
@@ -310,6 +415,15 @@ body{
     </div>
 </div>
 
+<div class="gift-popup" id="giftPopup">
+    <div class="gift-box">
+        <div class="gift-title">선물 선택하기</div>
+        <div class="gift-sub">가지고 있는 선물을 공주에게 건네보자.</div>
+        <div class="gift-list" id="giftList"></div>
+        <button class="gift-close" onclick="closeGiftPopup()">닫기</button>
+    </div>
+</div>
+
 <script src="js/inventory.js"></script>
 
 <script>
@@ -322,6 +436,9 @@ const dialogText = document.getElementById("dialogText");
 const dialogSub = document.getElementById("dialogSub");
 const dialogActions = document.getElementById("dialogActions");
 const rewardBox = document.getElementById("rewardBox");
+
+const giftPopup = document.getElementById("giftPopup");
+const giftList = document.getElementById("giftList");
 
 let talkStep = 0;
 let talkDone = localStorage.getItem("princessDateCleared") === "true";
@@ -339,12 +456,26 @@ function setActions(html){
     dialogActions.innerHTML = html;
 }
 
+function getInventorySafe(){
+    try{
+        if(typeof getInventory === "function"){
+            const inv = getInventory();
+            return Array.isArray(inv) ? inv : [];
+        }
+    }catch(e){}
+    try{
+        const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+        return Array.isArray(inv) ? inv : [];
+    }catch(e){}
+    return [];
+}
+
 function safeAddItem(id){
     try{
         if(typeof addItem === "function"){
             addItem(id);
         }else{
-            let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+            const inv = getInventorySafe();
             if(!inv.includes(id)){
                 inv.push(id);
                 localStorage.setItem("inventory", JSON.stringify(inv));
@@ -364,10 +495,29 @@ function safeRemoveItem(id){
     }catch(e){}
 
     try{
-        let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+        let inv = getInventorySafe();
         inv = inv.filter(item => item !== id);
         localStorage.setItem("inventory", JSON.stringify(inv));
-    }catch(e){}
+    }catch(e){
+        console.log(e);
+    }
+}
+
+function normalizeLabel(item){
+    if(item === "bubbletea") return "🍹 흑당 버블티";
+    if(item === "jjamppong") return "🍜 짬뽕";
+    if(item === "flower") return "🌸 꽃";
+    if(item === "axe") return "🪓 도끼";
+    if(item === "shield") return "🛡 방패";
+    if(item === "key") return "🔑 열쇠";
+    if(item === "heart") return "💖 하트 생명";
+    if(item === "iceAmericano") return "🧊 아이스 아메리카노";
+    if(item === "tiramisu") return "🍰 티라미수";
+    if(item === "bugSpray") return "🧴 벌레 퇴치제";
+    if(item === "goldenApple") return "🍎 황금사과";
+    if(item === "pdateCoupon") return "💌 공주와 데이트 쿠폰";
+    if(item === "dateCoupon") return "💌 마녀와 데이트 쿠폰";
+    return item;
 }
 
 function playTalkIntro(){
@@ -407,93 +557,79 @@ function nextTalk(){
         dialogHero.src = "images/ps.png";
         dialogText.textContent = "나한테 황금사과를 주면 좋을 일이 일어날지도.....?";
         setActions(`
-            <button class="btn gold" onclick="giveGoldenApple()">🎁 선물주기</button>
+            <button class="btn gold" onclick="openGiftPopup()">🎁 선물주기</button>
             <button class="btn secondary" onclick="location.href='room1.html'">나가서 구해오기</button>
         `);
         return;
     }
 }
 
-function giveGoldenApple(){
-    let inv = [];
+function openGiftPopup(){
+    const inv = getInventorySafe();
+    giftList.innerHTML = "";
 
-    try{
-        if(typeof getInventory === "function"){
-            inv = getInventory() || [];
-        }else{
-            inv = JSON.parse(localStorage.getItem("inventory") || "[]");
-        }
-    }catch(e){}
+    if(inv.length === 0){
+        giftList.innerHTML = `
+            <div class="gift-empty">
+                가지고 있는 선물이 없다...<br>
+                밖에 나가서 선물을 구해오자.
+            </div>
+        `;
+    }else{
+        inv.forEach(item => {
+            const btn = document.createElement("button");
+            btn.className = "gift-item";
+            btn.innerHTML = `<span class="gift-item-emoji">🎁</span>${normalizeLabel(item)}`;
+            btn.onclick = () => useGiftItem(item);
+            giftList.appendChild(btn);
+        });
+    }
 
-    if(inv.includes("goldenApple")){
+    giftPopup.classList.add("show");
+}
+
+function closeGiftPopup(){
+    giftPopup.classList.remove("show");
+}
+
+function useGiftItem(item){
+    closeGiftPopup();
+
+    if(item === "goldenApple"){
         dialogHero.src = "images/psb.png";
         dialogText.textContent = "어머! 황금사과잖아?! 정말 고마워! 약속대로 특별한 선물을 줄게!";
         setActions(`
             <button class="btn gold" onclick="finishTalk()">선물 받기</button>
+            <button class="btn secondary" onclick="openGiftPopup()">다른 선물 고르기</button>
         `);
         return;
     }
 
-    if(inv.includes("flower")){
-        dialogText.textContent = "꽃은 예쁘지만... 지금은 황금사과가 갖고 싶어!";
-        return;
-    }
+    const reactions = {
+        bubbletea: "버블티 좋아해! 하지만 지금은 황금사과가 더 끌리네~",
+        jjamppong: "짬뽕...? 공주가 먹기엔 조금 맵지 않을까?",
+        flower: "꽃 너무 예쁘다! 그래도 내가 찾는 건 황금사과야!",
+        axe: "도끼를 선물하는 사람은 처음 봤어...",
+        shield: "날 지켜주겠다는 뜻이야?",
+        key: "열쇠는 이미 충분히 많아~",
+        heart: "마음은 고맙지만 황금사과를 가져와줘!",
+        iceAmericano: "쓴 건 아직 잘 못 마시겠어...",
+        tiramisu: "티라미수 정말 좋아! 하지만 황금사과가 더 좋아!",
+        bugSpray: "벌레 퇴치제...? 공주 선물 맞아?",
+        pdateCoupon: "공주와 데이트 쿠폰은 이미 내가 줬는걸?",
+        dateCoupon: "마녀와 데이트 쿠폰은 지금은 필요 없어!"
+    };
 
-    if(inv.includes("bubbletea")){
-        dialogText.textContent = "버블티 좋아하지만 황금사과만큼은 아니야~";
-        return;
-    }
-
-    if(inv.includes("jjamppong")){
-        dialogText.textContent = "짬뽕...? 갑자기 배고파지네.";
-        return;
-    }
-
-    if(inv.includes("iceAmericano")){
-        dialogText.textContent = "아이스 아메리카노도 좋지만 내가 원하는 건 아니야!";
-        return;
-    }
-
-    if(inv.includes("tiramisu")){
-        dialogText.textContent = "티라미수는 맛있어 보이네! 그래도 황금사과가 더 좋아!";
-        return;
-    }
-
-    if(inv.includes("axe")){
-        dialogText.textContent = "도끼를 선물하는 사람은 처음 봤어...";
-        return;
-    }
-
-    if(inv.includes("shield")){
-        dialogText.textContent = "방패로 날 지키라는 뜻인가...? ";
-        return;
-    }
-
-    if(inv.includes("key")){
-        dialogText.textContent = "열쇠는 이미 충분히 많아!";
-        return;
-    }
-
-    if(inv.includes("bugSpray")){
-        dialogText.textContent = "벌레 퇴치제...? 공주한테 줄 선물은 아니지 않을까?";
-        return;
-    }
-
-    if(inv.includes("heart")){
-        dialogText.textContent = "마음은 고맙지만... 황금사과를 가져와줘!";
-        return;
-    }
-
-    dialogText.textContent = "어라? 선물이 없네...?";
-
+    dialogHero.src = "images/ps.png";
+    dialogText.textContent = reactions[item] || "어라? 이건 내가 원하는 선물이 아니야!";
     setActions(`
+        <button class="btn gold" onclick="openGiftPopup()">🎁 선물주기</button>
         <button class="btn secondary" onclick="location.href='room1.html'">나가서 구해오기</button>
     `);
 }
 
 function finishTalk(){
     safeRemoveItem("goldenApple");
-
     talkDone = true;
     localStorage.setItem("princessDateCleared", "true");
 
