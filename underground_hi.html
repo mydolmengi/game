@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>지하통로 - 공주 만남</title>
 <style>
 @font-face {
@@ -341,17 +342,32 @@ function setActions(html){
 function safeAddItem(id){
     try{
         if(typeof addItem === "function"){
-            if(typeof getInventory === "function"){
-                const inv = getInventory();
-                if(Array.isArray(inv) && inv.includes(id)){
-                    return;
-                }
-            }
             addItem(id);
+        }else{
+            let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+            if(!inv.includes(id)){
+                inv.push(id);
+                localStorage.setItem("inventory", JSON.stringify(inv));
+            }
         }
     }catch(e){
         console.log(e);
     }
+}
+
+function safeRemoveItem(id){
+    try{
+        if(typeof removeItem === "function"){
+            removeItem(id);
+            return;
+        }
+    }catch(e){}
+
+    try{
+        let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+        inv = inv.filter(item => item !== id);
+        localStorage.setItem("inventory", JSON.stringify(inv));
+    }catch(e){}
 }
 
 function playTalkIntro(){
@@ -363,7 +379,7 @@ function playTalkIntro(){
     rewardBox.classList.remove("show");
     talkStep = 0;
     setActions(`
-        <button class="btn primary" onclick="startTalk()">당연한 말을</button>
+        <button class="btn primary" onclick="startTalk()">대화하기</button>
         <button class="btn secondary" onclick="closePopup()">닫기</button>
     `);
 }
@@ -389,13 +405,95 @@ function nextTalk(){
 
     if(talkStep === 3){
         dialogHero.src = "images/ps.png";
-        dialogText.textContent = "자, 이건 내 선물이야~!";
-        setActions(`<button class="btn gold" onclick="finishTalk()">선물 받기</button>`);
+        dialogText.textContent = "나한테 황금사과를 주면 좋을 일이 일어날지도.....?";
+        setActions(`
+            <button class="btn gold" onclick="giveGoldenApple()">🎁 선물주기</button>
+            <button class="btn secondary" onclick="location.href='room1.html'">나가서 구해오기</button>
+        `);
         return;
     }
 }
 
+function giveGoldenApple(){
+    let inv = [];
+
+    try{
+        if(typeof getInventory === "function"){
+            inv = getInventory() || [];
+        }else{
+            inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+        }
+    }catch(e){}
+
+    if(inv.includes("goldenApple")){
+        dialogHero.src = "images/psb.png";
+        dialogText.textContent = "어머! 황금사과잖아?! 정말 고마워! 약속대로 특별한 선물을 줄게!";
+        setActions(`
+            <button class="btn gold" onclick="finishTalk()">선물 받기</button>
+        `);
+        return;
+    }
+
+    if(inv.includes("flower")){
+        dialogText.textContent = "꽃은 예쁘지만... 지금은 황금사과가 갖고 싶어!";
+        return;
+    }
+
+    if(inv.includes("bubbletea")){
+        dialogText.textContent = "버블티 좋아하지만 황금사과만큼은 아니야~";
+        return;
+    }
+
+    if(inv.includes("jjamppong")){
+        dialogText.textContent = "짬뽕...? 갑자기 배고파지네.";
+        return;
+    }
+
+    if(inv.includes("iceAmericano")){
+        dialogText.textContent = "아이스 아메리카노도 좋지만 내가 원하는 건 아니야!";
+        return;
+    }
+
+    if(inv.includes("tiramisu")){
+        dialogText.textContent = "티라미수는 맛있어 보이네! 그래도 황금사과가 더 좋아!";
+        return;
+    }
+
+    if(inv.includes("axe")){
+        dialogText.textContent = "도끼를 선물하는 사람은 처음 봤어...";
+        return;
+    }
+
+    if(inv.includes("shield")){
+        dialogText.textContent = "방패로 날 지키라는 뜻인가...? ";
+        return;
+    }
+
+    if(inv.includes("key")){
+        dialogText.textContent = "열쇠는 이미 충분히 많아!";
+        return;
+    }
+
+    if(inv.includes("bugSpray")){
+        dialogText.textContent = "벌레 퇴치제...? 공주한테 줄 선물은 아니지 않을까?";
+        return;
+    }
+
+    if(inv.includes("heart")){
+        dialogText.textContent = "마음은 고맙지만... 황금사과를 가져와줘!";
+        return;
+    }
+
+    dialogText.textContent = "어라? 선물이 없네...?";
+
+    setActions(`
+        <button class="btn secondary" onclick="location.href='room1.html'">나가서 구해오기</button>
+    `);
+}
+
 function finishTalk(){
+    safeRemoveItem("goldenApple");
+
     talkDone = true;
     localStorage.setItem("princessDateCleared", "true");
 
