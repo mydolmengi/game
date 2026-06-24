@@ -1,1 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공주와의 데이트</title>
+<style>
+@font-face {
+  font-family: 'GmarketSans';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  min-height: 100vh;
+  font-family: 'GmarketSans', sans-serif;
+  background: #000;
+  overflow: hidden;
+}
+.scene {
+  position: relative;
+  width: min(100vw, 1086px);
+  height: 100vh;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+}
+.hit-zone {
+  position: absolute;
+  left: 58%;
+  top: 34%;
+  width: 30%;
+  height: 48%;
+  cursor: pointer;
+  z-index: 5;
+  border-radius: 50%;
+}
+.hint {
+  position: absolute;
+  left: 50%;
+  top: 4%;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(70, 40, 20, 0.45);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff7dd;
+  font-size: 18px;
+  text-shadow: 0 2px 6px rgba(0,0,0,.5);
+  z-index: 4;
+  pointer-events: none;
+}
+.popup, .ending {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 18px;
+  z-index: 1000;
+}
+.popup {
+  background: rgba(0,0,0,0.62);
+}
+.ending {
+  background: rgba(0,0,0,0.82);
+  z-index: 1100;
+}
+.popup.show, .ending.show { display: flex; }
+.card {
+  width: min(92vw, 620px);
+  background: linear-gradient(180deg, #fff9e9 0%, #f7e8c7 100%);
+  border: 6px solid #c79554;
+  border-radius: 30px;
+  box-shadow: 0 20px 45px rgba(0,0,0,.35);
+  overflow: hidden;
+}
+.card-top {
+  padding: 16px 18px 10px;
+  border-bottom: 3px solid rgba(184,140,73,0.35);
+}
+.title {
+  font-size: 24px;
+  color: #5f3717;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.sub {
+  font-size: 16px;
+  color: #7b5730;
+  line-height: 1.5;
+}
+.hero {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: block;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.55) 55%, rgba(255,255,255,0));
+}
+.body {
+  padding: 16px 18px 18px;
+}
+.name {
+  font-size: 22px;
+  color: #2a58a0;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+.text {
+  min-height: 96px;
+  font-size: 22px;
+  line-height: 1.7;
+  color: #6a4a25;
+  white-space: pre-line;
+}
+.actions {
+  padding: 0 18px 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.btn {
+  border: none;
+  border-radius: 18px;
+  padding: 12px 18px;
+  font-family: 'GmarketSans', sans-serif;
+  font-size: 17px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+.btn.primary { background: #ff8fc7; color: #fff; }
+.btn.secondary { background: #f7f1e1; color: #5f3717; border: 3px solid #c79554; }
+.btn.gold { background: #ffd86a; color: #6b430f; border: 3px solid #cc9d33; }
 
+.ending-box {
+  width: min(92vw, 700px);
+  text-align: center;
+  color: #fff;
+}
+.ending-img {
+  width: min(72vw, 420px);
+  height: auto;
+  display: block;
+  margin: 0 auto 16px;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 20px rgba(0,0,0,.35));
+}
+.ending-text {
+  margin-top: 10px;
+  font-size: 30px;
+  font-weight: 900;
+  color: #fff6d9;
+  text-shadow: 0 2px 8px rgba(0,0,0,.45);
+}
+.ending-sub {
+  margin-top: 12px;
+  font-size: 18px;
+  color: #f0ddbb;
+  line-height: 1.6;
+}
+.ending-btn {
+  margin-top: 18px;
+  border: none;
+  border-radius: 18px;
+  padding: 14px 24px;
+  background: #f9e9c8;
+  color: #5b3719;
+  font-family: 'GmarketSans', sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+}
+@media (max-width: 600px) {
+  .hint { font-size: 14px; padding: 8px 12px; }
+  .title { font-size: 20px; }
+  .name { font-size: 20px; }
+  .text { font-size: 18px; min-height: 82px; }
+  .btn { font-size: 15px; padding: 11px 15px; }
+  .ending-img { width: min(84vw, 380px); }
+  .ending-text { font-size: 24px; }
+  .ending-sub { font-size: 16px; }
+  .ending-btn { font-size: 16px; padding: 12px 20px; }
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <img class="bg" src="bg.png" alt="데이트 배경">
+  <div class="hint" id="hint">공주를 눌러보자</div>
+  <div class="hit-zone" id="hitZone" title="공주"></div>
+</div>
+
+<div class="popup" id="popup">
+  <div class="card">
+    <div class="card-top">
+      <div class="title">공주와의 대화</div>
+      <div class="sub" id="subText">공주가 미소를 짓고 있다.</div>
+    </div>
+    <img class="hero" id="hero" src="bg.png" alt="공주 이미지">
+    <div class="body">
+      <div class="name" id="nameText">공주</div>
+      <div class="text" id="dialogText">구해줘서 고마워</div>
+    </div>
+    <div class="actions" id="actions">
+      <button class="btn primary" onclick="startTalk()">대화하기</button>
+      <button class="btn secondary" onclick="closePopup()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="ending" id="ending">
+  <div class="ending-box">
+    <img class="ending-img" id="endingImg" src="ending.png" alt="엔딩 이미지">
+    <div class="ending-text">엔딩 1. 애기미 구출 실패</div>
+    <div class="ending-sub">
+      ??? 나 애기미 아닌데<br>
+      결국 편지는 받지 못했다.
+    </div>
+    <button class="ending-btn" onclick="location.href='room1.html'">돌아가기</button>
+  </div>
+</div>
+
+<script>
+const lines = [
+  "구해줘서 고마워",
+  "알쓰",
+  "근데 3주년 편지 받을 수 있을까?",
+  "편지? 지금 쓰면 되는거야?",
+  "응? 이번에 편지 받을 수 있다며?",
+  "나? 그런말 한적 없는데 우리 오늘 처음만났잖아.",
+  "너 애기미 아니야?",
+  "??? 나 애기미 아닌데"
+];
+
+const hitZone = document.getElementById("hitZone");
+const popup = document.getElementById("popup");
+const ending = document.getElementById("ending");
+const hero = document.getElementById("hero");
+const nameText = document.getElementById("nameText");
+const dialogText = document.getElementById("dialogText");
+const subText = document.getElementById("subText");
+const actions = document.getElementById("actions");
+const hint = document.getElementById("hint");
+
+let step = 0;
+let inTalk = false;
+let ended = false;
+
+function closePopup(){
+  popup.classList.remove("show");
+}
+
+function openPopup(){
+  popup.classList.add("show");
+  hint.style.display = "none";
+}
+
+function setActionButtons(html){
+  actions.innerHTML = html;
+}
+
+function showCurrentLine(){
+  dialogText.textContent = lines[step];
+}
+
+function startTalk(){
+  inTalk = true;
+  step = 0;
+  openPopup();
+  hero.src = "bg.png";
+  nameText.textContent = "공주";
+  subText.textContent = "공주가 당신을 반갑게 맞이한다.";
+  showCurrentLine();
+  setActionButtons('<button class="btn gold" onclick="nextLine()">다음</button>');
+}
+
+function nextLine(){
+  step++;
+
+  if(step < 3){
+    showCurrentLine();
+    setActionButtons('<button class="btn gold" onclick="nextLine()">다음</button>');
+    return;
+  }
+
+  if(step === 3){
+    hero.src = "shocked.png";
+    nameText.textContent = "공주";
+    subText.textContent = "공주가 당황했다.";
+    showCurrentLine();
+    setActionButtons('<button class="btn gold" onclick="nextLine()">다음</button>');
+    return;
+  }
+
+  if(step < lines.length - 1){
+    showCurrentLine();
+    setActionButtons('<button class="btn gold" onclick="nextLine()">다음</button>');
+    return;
+  }
+
+  if(step === lines.length - 1){
+    showCurrentLine();
+    setTimeout(() => {
+      popup.classList.remove("show");
+      ending.classList.add("show");
+      ended = true;
+    }, 650);
+  }
+}
+
+hitZone.addEventListener("click", () => {
+  if(ended) return;
+  startTalk();
+});
+</script>
+</body>
+</html>
