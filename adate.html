@@ -316,13 +316,13 @@ const mainLines = [
   { speaker: "마녀", text: "맞아! 나 애기미였어!!! 기억이 났어" },
   { speaker: "왕자", text: "기억이 났어??" },
   { speaker: "마녀", text: "오빠미!!! 왜 이제야 왔어ㅠㅠ" },
-  { speaker: "왕자", text: "그래, 기억 돌아온거 축하해. 자, 그럼 이제 3주년 편지를 줘" }
+  { speaker: "오빠미", text: "그래, 기억 돌아온거 축하해. 자, 그럼 이제 3주년 편지를 줘" }
 ];
 
 const branchLines = [
-  { speaker: "마녀", text: "오빠미, 근데 내가 첫 데이트가 아니네;;" },
-  { speaker: "왕자", text: "아니, 헷갈릴 수도 있지;;" },
-  { speaker: "마녀", text: "흥, 난 용서할 수 없엉!!!!" }
+  { speaker: "애기미", text: "오빠미, 근데 내가 첫 데이트가 아니네;;" },
+  { speaker: "오빠미", text: "아니, 헷갈릴 수도 있지;;" },
+  { speaker: "애기미", text: "흥, 난 용서할 수 없엉!!!!" }
 ];
 
 const hitZone = document.getElementById("hitZone");
@@ -458,7 +458,7 @@ function showBranchLine(){
   const line = branchLines[branchStep];
   nameText.textContent = line.speaker;
   dialogText.textContent = line.text;
-  subText.textContent = "마녀가 불만스러운 표정을 짓는다.";
+  subText.textContent = "애기미가 불만스러운 표정을 짓는다.";
 
   if(branchStep < branchLines.length - 1){
     setActionButtons('<button class="btn gold" onclick="nextBranch()">다음</button>');
@@ -518,8 +518,8 @@ function nextFlowerGiven(){
   if(phase === "flowerGiven1"){
     phase = "flowerGiven2";
     hero.src = "images/adate_mage_smirk.png";
-    nameText.textContent = "마녀";
-    subText.textContent = "마녀가 꽃을 받아들인다.";
+    nameText.textContent = "애기미";
+    subText.textContent = "애기미가 꽃을 받아들인다.";
     dialogText.textContent = "흥... 이번만이다.";
     setActionButtons('<button class="btn gold" onclick="showLetterScene(true)">다음</button>');
     return;
@@ -533,10 +533,10 @@ function showLetterScene(fromFlower){
   letterImg.src = "images/adate_letter.png";
 
   if(fromFlower){
-    letterText.textContent = "여기 편지.";
+    letterText.textContent = "여기 3주년 편지.";
     letterSub.textContent = "편지를 눌러서 확인해보자.";
   }else{
-    letterText.textContent = "여기 편지~ 여기부터 볼 수 있음.";
+    letterText.textContent = "여기 3주년 편지.";
     letterSub.textContent = "편지를 눌러서 확인해보자.";
   }
 }
