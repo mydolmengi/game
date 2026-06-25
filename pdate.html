@@ -230,14 +230,14 @@ body {
 
 <script>
 const lines = [
-  "구해줘서 고마워",
-  "알쓰",
-  "근데 3주년 편지 받을 수 있을까?",
-  "편지? 지금 쓰면 되는거야?",
-  "응? 이번에 편지 받을 수 있다며?",
-  "나? 그런말 한적 없는데 우리 오늘 처음만났잖아.",
-  "너 애기미 아니야?",
-  "??? 나 애기미 아닌데"
+  { speaker: "공주", text: "구해줘서 고마워" },
+  { speaker: "왕자", text: "알쓰" },
+  { speaker: "왕자", text: "근데 3주년 편지 받을 수 있을까?" },
+  { speaker: "공주", text: "편지? 지금 쓰면 되는거야?" },
+  { speaker: "왕자", text: "응? 이번에 편지 받을 수 있다며?" },
+  { speaker: "공주", text: "나? 그런말 한적 없는데 우리 오늘 처음만났잖아." },
+  { speaker: "왕자", text: "너 애기미 아니야?" },
+  { speaker: "공주", text: "??? 나 애기미 아닌데" }
 ];
 
 const hitZone = document.getElementById("hitZone");
@@ -267,14 +267,16 @@ function setActionButtons(html){
 }
 
 function showCurrentLine(){
-  dialogText.textContent = lines[step];
+  const line = lines[step];
+  nameText.textContent = line.speaker;
+  dialogText.textContent = line.text;
 }
 
 function startTalk(){
   step = 0;
   openPopup();
   hero.src = "images/ps.png";
-  nameText.textContent = "공주";
+  nameText.textContent = lines[0].speaker;
   subText.textContent = "공주가 당신을 반갑게 맞이한다.";
   showCurrentLine();
   setActionButtons('<button class="btn gold" onclick="nextLine()">다음</button>');
