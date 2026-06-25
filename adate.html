@@ -263,7 +263,7 @@ body {
 </head>
 <body>
 <div class="scene">
-  <img class="bg" src="adate_bg.png" alt="데이트 배경">
+  <img class="bg" src="images/adate_bg.png" alt="데이트 배경">
   <div class="hint" id="hint">마녀를 눌러보자</div>
   <div class="hit-zone" id="hitZone" title="마녀"></div>
 </div>
@@ -274,7 +274,7 @@ body {
       <div class="title">마녀와의 대화</div>
       <div class="sub" id="subText">마녀가 미소를 짓고 있다.</div>
     </div>
-    <img class="hero" id="hero" src="adate_mage_happy.png" alt="마녀 이미지">
+    <img class="hero" id="hero" src="images/adate_mage_happy.png" alt="마녀 이미지">
     <div class="body">
       <div class="name" id="nameText">마녀</div>
       <div class="text" id="dialogText">왜 나한테 데이트를 신청했어?</div>
@@ -297,7 +297,7 @@ body {
 
 <div class="letterView" id="letterView">
   <div class="letterBox">
-    <img class="letterImg" id="letterImg" src="adate_letter.png" alt="편지" onclick="goLetter()">
+    <img class="letterImg" id="letterImg" src="images/adate_letter.png" alt="편지" onclick="goLetter()">
     <div class="letterText" id="letterText">여기 편지~ 여기부터 볼 수 있음.</div>
     <div class="letterSub" id="letterSub">편지를 눌러보자.</div>
     <button class="letterBtn" onclick="goLetter()">편지 열기</button>
@@ -410,7 +410,7 @@ function startTalk(){
   branchStep = 0;
   phase = "main";
   openPopup();
-  hero.src = "adate_mage_happy.png";
+  hero.src = "images/adate_mage_happy.png";
   nameText.textContent = "마녀";
   subText.textContent = "마녀가 당신을 반갑게 맞이한다.";
   showMainLine();
@@ -420,7 +420,7 @@ function showMainLine(){
   const line = mainLines[step];
   nameText.textContent = line.speaker;
   dialogText.textContent = line.text;
-  hero.src = "adate_mage_happy.png";
+  hero.src = "images/adate_mage_happy.png";
 
   if(step === 0){
     setActionButtons('<button class="btn gold" onclick="nextMain()">다음</button>');
@@ -454,7 +454,7 @@ function finishMain(){
 }
 
 function showBranchLine(){
-  hero.src = "adate_mage_smirk.png";
+  hero.src = "images/adate_mage_smirk.png";
   const line = branchLines[branchStep];
   nameText.textContent = line.speaker;
   dialogText.textContent = line.text;
@@ -507,7 +507,7 @@ function useGiftItem(item){
 
   safeRemoveItem("flower");
   phase = "flowerGiven1";
-  hero.src = "adate_mage_happy.png";
+  hero.src = "images/adate_mage_happy.png";
   nameText.textContent = "오빠미";
   subText.textContent = "오빠미가 애기미에게 사과의 꽃을 준다.";
   dialogText.textContent = "오빠미가 애기미에게 사과의 꽃을 준다.";
@@ -517,7 +517,7 @@ function useGiftItem(item){
 function nextFlowerGiven(){
   if(phase === "flowerGiven1"){
     phase = "flowerGiven2";
-    hero.src = "adate_mage_smirk.png";
+    hero.src = "images/adate_mage_smirk.png";
     nameText.textContent = "마녀";
     subText.textContent = "마녀가 꽃을 받아들인다.";
     dialogText.textContent = "흥... 이번만이다.";
@@ -530,7 +530,7 @@ function showLetterScene(fromFlower){
   phase = "letter";
   popup.classList.remove("show");
   letterView.classList.add("show");
-  letterImg.src = "adate_letter.png";
+  letterImg.src = "images/adate_letter.png";
 
   if(fromFlower){
     letterText.textContent = "여기 편지.";
