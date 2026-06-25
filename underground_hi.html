@@ -398,7 +398,7 @@ body{
         </div>
 
         <div class="dialog-actions" id="dialogActions">
-            <button class="btn primary" onclick="startTalk()">대화하기</button>
+            <button class="btn primary" onclick="startTalk()">당연한 말을 ㅋㅋ</button>
             <button class="btn secondary" onclick="closePopup()">닫기</button>
         </div>
 
@@ -529,7 +529,7 @@ function playTalkIntro(){
     rewardBox.classList.remove("show");
     talkStep = 0;
     setActions(`
-        <button class="btn primary" onclick="startTalk()">대화하기</button>
+        <button class="btn primary" onclick="startTalk()">당연한 말을 ㅋㅋ</button>
         <button class="btn secondary" onclick="closePopup()">닫기</button>
     `);
 }
@@ -555,7 +555,7 @@ function nextTalk(){
 
     if(talkStep === 3){
         dialogHero.src = "images/ps.png";
-        dialogText.textContent = "나한테 황금사과를 주면 좋을 일이 일어날지도.....?";
+        dialogText.textContent = "날 구했으니까 선물을 줘야겠지?";
         setActions(`
             <button class="btn gold" onclick="openGiftPopup()">🎁 선물주기</button>
             <button class="btn secondary" onclick="location.href='room1.html'">나가서 구해오기</button>
@@ -597,7 +597,7 @@ function useGiftItem(item){
 
     if(item === "goldenApple"){
         dialogHero.src = "images/psb.png";
-        dialogText.textContent = "어머! 황금사과잖아?! 정말 고마워! 약속대로 특별한 선물을 줄게!";
+        dialogText.textContent = "어머! 황금사과잖아?! 정말 고마워! 고마움의 의미로 특별한 선물을 줄게!";
         setActions(`
             <button class="btn gold" onclick="finishTalk()">선물 받기</button>
             <button class="btn secondary" onclick="openGiftPopup()">다른 선물 고르기</button>
@@ -606,18 +606,18 @@ function useGiftItem(item){
     }
 
     const reactions = {
-        bubbletea: "버블티 좋아해! 하지만 지금은 황금사과가 더 끌리네~",
-        jjamppong: "짬뽕...? 공주가 먹기엔 조금 맵지 않을까?",
-        flower: "꽃 너무 예쁘다! 그래도 내가 찾는 건 황금사과야!",
-        axe: "도끼를 선물하는 사람은 처음 봤어...",
-        shield: "날 지켜주겠다는 뜻이야?",
-        key: "열쇠는 이미 충분히 많아~",
+        bubbletea: "버블티 개노맛! 지금은 황금사과가 더 끌리네~",
+        jjamppong: "짬뽕...? 공주가 먹기엔 딱 맛도리 각, 황금사과랑 순삭",
+        flower: "사과의 꽃? 머 사과할거 있어? 그치만 내가 바라는건 황금사과야!",
+        axe: "도끼를 선물하는 사람은 처음 봤어... 센스 레전드.. 황금사과나 끓여오거라~",
+        shield: "날 지켜주겠다는 뜻이야? 황금사과나 줘",
+        key: "열쇠는 이미 충분히 많아~. 황금사과면 더 좋고",
         heart: "마음은 고맙지만 황금사과를 가져와줘!",
-        iceAmericano: "쓴 건 아직 잘 못 마시겠어...",
-        tiramisu: "티라미수 정말 좋아! 하지만 황금사과가 더 좋아!",
+        iceAmericano: "쓴 건 또 내가 잘 먹지...! 그치만 황금사과 가져와!",
+        tiramisu: "티라미수 텁텁 레전드! 황금사과가 더 좋아!",
         bugSpray: "벌레 퇴치제...? 공주 선물 맞아?",
         pdateCoupon: "공주와 데이트 쿠폰은 이미 내가 줬는걸?",
-        dateCoupon: "마녀와 데이트 쿠폰은 지금은 필요 없어!"
+        dateCoupon: "인성질 무엇?"
     };
 
     dialogHero.src = "images/ps.png";
