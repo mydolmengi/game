@@ -308,6 +308,10 @@ function nextLine(){
 
   if(step === lines.length - 1){
     showCurrentLine();
+
+    // 엔딩1 저장
+    localStorage.setItem("ending1", "true");
+
     setTimeout(() => {
       popup.classList.remove("show");
       ending.classList.add("show");
