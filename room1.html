@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>갈림길</title>
 
 <style>
@@ -40,7 +39,6 @@ body{
 }
 
 /* 🌳 숲 */
-
 .forest{
     position:absolute;
     left:0%;
@@ -51,7 +49,6 @@ body{
 }
 
 /* 🏠 집 */
-
 .house{
     position:absolute;
     left:33%;
@@ -62,7 +59,6 @@ body{
 }
 
 /* 🕳️ 동굴 */
-
 .cave{
     position:absolute;
     right:0%;
@@ -73,22 +69,17 @@ body{
 }
 
 /* 🚗 분좋카 */
-
 .date-car{
     position:absolute;
-
     left:226px;
     top:980px;
-
     width:460px;
     height:180px;
-
     transform:scale(0.5);
-
     transform-origin:top left;
-
     z-index:20;
     cursor:pointer;
+    display:none;
 }
 
 .date-car img{
@@ -96,63 +87,40 @@ body{
     height:auto;
     display:block;
 }
-    
+
 .date-car-label{
     position:absolute;
-
     left:50%;
-    bottom:-18px;   /* -45px → -18px */
-
+    bottom:-18px;
     transform:translateX(-50%);
-
     background:#f9e9c8;
     border:4px solid #c89b5d;
     border-radius:18px;
-
     padding:4px 12px;
-
     color:#5b3719;
     font-size:16px;
-
     white-space:nowrap;
 }
 
 /* 하단 대화창 */
-
 .choice-box{
-
     position:absolute;
-
     bottom:15%;
-
     left:50%;
-
     transform:translateX(-50%);
-
     width:80%;
-
     max-width:650px;
-
     background:#f9e9c8;
-
     border:6px solid #c89b5d;
-
     border-radius:30px;
-
     padding:18px;
-
     text-align:center;
-
     font-size:28px;
-
     color:#5b3719;
-
-    box-shadow:
-        0 8px 20px rgba(0,0,0,0.2);
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
 @media (max-width:600px){
-
     .choice-box{
         font-size:20px;
         padding:12px;
@@ -168,7 +136,6 @@ body{
     .date-car-label{
         font-size:18px;
     }
-
 }
 
 </style>
@@ -177,28 +144,13 @@ body{
 
 <div class="game">
 
-    <img
-    src="images/room1.png"
-    class="bg"
-    alt="갈림길">
+    <img src="images/room1.png" class="bg" alt="갈림길">
 
-    <div
-    class="forest"
-    onclick="location.href='forest.html'"
-    title="숲">
-    </div>
+    <div class="forest" onclick="location.href='forest.html'" title="숲"></div>
 
-    <div
-    class="house"
-    onclick="location.href='house.html'"
-    title="집">
-    </div>
+    <div class="house" onclick="location.href='house.html'" title="집"></div>
 
-    <div
-    class="cave"
-    onclick="location.href='cave.html'"
-    title="동굴">
-    </div>
+    <div class="cave" onclick="location.href='cave.html'" title="동굴"></div>
 
     <!-- 🚗 분좋카 -->
     <div
@@ -206,63 +158,40 @@ body{
         id="dateCar"
         onclick="location.href='Date.html'">
 
-        <img
-        src="images/date_car.png"
-        alt="분좋카">
+        <img src="images/date_car.png" alt="분좋카">
 
-        <div class="date-car-label">
-            🚗 분좋카
-        </div>
-
+        <div class="date-car-label">🚗 분좋카</div>
     </div>
 
-    <div class="choice-box">
-        🌿 어디로 갈까? 🌿
-    </div>
+    <div class="choice-box">🌿 어디로 갈까? 🌿</div>
 
 </div>
 
 <script src="js/inventory.js"></script>
 
 <script>
-
 window.addEventListener("DOMContentLoaded", () => {
+    const dateCar = document.getElementById("dateCar");
+    dateCar.style.display = "none";
 
     let hasCoupon = false;
 
     try{
-
         if(typeof getInventory === "function"){
-
             const inv = getInventory();
-
-            hasCoupon =
-                Array.isArray(inv) &&
-                inv.includes("pdateCoupon");
-
+            hasCoupon = Array.isArray(inv) && inv.includes("pdateCoupon");
         }else{
-
-            const inv = JSON.parse(
-                localStorage.getItem("inventory") || "[]"
-            );
-
-            hasCoupon =
-                inv.includes("pdateCoupon");
+            const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+            hasCoupon = inv.includes("pdateCoupon");
         }
-
     }catch(e){
         console.log(e);
     }
 
     if(hasCoupon){
-
-        document
-            .getElementById("dateCar")
-            .style.display = "block";
+        dateCar.style.display = "block";
     }
-
 });
-
 </script>
 
 </body>
