@@ -193,7 +193,7 @@ body {
 </head>
 <body>
 <div class="scene">
-  <img class="bg" src="bg.png" alt="데이트 배경">
+  <img class="bg" src="images/pdate_bg.png" alt="데이트 배경">
   <div class="hint" id="hint">공주를 눌러보자</div>
   <div class="hit-zone" id="hitZone" title="공주"></div>
 </div>
@@ -204,7 +204,7 @@ body {
       <div class="title">공주와의 대화</div>
       <div class="sub" id="subText">공주가 미소를 짓고 있다.</div>
     </div>
-    <img class="hero" id="hero" src="bg.png" alt="공주 이미지">
+    <img class="hero" id="hero" src="images/ps.png" alt="공주 이미지">
     <div class="body">
       <div class="name" id="nameText">공주</div>
       <div class="text" id="dialogText">구해줘서 고마워</div>
@@ -218,7 +218,7 @@ body {
 
 <div class="ending" id="ending">
   <div class="ending-box">
-    <img class="ending-img" id="endingImg" src="ending.png" alt="엔딩 이미지">
+    <img class="ending-img" id="endingImg" src="images/pdate3.png" alt="엔딩 이미지">
     <div class="ending-text">엔딩 1. 애기미 구출 실패</div>
     <div class="ending-sub">
       ??? 나 애기미 아닌데<br>
@@ -251,7 +251,6 @@ const actions = document.getElementById("actions");
 const hint = document.getElementById("hint");
 
 let step = 0;
-let inTalk = false;
 let ended = false;
 
 function closePopup(){
@@ -272,10 +271,9 @@ function showCurrentLine(){
 }
 
 function startTalk(){
-  inTalk = true;
   step = 0;
   openPopup();
-  hero.src = "bg.png";
+  hero.src = "images/ps.png";
   nameText.textContent = "공주";
   subText.textContent = "공주가 당신을 반갑게 맞이한다.";
   showCurrentLine();
@@ -292,7 +290,7 @@ function nextLine(){
   }
 
   if(step === 3){
-    hero.src = "shocked.png";
+    hero.src = "images/pending.png";
     nameText.textContent = "공주";
     subText.textContent = "공주가 당황했다.";
     showCurrentLine();
