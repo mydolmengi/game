@@ -64,33 +64,7 @@ body{
     transform:translateX(-50%) scale(0.95);
 }
 
-.reset-btn{
-    position:absolute;
-    bottom:40px;
-    left:50%;
-    transform:translateX(-50%);
-    background:#f9e9c8;
-    color:#5b3719;
-    border:4px solid #c89b5d;
-    border-radius:999px;
-    padding:10px 30px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    box-shadow:0 6px 15px rgba(0,0,0,0.15);
-    transition:0.2s;
-}
-
-.reset-btn:hover{
-    transform:translateX(-50%) scale(1.05);
-}
-
-.reset-btn:active{
-    transform:translateX(-50%) scale(0.95);
-}
-
-    @media (max-width: 600px){
-
+@media (max-width: 600px){
     .title{
         font-size:30px;
     }
@@ -108,13 +82,7 @@ body{
         padding:12px 30px;
         font-size:18px;
     }
-​
-
 }
-
-​
-
-
 </style>
 </head>
 <body>
@@ -125,17 +93,33 @@ body{
     <button class="start-btn" onclick="location.href='story.html'">
         💖 시작하기
     </button>
-
-    <button class="reset-btn" onclick="resetGame()">
-        초기화
-    </button>
 </div>
 
 <script>
-function resetGame(){
-    localStorage.clear();
-    alert("게임 진행 상태를 초기화했어!");
-}
+let bgClickCount = 0;
+let bgClickTimer = null;
+
+document.body.addEventListener("click", function (e) {
+    // 버튼이나 이미지가 아닌 "빈 배경"만 카운트
+    if (e.target !== document.body) return;
+
+    bgClickCount++;
+
+    if (bgClickCount === 1) {
+        bgClickTimer = setTimeout(() => {
+            bgClickCount = 0;
+            bgClickTimer = null;
+        }, 1500);
+    }
+
+    if (bgClickCount >= 7) {
+        clearTimeout(bgClickTimer);
+        bgClickCount = 0;
+        bgClickTimer = null;
+        localStorage.clear();
+        alert("게임 진행 상태를 초기화했어!");
+    }
+});
 </script>
 
 </body>
