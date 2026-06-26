@@ -11,11 +11,12 @@
     --ink: #5b4631;
     --shadow: 0 20px 60px rgba(56, 74, 98, 0.18);
     --soft-shadow: 0 12px 32px rgba(56, 74, 98, 0.14);
-    --envelope-w: min(78vw, 700px);
+    --envelope-w: min(66vw, 620px);
     --letter-w: min(74vw, 620px);
   }
 
   * { box-sizing: border-box; }
+
   html, body {
     width: 100%;
     height: 100%;
@@ -25,9 +26,7 @@
     background: var(--sky);
   }
 
-  body {
-    position: relative;
-  }
+  body { position: relative; }
 
   #scene {
     position: relative;
@@ -68,7 +67,7 @@
   #envelopeBtn {
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 43%;
     transform: translate(-50%, -50%);
     width: var(--envelope-w);
     aspect-ratio: 1.88 / 1;
@@ -76,23 +75,28 @@
     background: transparent;
     padding: 0;
     cursor: pointer;
-    z-index: 10;
+    z-index: 20;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    transition: transform .25s ease, filter .25s ease;
-    filter: drop-shadow(0 24px 34px rgba(72, 78, 107, .22));
+    transition: transform .22s ease, filter .22s ease, opacity .25s ease;
+    filter: drop-shadow(0 26px 36px rgba(72, 78, 107, .24));
   }
 
   #envelopeBtn::before {
     content: '';
     position: absolute;
-    inset: -8%;
+    inset: -10%;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,.65), rgba(255,255,255,0) 68%);
-    filter: blur(14px);
-    opacity: .55;
-    animation: envelopeGlow 2.4s ease-in-out infinite;
+    background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0) 68%);
+    filter: blur(16px);
+    opacity: .78;
+    animation: envelopeGlow 2.2s ease-in-out infinite;
     z-index: -1;
+  }
+
+  @keyframes envelopeGlow {
+    0%, 100% { transform: scale(1); opacity: .65; }
+    50% { transform: scale(1.06); opacity: 1; }
   }
 
   #envelopeBtn:hover {
@@ -116,22 +120,22 @@
   #openEnvelope {
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 43%;
     width: var(--envelope-w);
     aspect-ratio: 1.88 / 1;
     transform: translate(-50%, -50%);
-    z-index: 15;
+    z-index: 14;
     display: none;
-    filter: drop-shadow(0 24px 34px rgba(72, 78, 107, .20));
+    filter: drop-shadow(0 26px 36px rgba(72, 78, 107, .22));
   }
 
   #letter {
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 43%;
     width: var(--letter-w);
     aspect-ratio: 1.38 / 1.72;
-    transform: translate(-50%, -45%) translateY(180px) scale(0.98);
+    transform: translate(-50%, -36%) translateY(170px) scale(0.985);
     opacity: 0;
     z-index: 22;
     transition: transform 1s cubic-bezier(.2,.95,.2,1), opacity .8s ease;
@@ -141,7 +145,7 @@
 
   #letter.active {
     opacity: 1;
-    transform: translate(-50%, -45%) translateY(-120px) scale(1);
+    transform: translate(-50%, -36%) translateY(-118px) scale(1);
   }
 
   #letter img {
@@ -154,14 +158,14 @@
   #letterContent {
     position: absolute;
     left: 50%;
-    top: 12.5%;
+    top: 12.8%;
     width: 76%;
-    height: 69%;
+    height: 71%;
     transform: translateX(-50%);
     color: var(--ink);
     z-index: 2;
     font-size: clamp(15px, 1.9vw, 22px);
-    line-height: 1.7;
+    line-height: 1.72;
     letter-spacing: 0.01em;
     text-align: center;
     white-space: normal;
@@ -171,11 +175,11 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    gap: 0.55em;
+    gap: 0.7em;
     overflow-y: auto;
     overflow-x: hidden;
     scroll-behavior: smooth;
-    padding: 0 .4em 1.4em .2em;
+    padding: 0 .5em 1.2em .3em;
     pointer-events: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(91,70,49,.45) rgba(255,255,255,.18);
@@ -220,23 +224,16 @@
     100% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); filter: blur(0); }
   }
 
-  @keyframes envelopeGlow {
-    0%, 100% { transform: scale(0.96); opacity: .45; }
-    50% { transform: scale(1.06); opacity: .92; }
-  }
-
   #endingButton {
-    position: absolute;
-    left: 50%;
-    bottom: 8.2%;
-    transform: translateX(-50%);
-    padding: 0.9em 1.5em;
+    display: none;
+    margin: 1.1rem auto 0;
+    padding: 0.9em 1.45em;
     border-radius: 999px;
     border: 1px solid rgba(91, 70, 49, .22);
     background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,243,232,.92));
-    color: #5b4631;
+    color: #000;
     font-family: inherit;
-    font-size: clamp(14px, 1.8vw, 18px);
+    font-size: clamp(14px, 1.7vw, 17px);
     letter-spacing: 0.04em;
     cursor: pointer;
     box-shadow: 0 10px 24px rgba(95, 69, 46, 0.14), inset 0 1px 0 rgba(255,255,255,.7);
@@ -244,15 +241,15 @@
     pointer-events: none;
     transition: transform .2s ease, box-shadow .2s ease, opacity .5s ease;
     z-index: 4;
-    max-width: 72%;
   }
 
   #endingButton:hover {
-    transform: translateX(-50%) translateY(-2px);
+    transform: translateY(-2px);
     box-shadow: 0 14px 30px rgba(95, 69, 46, 0.18), inset 0 1px 0 rgba(255,255,255,.7);
   }
 
   #endingButton.show {
+    display: block;
     opacity: 1;
     pointer-events: auto;
   }
@@ -292,7 +289,6 @@
     to   { left: 100vw; }
   }
 
-  /* Ending overlay */
   #endingOverlay {
     position: fixed;
     inset: 0;
@@ -321,8 +317,7 @@
 
   #endingTitle {
     font-size: clamp(20px, 3vw, 34px);
-    color: #000000;
-    text-shadow: 0 8px 20px rgba(0,0,0,.16);
+    color: #000;
     letter-spacing: .04em;
     animation: fadeUp .9s ease .08s both;
   }
@@ -332,23 +327,35 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  /* Mobile tuning */
   @media (max-width: 720px) {
     :root {
-      --envelope-w: min(80vw, 640px);
-      --letter-w: min(82vw, 560px);
+      --envelope-w: min(86vw, 640px);
+      --letter-w: min(86vw, 620px);
+    }
+
+    #envelopeBtn,
+    #openEnvelope {
+      top: 42%;
+    }
+
+    #letter {
+      top: 42%;
+      transform: translate(-50%, -34%) translateY(170px) scale(0.985);
+    }
+
+    #letter.active {
+      transform: translate(-50%, -34%) translateY(-108px) scale(1);
     }
 
     #letterContent {
       top: 12.5%;
-      width: 76%;
-      height: 68%;
-      font-size: clamp(14px, 4vw, 19px);
-      line-height: 1.65;
+      width: 74%;
+      height: 70%;
+      font-size: clamp(15px, 4.1vw, 20px);
+      line-height: 1.68;
     }
 
     #endingButton {
-      bottom: 8.2%;
       font-size: 14px;
       padding: .85em 1.2em;
     }
@@ -358,7 +365,6 @@
 <body>
   <div id="scene">
     <img id="sky" src="images/sky.png" alt="하늘 배경" />
-
     <img id="paperCloud" src="images/cloud.png" alt="흐르는 구름" />
 
     <button id="envelopeBtn" aria-label="편지 봉투 열기">
@@ -370,7 +376,6 @@
     <div id="letter" aria-hidden="true">
       <img src="images/letter.png" alt="편지지" />
       <div id="letterContent"></div>
-      <button id="endingButton" type="button">엔딩 보러가기</button>
     </div>
 
     <div id="endingOverlay" aria-hidden="true">
@@ -380,17 +385,23 @@
   </div>
 
 <script>
+  const scene = document.getElementById('scene');
   const closeBtn = document.getElementById('envelopeBtn');
   const closeImg = closeBtn.querySelector('img');
   const openEnvelope = document.getElementById('openEnvelope');
   const letter = document.getElementById('letter');
   const letterContent = document.getElementById('letterContent');
-  const endingButton = document.getElementById('endingButton');
   const endingOverlay = document.getElementById('endingOverlay');
   const paperCloud = document.getElementById('paperCloud');
 
+  const endingButton = document.createElement('button');
+  endingButton.id = 'endingButton';
+  endingButton.type = 'button';
+  endingButton.textContent = '엔딩 보러가기';
+  letterContent.appendChild(endingButton);
+
   const LETTER_SENTENCES = [
-    '천공도시의 밤하늘 아래, 오늘도 당신을 향한 작은 마법 하나를 정성껏 접어 보냅니다.',
+    '천공도시에서 보내는 작은 마법의 편지를, 오늘은 조금 더 천천히 적어 봅니다.',
     '이 편지가 당신의 손에 닿는 순간, 바쁜 마음은 잠시 쉬어 가고 숨결은 조금 더 고요해지기를 바랍니다.',
     '누군가를 기다리는 시간도, 무언가를 시작하려는 용기도, 사실은 아주 작은 다정함에서부터 자라난다고 믿습니다.',
     '그래서 저는 오늘, 당신의 하루에 조용히 머무를 수 있는 온기를 담아 이 편지를 띄웁니다.',
@@ -402,7 +413,9 @@
     '서두르지 않아도 괜찮고, 완벽하지 않아도 괜찮습니다. 당신의 속도만으로도 충분히 멋진 하루입니다.',
     '무심코 지나친 순간들 속에도 분명히 기쁨은 숨어 있고, 그 기쁨은 생각보다 자주 당신을 기다리고 있습니다.',
     '언제나 당신의 편에서 응원하고, 어디에서든 행복이 먼저 닿는 하루를 진심으로 바랄게요.',
-    '천천히 읽어도 괜찮습니다. 이 편지는 끝까지 당신을 향해, 다정하게 열려 있을 테니까요.'
+    '천천히 읽어도 괜찮습니다. 이 편지는 끝까지 당신을 향해, 다정하게 열려 있을 테니까요.',
+    '그리고 편지의 끝에서, 당신이 미소 짓는 장면을 떠올리며 오늘의 문장을 마무리합니다.',
+    '언제나 같은 자리에서 당신을 응원할게요. 오늘도 잘 해내고 있는 당신에게, 정말 고맙고 또 자랑스럽습니다.'
   ];
 
   const CLOUD_COUNT = 8;
@@ -417,7 +430,6 @@
   }
 
   function addClouds() {
-    const scene = document.getElementById('scene');
     for (let i = 0; i < CLOUD_COUNT; i++) {
       const img = document.createElement('img');
       img.src = 'images/cloud.png';
@@ -449,21 +461,28 @@
       span.className = 'char';
       span.textContent = ch === ' ' ? '\u00A0' : ch;
       target.appendChild(span);
-      await sleep(60);
+      letterContent.scrollTop = letterContent.scrollHeight;
+      await sleep(/[,.!?…]/.test(ch) ? 72 : 42);
     }
   }
 
   async function buildHandwrittenText() {
-    letterContent.innerHTML = '';
+    letterContent.querySelectorAll('.sentence').forEach(node => node.remove());
+
     for (const sentence of LETTER_SENTENCES) {
       const p = document.createElement('p');
       p.className = 'sentence';
-      letterContent.appendChild(p);
+      letterContent.insertBefore(p, endingButton);
       p.style.opacity = '1';
       await typeSentence(p, sentence);
-      p.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      await sleep(260);
+      letterContent.scrollTop = letterContent.scrollHeight;
+      await sleep(220);
     }
+
+    endingButton.classList.add('show');
+    await sleep(80);
+    endingButton.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    letterContent.scrollTop = letterContent.scrollHeight;
   }
 
   function spawnButterflies() {
@@ -539,13 +558,16 @@
 
     closeBtn.style.pointerEvents = 'none';
     closeBtn.style.opacity = '0';
-
     closeImg.style.opacity = '0';
+
     openEnvelope.style.display = 'block';
-    openEnvelope.animate([
-      { opacity: 0, transform: 'translate(-50%, -50%) translateY(8px) scale(0.99)' },
-      { opacity: 1, transform: 'translate(-50%, -50%) translateY(0) scale(1)' }
-    ], { duration: 420, fill: 'forwards', easing: 'ease-out' });
+    openEnvelope.animate(
+      [
+        { opacity: 0, transform: 'translate(-50%, -50%) translateY(10px) scale(0.99)' },
+        { opacity: 1, transform: 'translate(-50%, -50%) translateY(0) scale(1)' }
+      ],
+      { duration: 420, fill: 'forwards', easing: 'ease-out' }
+    );
 
     spawnButterflies();
     spawnFeathers();
@@ -563,10 +585,6 @@
       paperCloud.classList.add('pass');
       paperCloud.style.opacity = '.85';
     }, 8500);
-
-    setTimeout(() => {
-      endingButton.classList.add('show');
-    }, 14500);
   }
 
   closeBtn.addEventListener('click', openLetterSequence);
