@@ -21,21 +21,21 @@ body{
     margin:0;
     background:#000;
     font-family:'GmarketSans', sans-serif;
-    display:flex;
-    justify-content:center;
-    overflow:hidden;
+    overflow-x:hidden;
 }
 
 .game{
     position:relative;
-    width:min(100%,900px);
+    width:100vw;
+    max-width:900px;
+    margin:0 auto;
 }
 
 .bg{
-    width:100%;
     display:block;
+    width:100%;
+    height:auto;
 }
-
 /* =========================
    물약 만들기 버튼
 ========================= */
@@ -350,7 +350,7 @@ body{
     <img src="images/potion_workbench.png" class="bg" alt="물약 제조대">
 
     <button class="make-btn" onclick="startGame()">
-        물약 만들기
+        물약 만들
     </button>
 
     <div class="bottle b1" onclick="pick(1, this)"></div>
