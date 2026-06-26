@@ -21,31 +21,30 @@ body{
     margin:0;
     background:#000;
     font-family:'GmarketSans', sans-serif;
-    overflow-x:hidden;
+    display:flex;
+    justify-content:center;
 }
 
 .game{
     position:relative;
-    width:100%;
+    width:min(100%, 900px);
 }
 
 .bg{
-    display:block;
     width:100%;
-    height:auto;
+    display:block;
 }
+
 /* =========================
    물약 만들기 버튼
 ========================= */
 .make-btn{
     position:absolute;
     left:50%;
-    bottom:12%;          /* 필요하면 10~15% 사이에서 조절 */
+    top:79%;
     transform:translateX(-50%);
-
-    width:32%;
-    min-height:48px;
-
+    width:38%;
+    padding:12px 0;
     z-index:10;
 
     background:#f9e9c8;
@@ -63,10 +62,10 @@ body{
 ========================= */
 .bottle{
     position:absolute;
-    width:63.984375px;
-    height:51px;
+    width:8%;
+    height:4%;
     cursor:pointer;
-    transition:0.2s;
+    transition:.2s;
     z-index:8;
     background:rgba(255,255,255,0);
 }
@@ -76,13 +75,13 @@ body{
 }
 
 /* 좌표 적용 */
-.b1{ left:138.9609375px; top:552.984375px; }
-.b2{ left:237.9609375px; top:543.984375px; }
-.b3{ left:333.9609375px; top:549.984375px; }
-.b4{ left:427.9453125px; top:547.96875px; }
-.b5{ left:525.9375px; top:550.96875px; }
-.b6{ left:621.9375px; top:552.9609375px; }
-.b7{ left:717.9375px; top:552.9609375px; }
+.b1{ left:13%; top:40%; }
+.b2{ left:25%; top:39.5%; }
+.b3{ left:37%; top:40%; }
+.b4{ left:48%; top:39.8%; }
+.b5{ left:60%; top:40%; }
+.b6{ left:71%; top:40%; }
+.b7{ left:83%; top:40%; }
 
 /* 선택 표시 */
 .bottle.selected{
@@ -205,20 +204,17 @@ body{
 }
 
 .inventory-btn{
-   position:fixed;
-    top:12px;
-    right:12px;
-
-    width:56px;
-    height:56px;
-
+    position:fixed;
+    top:15px;
+    right:15px;
+    width:65px;
+    height:65px;
     border:none;
-    border-radius:18px;
+    border-radius:20px;
     background:#ff9fd2;
-    font-size:26px;
+    font-size:30px;
     cursor:pointer;
-    z-index:9999;
-    box-shadow:0 8px 18px rgba(0,0,0,.2);
+    z-index:999;
 }
 
 /* =========================
@@ -322,21 +318,6 @@ body{
     font-weight:800;
     color:#5b3719;
     margin-top:8px;
-}
-
-   @media (max-width:600px){
-
-    .inventory-btn{
-        top:10px;
-        right:10px;
-
-        width:48px;
-        height:48px;
-
-        font-size:22px;
-        border-radius:15px;
-    }
-
 }
 </style>
 </head>
