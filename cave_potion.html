@@ -207,17 +207,20 @@ body{
 }
 
 .inventory-btn{
-    position:fixed;
-    top:15px;
-    right:15px;
-    width:65px;
-    height:65px;
+   position:fixed;
+    top:12px;
+    right:12px;
+
+    width:56px;
+    height:56px;
+
     border:none;
-    border-radius:20px;
+    border-radius:18px;
     background:#ff9fd2;
-    font-size:30px;
+    font-size:26px;
     cursor:pointer;
-    z-index:999;
+    z-index:9999;
+    box-shadow:0 8px 18px rgba(0,0,0,.2);
 }
 
 /* =========================
@@ -323,22 +326,19 @@ body{
     margin-top:8px;
 }
 
-    @media (max-width:600px){
-    .choice-box{
-        font-size:20px;
-        padding:12px;
+   @media (max-width:600px){
+
+    .inventory-btn{
+        top:10px;
+        right:10px;
+
+        width:48px;
+        height:48px;
+
+        font-size:22px;
+        border-radius:15px;
     }
 
-    .date-car{
-        top:51%;
-        width:78vw;
-        max-width:none;
-    }
-
-    .date-car-label{
-        font-size:15px;
-        padding:5px 10px;
-    }
 }
 </style>
 </head>
@@ -350,7 +350,7 @@ body{
     <img src="images/potion_workbench.png" class="bg" alt="물약 제조대">
 
     <button class="make-btn" onclick="startGame()">
-        물약 만들기깅
+        물약 만들기
     </button>
 
     <div class="bottle b1" onclick="pick(1, this)"></div>
