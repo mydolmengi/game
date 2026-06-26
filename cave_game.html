@@ -361,12 +361,9 @@ function submitCauldron(){
 
 
 
-function openDish(){
-    if(localStorage.getItem(FLAG_DISH_DONE) === "true"){
-        location.href = "cave_game.html";
-        return;
-    }
 
+
+function openDish(){
     openPopup(
         "마녀가 시킨 일은?",
         `
@@ -389,12 +386,7 @@ function submitDish(){
     const value = normalizeText(input?.value);
 
     if(value === "설거지"){
-        localStorage.setItem(FLAG_DISH_DONE, "true");
-        openPopup(
-            "성공",
-            "설거지하러 가자!",
-            `<button class="choice-btn" onclick="location.href='cave_game.html'">바로 가기</button>`
-        );
+        location.href = "cave_game.html";
         return;
     }
 
@@ -407,7 +399,6 @@ function submitDish(){
         `
     );
 }
-
 function openHint(){
     openPopup(
         "힌트 사진",
