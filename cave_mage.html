@@ -340,6 +340,11 @@ function resolveGiftId(raw){
     if(["도끼","axe"].includes(t)) return "axe";
     if(["방패","shield"].includes(t)) return "shield";
     if(["꽃","flower"].includes(t)) return "flower";
+    if(["열쇠","key"].includes(t)) return "key";
+    if(["하트생명","heart"].includes(t)) return "heart";
+    if(["벌레 퇴치제","bugSpray"].includes(t)) return "bugSprayt";
+    if(["공주와 데이트 쿠폰","pdateCoupon"].includes(t)) return "pdateCoupon";
+    if(["마녀와 데이트 쿠폰","dateCoupon"].includes(t)) return "dateCoupon";
 
     return null;
 }
@@ -730,15 +735,65 @@ function submitGift(){
         return;
     }
 
-    if(giftId === "axe" || giftId === "shield" || giftId === "flower"){
+    if(giftId === "flower"){
         openPopup(
             "마녀",
-            "이걸 왜 줌?",
+            "꽃 좋긴한데...<br> 이건 사과의 꽃이잖아. 뭐 잘못했어??",
             `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
         );
         return;
     }
 
+    if(giftId === "key"){
+        openPopup(
+            "마녀",
+            "어따 씀???",
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+    }
+
+    if(giftId === "heart"){
+        openPopup(
+            "마녀",
+            "마법 재료로 잘 쓸게",
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+    }
+    if(giftId === "bugSpray"){
+        openPopup(
+            "마녀",
+            "이걸로 너 쫓아낸다??",
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+    }
+    if(giftId === "dateCoupon"){
+        openPopup(
+            "마녀",
+            "뭐 셀프 데이트야?",
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+    }
+    if(giftId === "pdateCoupon"){
+        openPopup(
+            "마녀",
+            "...싸패야?",
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+    }
+  if(giftId === "axe" || giftId === "shield"){
+         openPopup(
+            "마녀",
+            "이걸 왜 줌?",
+            `<button class="choice-btn blue" onclick="openWitch()">확인</button>`
+        );
+        return;
+     }
+ 
     openPopup(
         "마녀",
         "흠... 어디있어? 없잖아",
