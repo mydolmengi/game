@@ -1,1 +1,151 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>천공도시의 마법 편지</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif KR',serif;background:#bfe7ff}
+#scene{position:relative;width:100%;height:100%}
+#sky{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cloud{position:absolute;width:220px;opacity:.85;animation:cloudMove 20s linear infinite}
+.c1{top:10%;left:-250px}.c2{top:65%;left:-400px;animation-duration:28s}
+@keyframes cloudMove{to{transform:translateX(calc(100vw + 700px));}}
+#envelope,#openEnvelope,#letter{position:absolute;left:50%;transform:translateX(-50%)}
+#envelope,#openEnvelope{width:320px;bottom:170px;cursor:pointer;transition:.8s}
+#openEnvelope{display:none}
+#letter{width:300px;bottom:170px;opacity:0;transform:translate(-50%,120px);transition:1s}
+.butterfly,.feather{position:absolute;opacity:0}
+.butterfly{width:60px}
+.feather{width:45px}
+#text{
+position:absolute;
+left:50%;
+top:23%;
+transform:translateX(-50%);
+width:220px;
+font-size:20px;
+line-height:1.8;
+color:#5b4631;
+opacity:0;
+-webkit-mask-image:linear-gradient(to right,#000 0,#000 0,transparent 0);
+mask-image:linear-gradient(to right,#000 0,#000 0,transparent 0);
+}
+.write{
+opacity:1;
+animation:write 5s forwards;
+}
+@keyframes write{
+from{-webkit-mask-size:0% 100%;mask-size:0% 100%}
+to{-webkit-mask-size:100% 100%;mask-size:100% 100%}
+}
+#paperCloud{
+position:absolute;
+width:240px;
+top:18%;
+left:-260px;
+opacity:0;
+animation:none;
+}
+.pass{
+opacity:.8!important;
+animation:pass 8s linear forwards!important;
+}
+@keyframes pass{
+from{left:-260px}
+to{left:100vw}
+}
+</style>
+</head>
+<body>
+<div id="scene">
+<img id="sky" src="images/sky.png">
+<img class="cloud c1" src="images/cloud.png">
+<img class="cloud c2" src="images/cloud.png">
+
+<img id="envelope" src="images/envelope_close.png">
+<img id="openEnvelope" src="images/envelope_open.png">
+
+<img id="letter" src="images/letter.png">
+
+<div id="text">
+천공도시에서 보내는<br>
+작은 마법의 편지.<br><br>
+오늘도 당신에게<br>
+행복이 머물기를.
+</div>
+
+<img id="paperCloud" src="images/cloud.png">
+</div>
+
+<script>
+const close=document.getElementById("envelope");
+const open=document.getElementById("openEnvelope");
+const letter=document.getElementById("letter");
+const text=document.getElementById("text");
+const paperCloud=document.getElementById("paperCloud");
+
+close.onclick=()=>{
+close.style.display="none";
+open.style.display="block";
+
+spawnButterflies();
+spawnFeathers();
+
+setTimeout(()=>{
+letter.style.opacity=1;
+letter.style.transform="translate(-50%,-150px)";
+},400);
+
+setTimeout(()=>{
+text.classList.add("write");
+},1700);
+
+setTimeout(()=>{
+paperCloud.classList.add("pass");
+},7000);
+}
+
+function spawnButterflies(){
+for(let i=0;i<5;i++){
+let b=document.createElement("img");
+b.src="images/butterfly.png";
+b.className="butterfly";
+b.style.left="50%";
+b.style.bottom="240px";
+document.body.appendChild(b);
+setTimeout(()=>b.style.opacity=1,50);
+let x=(Math.random()*400)-200;
+let y=-(Math.random()*350+120);
+b.animate([
+{transform:"translate(0,0) rotate(0deg)"},
+{transform:`translate(${x}px,${y}px) rotate(${Math.random()*180}deg)`}
+],{duration:3000+Math.random()*1500,fill:"forwards",easing:"ease-out"});
+setTimeout(()=>b.remove(),5000);
+}
+}
+
+function spawnFeathers(){
+for(let i=0;i<6;i++){
+let f=document.createElement("img");
+f.src="images/feather.png";
+f.className="feather";
+f.style.left=(window.innerWidth/2)+"px";
+f.style.bottom="240px";
+document.body.appendChild(f);
+setTimeout(()=>f.style.opacity=1,50);
+let x=(Math.random()*300)-150;
+let y=(Math.random()*300)+250;
+f.animate([
+{transform:"translate(0,0) rotate(0deg)"},
+{transform:`translate(${x}px,-${y}px) rotate(${Math.random()*360}deg)`},
+{transform:`translate(${x+50}px,${y}px) rotate(${Math.random()*720}deg)`}
+],{duration:5000,fill:"forwards",easing:"ease-in-out"});
+setTimeout(()=>f.remove(),5200);
+}
+}
+</script>
+</body>
+</html>
