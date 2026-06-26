@@ -482,7 +482,7 @@
       span.textContent = ch === ' ' ? '\u00A0' : ch;
       target.appendChild(span);
       letterContent.scrollTop = letterContent.scrollHeight;
-      await sleep(/[,.!?…]/.test(ch) ? 72 : 42);
+      await sleep(/[,.!?…]/.test(ch) ? 100 : 60);
     }
   }
 
