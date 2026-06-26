@@ -127,6 +127,8 @@ body{
 .popup-box{
     width:100%;
     max-width:520px;
+    max-height:85vh;      
+    overflow-y:auto;
     background:#f9e9c8;
     border:6px solid #c89b5d;
     border-radius:28px;
@@ -197,8 +199,8 @@ body{
 
 .choice-row{
     display:flex;
+    flex-direction:column;
     gap:10px;
-    flex-wrap:wrap;
 }
 
 .choice-row .choice-btn{
@@ -228,20 +230,23 @@ body{
     width:100%;
 }
     @media (max-width:600px){
-    .choice-box{
+
+    .popup-box{
+        max-height:80vh;
+        padding:16px;
+    }
+
+    .choice-btn{
+        font-size:16px;
+        padding:10px;
+    }
+
+    .popup-title{
         font-size:20px;
-        padding:12px;
     }
 
-    .date-car{
-        top:51%;
-        width:78vw;
-        max-width:none;
-    }
-
-    .date-car-label{
-        font-size:15px;
-        padding:5px 10px;
+    .popup-body{
+        font-size:16px;
     }
 }
 </style>
@@ -259,7 +264,7 @@ body{
     <div class="hotspot talk-zone" onclick="openWitch()"></div>
 
     <button class="back-btn" onclick="location.href='cave.html'">
-        돌아가
+        돌아가기
     </button>
 </div>
 
