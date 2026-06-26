@@ -68,8 +68,8 @@
   #envelopeBtn {
     position: absolute;
     left: 50%;
-    bottom: 7.5vh;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
     width: var(--envelope-w);
     aspect-ratio: 1.88 / 1;
     border: 0;
@@ -80,15 +80,27 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     transition: transform .25s ease, filter .25s ease;
-    filter: drop-shadow(0 24px 34px rgba(72, 78, 107, .18));
+    filter: drop-shadow(0 24px 34px rgba(72, 78, 107, .22));
+  }
+
+  #envelopeBtn::before {
+    content: '';
+    position: absolute;
+    inset: -8%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.65), rgba(255,255,255,0) 68%);
+    filter: blur(14px);
+    opacity: .55;
+    animation: envelopeGlow 2.4s ease-in-out infinite;
+    z-index: -1;
   }
 
   #envelopeBtn:hover {
-    transform: translateX(-50%) translateY(-2px) scale(1.01);
+    transform: translate(-50%, -50%) scale(1.03);
   }
 
   #envelopeBtn:active {
-    transform: translateX(-50%) translateY(2px) scale(0.995);
+    transform: translate(-50%, -50%) scale(0.99);
   }
 
   #envelopeBtn img,
@@ -104,32 +116,32 @@
   #openEnvelope {
     position: absolute;
     left: 50%;
-    bottom: 7.5vh;
+    top: 50%;
     width: var(--envelope-w);
     aspect-ratio: 1.88 / 1;
-    transform: translateX(-50%);
-    z-index: 12;
+    transform: translate(-50%, -50%);
+    z-index: 15;
     display: none;
-    filter: drop-shadow(0 24px 34px rgba(72, 78, 107, .18));
+    filter: drop-shadow(0 24px 34px rgba(72, 78, 107, .20));
   }
 
   #letter {
     position: absolute;
     left: 50%;
-    bottom: 9.2vh;
+    top: 50%;
     width: var(--letter-w);
     aspect-ratio: 1.38 / 1.72;
-    transform: translateX(-50%) translateY(140px) scale(0.98);
+    transform: translate(-50%, -45%) translateY(180px) scale(0.98);
     opacity: 0;
     z-index: 22;
     transition: transform 1s cubic-bezier(.2,.95,.2,1), opacity .8s ease;
-    filter: drop-shadow(0 22px 40px rgba(72, 78, 107, .15));
-    pointer-events: none;
+    filter: drop-shadow(0 22px 40px rgba(72, 78, 107, .18));
+    pointer-events: auto;
   }
 
   #letter.active {
     opacity: 1;
-    transform: translateX(-50%) translateY(-140px) scale(1);
+    transform: translate(-50%, -45%) translateY(-120px) scale(1);
   }
 
   #letter img {
@@ -159,29 +171,64 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    gap: 0.45em;
-    overflow: hidden;
+    gap: 0.55em;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    padding: 0 .4em 1.4em .2em;
+    pointer-events: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(91,70,49,.45) rgba(255,255,255,.18);
   }
+
+  #letterContent::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #letterContent::-webkit-scrollbar-track {
+    background: rgba(255,255,255,.18);
+    border-radius: 999px;
+  }
+
+  #letterContent::-webkit-scrollbar-thumb {
+    background: rgba(91,70,49,.42);
+    border-radius: 999px;
+  }
+
   .sentence {
     display: block;
     margin: 0;
     opacity: 0;
     transform: translateY(10px);
-    animation: sentenceWrite 0.62s ease forwards;
     max-width: 100%;
     text-align: center;
+    white-space: normal;
+    word-break: keep-all;
   }
 
-  @keyframes sentenceWrite {
-    0%   { opacity: 0; transform: translateY(12px); filter: blur(1px); }
-    55%  { opacity: 1; transform: translateY(0); filter: blur(0.2px); }
-    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  .char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px) rotate(-1deg) scale(0.98);
+    filter: blur(1px);
+    animation: inkWrite 0.42s ease forwards;
+  }
+
+  @keyframes inkWrite {
+    0%   { opacity: 0; transform: translateY(12px) rotate(-1.5deg) scale(0.98); filter: blur(1.5px); }
+    45%  { opacity: 1; transform: translateY(0) rotate(0deg) scale(1.01); filter: blur(0.2px); }
+    100% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); filter: blur(0); }
+  }
+
+  @keyframes envelopeGlow {
+    0%, 100% { transform: scale(0.96); opacity: .45; }
+    50% { transform: scale(1.06); opacity: .92; }
   }
 
   #endingButton {
     position: absolute;
     left: 50%;
-    bottom: 10.5%;
+    bottom: 8.2%;
     transform: translateX(-50%);
     padding: 0.9em 1.5em;
     border-radius: 999px;
@@ -288,8 +335,8 @@
   /* Mobile tuning */
   @media (max-width: 720px) {
     :root {
-      --envelope-w: min(88vw, 700px);
-      --letter-w: min(86vw, 620px);
+      --envelope-w: min(80vw, 640px);
+      --letter-w: min(82vw, 560px);
     }
 
     #letterContent {
@@ -301,7 +348,7 @@
     }
 
     #endingButton {
-      bottom: 10.5%;
+      bottom: 8.2%;
       font-size: 14px;
       padding: .85em 1.2em;
     }
@@ -351,6 +398,9 @@
     '오늘의 피로가 조금은 가벼워지고, 마음 한쪽에 남은 걱정도 천천히 풀어지기를 바랍니다.',
     '길 위에서 마주하는 수많은 순간들 속에서도 당신만의 빛은 언제나 또렷하게 반짝이고 있으니까요.',
     '그 빛이 스스로를 믿게 하고, 다시 한 걸음 나아가게 하는 따뜻한 용기가 되어 주기를 소망합니다.',
+    '때로는 멀리 돌아가는 길이 더 오래 기억되는 풍경을 남기듯, 오늘의 당신도 그런 아름다운 장면을 만날 거예요.',
+    '서두르지 않아도 괜찮고, 완벽하지 않아도 괜찮습니다. 당신의 속도만으로도 충분히 멋진 하루입니다.',
+    '무심코 지나친 순간들 속에도 분명히 기쁨은 숨어 있고, 그 기쁨은 생각보다 자주 당신을 기다리고 있습니다.',
     '언제나 당신의 편에서 응원하고, 어디에서든 행복이 먼저 닿는 하루를 진심으로 바랄게요.',
     '천천히 읽어도 괜찮습니다. 이 편지는 끝까지 당신을 향해, 다정하게 열려 있을 테니까요.'
   ];
@@ -360,6 +410,10 @@
 
   function random(min, max) {
     return Math.random() * (max - min) + min;
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   function addClouds() {
@@ -389,15 +443,27 @@
     }
   }
 
-  function buildHandwrittenText() {
+  async function typeSentence(target, sentence) {
+    for (const ch of sentence) {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.textContent = ch === ' ' ? '\u00A0' : ch;
+      target.appendChild(span);
+      await sleep(60);
+    }
+  }
+
+  async function buildHandwrittenText() {
     letterContent.innerHTML = '';
-    LETTER_SENTENCES.forEach((sentence, index) => {
+    for (const sentence of LETTER_SENTENCES) {
       const p = document.createElement('p');
       p.className = 'sentence';
-      p.textContent = sentence;
-      p.style.animationDelay = `${index * 0.9}s`;
       letterContent.appendChild(p);
-    });
+      p.style.opacity = '1';
+      await typeSentence(p, sentence);
+      p.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      await sleep(260);
+    }
   }
 
   function spawnButterflies() {
@@ -477,8 +543,8 @@
     closeImg.style.opacity = '0';
     openEnvelope.style.display = 'block';
     openEnvelope.animate([
-      { opacity: 0, transform: 'translateX(-50%) translateY(6px) scale(0.99)' },
-      { opacity: 1, transform: 'translateX(-50%) translateY(0) scale(1)' }
+      { opacity: 0, transform: 'translate(-50%, -50%) translateY(8px) scale(0.99)' },
+      { opacity: 1, transform: 'translate(-50%, -50%) translateY(0) scale(1)' }
     ], { duration: 420, fill: 'forwards', easing: 'ease-out' });
 
     spawnButterflies();
@@ -496,11 +562,11 @@
     setTimeout(() => {
       paperCloud.classList.add('pass');
       paperCloud.style.opacity = '.85';
-    }, 6900);
+    }, 8500);
 
     setTimeout(() => {
       endingButton.classList.add('show');
-    }, 11500);
+    }, 14500);
   }
 
   closeBtn.addEventListener('click', openLetterSequence);
