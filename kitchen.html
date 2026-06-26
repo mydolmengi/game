@@ -82,14 +82,21 @@ body{
 }
 
 .popup-box{
+    width:100%;
+    max-width:520px;
+
+    max-height:85vh;      /* 추가 */
+    overflow-y:auto;       /* 추가 */
+
     background:#f9e9c8;
     border:6px solid #c89b5d;
-    border-radius:30px;
-    padding:20px;
-    width:90%;
-    max-width:600px;
+    border-radius:28px;
+    padding:22px 20px 18px;
     text-align:center;
+    position:relative;
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
 }
+
 
 .choice-btn{
     width:100%;
@@ -134,28 +141,26 @@ body{
     to   { transform: rotate(32deg) translateY(-25px); }
 }
 
-     @media (max-width: 600px){
+   @media (max-width:600px){
 
-    .title{
-        font-size:30px;
+    .popup-box{
+        max-height:80vh;
+        padding:16px;
     }
 
-    .story{
-        font-size:18px;
-        line-height:1.8;
+    .choice-btn{
+        font-size:16px;
+        padding:10px;
     }
 
-    .story-box{
-        padding:25px 20px;
+    .popup-title{
+        font-size:20px;
     }
 
-    .start-btn{
-        padding:12px 30px;
-        font-size:18px;
+    .popup-body{
+        font-size:16px;
     }
-
 }
-
 </style>
 </head>
 
