@@ -308,21 +308,21 @@ body {
 
 <script>
 const mainLines = [
-  { speaker: "마녀", text: "왜 나한테 데이트를 신청했어?" },
-  { speaker: "왕자", text: "내 스타일이여서" },
-  { speaker: "마녀", text: "허 참놰" },
-  { speaker: "왕자", text: "너 애기미 맞지?" },
-  { speaker: "마녀", text: "?? 나 애기미....?" },
-  { speaker: "마녀", text: "맞아! 나 애기미였어!!! 기억이 났어" },
-  { speaker: "왕자", text: "기억이 났어??" },
-  { speaker: "마녀", text: "오빠미!!! 왜 이제야 왔어ㅠㅠ" },
-  { speaker: "오빠미", text: "그래, 기억 돌아온거 축하해. 자, 그럼 이제 3주년 편지를 줘" }
+  { speaker: "마녀", text: "왜 나한테 데이트를 신청했어?", src: "images/adate_mage_happy.png" },
+  { speaker: "왕자", text: "내 스타일이여서", src: "images/adate_mage_happy.png" },
+  { speaker: "마녀", text: "허 참놰", src: "images/adate_mage_smirk.png" },
+  { speaker: "왕자", text: "너 애기미 맞지?", src: "images/adate_mage_happy.png" },
+  { speaker: "마녀", text: "?? 나 애기미....?", src: "images/adate_mage_smirk.png" },
+  { speaker: "마녀", text: "맞아! 나 애기미였어!!! 기억이 났어", src: "images/adate_mage_happy.png" },
+  { speaker: "왕자", text: "기억이 났어??", src: "images/adate_mage_happy.png" },
+  { speaker: "마녀", text: "오빠미!!! 왜 이제야 왔어ㅠㅠ", src: "images/adate_mage_happy.png" },
+  { speaker: "오빠미", text: "그래, 기억 돌아온거 축하해. 자, 그럼 이제 3주년 편지를 줘", src: "images/adate_mage_smirk.png" }
 ];
 
 const branchLines = [
-  { speaker: "애기미", text: "오빠미, 근데 내가 첫 데이트가 아니네;;" },
-  { speaker: "오빠미", text: "아니, 헷갈릴 수도 있지;;" },
-  { speaker: "애기미", text: "흥, 난 용서할 수 없엉!!!!" }
+  { speaker: "애기미", text: "오빠미, 근데 내가 첫 데이트가 아니네;;", src: "images/adate_mage_smirk.png" },
+  { speaker: "오빠미", text: "아니, 헷갈릴 수도 있지;;", src: "images/adate_mage_happy.png" },
+  { speaker: "애기미", text: "흥, 난 용서할 수 없엉!!!!", src: "images/adate_mage_smirk.png" }
 ];
 
 const hitZone = document.getElementById("hitZone");
@@ -410,7 +410,7 @@ function startTalk(){
   branchStep = 0;
   phase = "main";
   openPopup();
-  hero.src = "images/adate_mage_happy.png";
+  hero.src = line.src;
   nameText.textContent = "마녀";
   subText.textContent = "마녀가 당신을 반갑게 맞이한다.";
   showMainLine();
@@ -454,8 +454,8 @@ function finishMain(){
 }
 
 function showBranchLine(){
-  hero.src = "images/adate_mage_smirk.png";
   const line = branchLines[branchStep];
+  hero.src = line.src;
   nameText.textContent = line.speaker;
   dialogText.textContent = line.text;
   subText.textContent = "애기미가 불만스러운 표정을 짓는다.";
