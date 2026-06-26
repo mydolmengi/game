@@ -264,7 +264,7 @@ body {
 <body>
 <div class="scene">
   <img class="bg" src="images/adate_bg.png" alt="데이트 배경">
-  <div class="hint" id="hint">정희를 눌러보자</div>
+  <div class="hint" id="hint">정순이를 눌러보자</div>
   <div class="hit-zone" id="hitZone" title="마녀"></div>
 </div>
 
@@ -410,7 +410,7 @@ function startTalk(){
   branchStep = 0;
   phase = "main";
   openPopup();
-  hero.src = line.src;
+  hero.src = "images/adate_mage_happy.png";
   nameText.textContent = "마녀";
   subText.textContent = "마녀가 당신을 반갑게 맞이한다.";
   showMainLine();
@@ -420,7 +420,7 @@ function showMainLine(){
   const line = mainLines[step];
   nameText.textContent = line.speaker;
   dialogText.textContent = line.text;
-  hero.src = "images/adate_mage_happy.png";
+  hero.src = line.src;
 
   if(step === 0){
     setActionButtons('<button class="btn gold" onclick="nextMain()">다음</button>');
