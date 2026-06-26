@@ -232,15 +232,20 @@ body{
 
 .popup-box{
     width:100%;
-    max-width:560px;
+    max-width:520px;
+
+    max-height:85vh;      /* 추가 */
+    overflow-y:auto;       /* 추가 */
+
     background:#f9e9c8;
     border:6px solid #c89b5d;
     border-radius:28px;
     padding:22px 20px 18px;
     text-align:center;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
     position:relative;
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
 }
+
 
 .close-btn{
     position:absolute;
@@ -317,6 +322,26 @@ body{
     font-weight:800;
     color:#5b3719;
     margin-top:8px;
+}
+    @media (max-width:600px){
+
+    .popup-box{
+        max-height:80vh;
+        padding:16px;
+    }
+
+    .choice-btn{
+        font-size:16px;
+        padding:10px;
+    }
+
+    .popup-title{
+        font-size:20px;
+    }
+
+    .popup-body{
+        font-size:16px;
+    }
 }
 </style>
 </head>
