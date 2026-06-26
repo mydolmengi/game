@@ -242,7 +242,7 @@ body{
     <div class="hotspot 대화" onclick="openWitch()"></div>
 
     <button class="back-btn" onclick="location.href='cave.html'">
-        집으로
+        정희집으로
     </button>
 </div>
 
@@ -359,7 +359,7 @@ function submitCauldron(){
     );
 }
 
-function openDish(){
+function openCauldron(){
     openPopup(
         "마녀가 시킨 일은?",
         `
@@ -377,7 +377,7 @@ function openDish(){
     }, 50);
 }
 
-function submitDish(){
+function submitCauldron(){
     const input = document.getElementById("dishInput");
     const value = normalizeText(input?.value);
 
