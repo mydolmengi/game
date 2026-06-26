@@ -96,26 +96,26 @@ body{
 </div>
 
 <script>
-let bgClickCount = 0;
-let bgClickTimer = null;
+let clickCount = 0;
+let clickTimer = null;
 
 document.body.addEventListener("click", function (e) {
-    // 버튼이나 이미지가 아닌 "빈 배경"만 카운트
-    if (e.target !== document.body) return;
+    // 시작하기 버튼은 제외
+    if (e.target.closest(".start-btn")) return;
 
-    bgClickCount++;
+    clickCount++;
 
-    if (bgClickCount === 1) {
-        bgClickTimer = setTimeout(() => {
-            bgClickCount = 0;
-            bgClickTimer = null;
+    if (clickCount === 1) {
+        clickTimer = setTimeout(() => {
+            clickCount = 0;
+            clickTimer = null;
         }, 1500);
     }
 
-    if (bgClickCount >= 7) {
-        clearTimeout(bgClickTimer);
-        bgClickCount = 0;
-        bgClickTimer = null;
+    if (clickCount >= 7) {
+        clearTimeout(clickTimer);
+        clickCount = 0;
+        clickTimer = null;
         localStorage.clear();
         alert("게임 진행 상태를 초기화했어!");
     }
