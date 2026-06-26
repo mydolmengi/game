@@ -1,534 +1,157 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>천공도시의 마법 편지</title>
 <style>
-  :root {
-    --sky: #bfe7ff;
-    --paper: #fff7ec;
-    --ink: #5b4631;
-    --shadow: 0 20px 60px rgba(56, 74, 98, 0.18);
-    --soft-shadow: 0 12px 32px rgba(56, 74, 98, 0.14);
-    --envelope-w: min(78vw, 700px);
-    --letter-w: min(74vw, 620px);
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#bfe7ff;font-family:'Noto Serif KR',serif}
+#scene{position:relative;width:100%;height:100%;overflow:hidden}
+#sky{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
-  * { box-sizing: border-box; }
-  html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    font-family: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
-    background: var(--sky);
-  }
+.cloud{position:absolute;left:-300px;opacity:.8;animation:cloud 28s linear infinite}
+@keyframes cloud{to{transform:translateX(calc(100vw + 900px));}}
 
-  body {
-    position: relative;
-  }
+#envBtn{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);width:min(700px,80vw);border:0;background:none;cursor:pointer;z-index:5}
+#envBtn img,#openEnv{width:100%;display:block}
+#openEnv{display:none;position:absolute;left:50%;bottom:6%;transform:translateX(-50%);width:min(700px,80vw);z-index:4}
 
-  #scene {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
+#letter{
+position:absolute;
+left:50%;
+bottom:7%;
+transform:translate(-50%,180px);
+width:min(620px,75vw);
+opacity:0;
+transition:1s;
+z-index:10; /* 편지가 열린 봉투 위 */
+}
+#letter.show{opacity:1;transform:translate(-50%,-150px)}
+#letter img{width:100%;display:block}
 
-  #sky {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none;
-    user-select: none;
-  }
+#content{
+position:absolute;
+left:50%;
+top:13%;
+width:72%;
+transform:translateX(-50%);
+text-align:center;
+font-size:21px;
+line-height:1.9;
+color:#5b4631;
+}
 
-  .cloud {
-    position: absolute;
-    left: -20vw;
-    opacity: 0.82;
-    filter: drop-shadow(0 10px 18px rgba(255,255,255,.22));
-    animation-name: cloudMove;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    will-change: transform;
-    pointer-events: none;
-    user-select: none;
-  }
+.sentence{
+opacity:0;
+transform:translateY(8px);
+transition:.5s;
+margin-bottom:10px;
+}
+.sentence.show{opacity:1;transform:translateY(0)}
 
-  @keyframes cloudMove {
-    from { transform: translateX(0); }
-    to { transform: translateX(calc(140vw + 900px)); }
-  }
+#endingBtn{
+position:absolute;
+left:50%;
+bottom:10%;
+transform:translateX(-50%);
+padding:12px 28px;
+border-radius:40px;
+border:none;
+background:#fff7ef;
+box-shadow:0 10px 20px rgba(0,0,0,.15);
+font-size:18px;
+display:none;
+cursor:pointer;
+}
 
-  #envelopeBtn {
-    position: absolute;
-    left: 50%;
-    bottom: 7.5vh;
-    transform: translateX(-50%);
-    width: var(--envelope-w);
-    aspect-ratio: 1.88 / 1;
-    border: 0;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-    z-index: 20;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    transition: transform .25s ease, filter .25s ease;
-    filter: drop-shadow(0 24px 34px rgba(72, 78, 107, .18));
-  }
-
-  #envelopeBtn:hover {
-    transform: translateX(-50%) translateY(-2px) scale(1.01);
-  }
-
-  #envelopeBtn:active {
-    transform: translateX(-50%) translateY(2px) scale(0.995);
-  }
-
-  #envelopeBtn img,
-  #openEnvelope {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    user-select: none;
-    pointer-events: none;
-  }
-
-  #openEnvelope {
-    position: absolute;
-    left: 50%;
-    bottom: 7.5vh;
-    width: var(--envelope-w);
-    aspect-ratio: 1.88 / 1;
-    transform: translateX(-50%);
-    z-index: 18;
-    display: none;
-    filter: drop-shadow(0 24px 34px rgba(72, 78, 107, .18));
-  }
-
-  #letter {
-    position: absolute;
-    left: 50%;
-    bottom: 9.2vh;
-    width: var(--letter-w);
-    aspect-ratio: 1.38 / 1.72;
-    transform: translateX(-50%) translateY(140px) scale(0.98);
-    opacity: 0;
-    z-index: 19;
-    transition: transform 1s cubic-bezier(.2,.95,.2,1), opacity .8s ease;
-    filter: drop-shadow(0 22px 40px rgba(72, 78, 107, .15));
-    pointer-events: none;
-  }
-
-  #letter.active {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-140px) scale(1);
-  }
-
-  #letter img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    user-select: none;
-  }
-
-  #letterContent {
-    position: absolute;
-    left: 50%;
-    top: 15.5%;
-    width: 72%;
-    transform: translateX(-50%);
-    color: var(--ink);
-    z-index: 2;
-    font-size: clamp(16px, 2vw, 24px);
-    line-height: 1.85;
-    letter-spacing: 0.02em;
-    text-align: left;
-    white-space: normal;
-    word-break: keep-all;
-    user-select: none;
-  }
-
-  .line {
-    display: block;
-    overflow: hidden;
-    margin: 0;
-    min-height: 1.6em;
-  }
-
-  .char {
-    display: inline-block;
-    opacity: 0;
-    transform: translateY(10px) rotate(-1deg) scale(0.98);
-    filter: blur(1px);
-    animation: inkWrite 0.42s ease forwards;
-  }
-
-  @keyframes inkWrite {
-    0%   { opacity: 0; transform: translateY(12px) rotate(-1.5deg) scale(0.98); filter: blur(1.5px); }
-    45%  { opacity: 1; transform: translateY(0) rotate(0deg) scale(1.01); filter: blur(0.2px); }
-    100% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); filter: blur(0); }
-  }
-
-  #endingButton {
-    position: absolute;
-    left: 50%;
-    bottom: 4.2%;
-    transform: translateX(-50%);
-    padding: 0.9em 1.5em;
-    border-radius: 999px;
-    border: 1px solid rgba(91, 70, 49, .22);
-    background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,243,232,.92));
-    color: #5d4632;
-    font-family: inherit;
-    font-size: clamp(14px, 1.8vw, 18px);
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    box-shadow: 0 10px 24px rgba(95, 69, 46, 0.14), inset 0 1px 0 rgba(255,255,255,.7);
-    opacity: 0;
-    pointer-events: none;
-    transition: transform .2s ease, box-shadow .2s ease, opacity .5s ease;
-    z-index: 3;
-  }
-
-  #endingButton:hover {
-    transform: translateX(-50%) translateY(-2px);
-    box-shadow: 0 14px 30px rgba(95, 69, 46, 0.18), inset 0 1px 0 rgba(255,255,255,.7);
-  }
-
-  #endingButton.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .butterfly, .feather {
-    position: absolute;
-    left: 50%;
-    bottom: 14vh;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 17;
-    user-select: none;
-    will-change: transform, opacity;
-  }
-
-  .butterfly { width: 60px; }
-  .feather { width: 46px; }
-
-  #paperCloud {
-    position: absolute;
-    width: min(26vw, 240px);
-    top: 20%;
-    left: -280px;
-    opacity: 0;
-    z-index: 16;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .pass {
-    opacity: .8 !important;
-    animation: pass 8s linear forwards !important;
-  }
-
-  @keyframes pass {
-    from { left: -280px; }
-    to   { left: 100vw; }
-  }
-
-  /* Ending overlay */
-  #endingOverlay {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 1rem;
-    background: radial-gradient(circle at center, rgba(255,255,255,.18), rgba(120,171,221,.36));
-    backdrop-filter: blur(3px);
-    z-index: 100;
-    text-align: center;
-    padding: 24px;
-  }
-
-  #endingOverlay.show { display: flex; }
-
-  #endingOverlay img {
-    width: min(84vw, 760px);
-    max-height: 72vh;
-    object-fit: contain;
-    border-radius: 28px;
-    box-shadow: var(--shadow);
-    animation: fadeUp .75s ease both;
-  }
-
-  #endingTitle {
-    font-size: clamp(20px, 3vw, 34px);
-    color: #ffffff;
-    text-shadow: 0 8px 20px rgba(0,0,0,.16);
-    letter-spacing: .04em;
-    animation: fadeUp .9s ease .08s both;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px) scale(.985); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  /* Mobile tuning */
-  @media (max-width: 720px) {
-    :root {
-      --envelope-w: min(88vw, 700px);
-      --letter-w: min(86vw, 620px);
-    }
-
-    #letterContent {
-      top: 15%;
-      width: 74%;
-      font-size: clamp(15px, 4.1vw, 20px);
-      line-height: 1.72;
-    }
-
-    #endingButton {
-      bottom: 4.4%;
-      font-size: 14px;
-      padding: .85em 1.2em;
-    }
-  }
+#ending{
+position:fixed;inset:0;background:rgba(0,0,0,.45);
+display:none;align-items:center;justify-content:center;flex-direction:column;
+z-index:100}
+#ending img{width:min(800px,90vw)}
+#ending h1{color:#fff;margin-top:20px}
 </style>
 </head>
 <body>
-  <div id="scene">
-    <img id="sky" src="images/sky.png" alt="하늘 배경" />
-
-    <img id="paperCloud" src="images/cloud.png" alt="흐르는 구름" />
-
-    <button id="envelopeBtn" aria-label="편지 봉투 열기">
-      <img src="images/envelope_close.png" alt="닫힌 편지 봉투" />
-    </button>
-
-    <img id="openEnvelope" src="images/envelope_open.png" alt="열린 편지 봉투" />
-
-    <div id="letter" aria-hidden="true">
-      <img src="images/letter.png" alt="편지지" />
-      <div id="letterContent"></div>
-      <button id="endingButton" type="button">엔딩 보러가기</button>
-    </div>
-
-    <div id="endingOverlay" aria-hidden="true">
-      <img src="images/ending.png" alt="엔딩 이미지" />
-      <div id="endingTitle">엔딩2. 행복한 결말</div>
-    </div>
-  </div>
+<div id="scene">
+<img id="sky" src="images/sky.png">
 
 <script>
-  const closeBtn = document.getElementById('envelopeBtn');
-  const closeImg = closeBtn.querySelector('img');
-  const openEnvelope = document.getElementById('openEnvelope');
-  const letter = document.getElementById('letter');
-  const letterContent = document.getElementById('letterContent');
-  const endingButton = document.getElementById('endingButton');
-  const endingOverlay = document.getElementById('endingOverlay');
-  const paperCloud = document.getElementById('paperCloud');
+for(let i=0;i<8;i++){
+ let c=document.createElement("img");
+ c.src="images/cloud.png";
+ c.className="cloud";
+ c.style.top=(Math.random()*70)+"%";
+ c.style.width=(120+Math.random()*180)+"px";
+ c.style.animationDuration=(18+Math.random()*20)+"s";
+ c.style.animationDelay=(-Math.random()*20)+"s";
+ scene.appendChild(c);
+}
+</script>
 
-  const LETTER_LINES = [
-    '천공도시에서 보내는',
-    '작은 마법의 편지.',
-    '',
-    '오늘도 당신에게',
-    '행복이 머물기를.',
-    '',
-    '바람이 부드럽게 스치고,',
-    '구름이 천천히 지나가며,',
-    '당신의 하루 끝에',
-    '포근한 빛이 남기를 바랍니다.'
-  ];
+<button id="envBtn"><img src="images/envelope_close.png"></button>
+<img id="openEnv" src="images/envelope_open.png">
 
-  const CLOUD_COUNT = 8;
-  let opened = false;
+<div id="letter">
+<img src="images/letter.png">
+<div id="content"></div>
+<button id="endingBtn">엔딩 보러가기</button>
+</div>
 
-  function random(min, max) {
-    return Math.random() * (max - min) + min;
-  }
+<div id="ending">
+<img src="images/ending.png">
+<h1>엔딩2. 행복한 결말</h1>
+</div>
 
-  function addClouds() {
-    const scene = document.getElementById('scene');
-    for (let i = 0; i < CLOUD_COUNT; i++) {
-      const img = document.createElement('img');
-      img.src = 'images/cloud.png';
-      img.className = 'cloud';
-      img.alt = '';
+</div>
 
-      const size = random(110, 280);
-      const top = random(3, 74);
-      const delay = random(-18, 0);
-      const duration = random(18, 40);
-      const opacity = random(0.45, 0.92);
-      const scaleY = random(0.9, 1.25);
+<script>
+const lines=[
+"천공도시에서 보내는 작은 마법의 편지입니다.",
+"오늘도 이 편지가 당신의 하루에 조용한 미소를 전해주기를 바랍니다.",
+"아무리 바쁜 하루였더라도 잠시 하늘을 올려다보세요.",
+"천천히 흘러가는 구름은 늘 같은 자리에서 당신을 기다리고 있습니다.",
+"기쁨은 예상하지 못한 순간에 찾아오고,",
+"행복은 아주 작은 순간들이 모여 만들어집니다.",
+"오늘의 선택이 내일의 추억이 되고,",
+"당신의 따뜻한 마음은 누군가에게 큰 힘이 될 것입니다.",
+"조급해하지 않아도 괜찮습니다.",
+"당신만의 속도로 천천히 걸어가도 충분합니다.",
+"바람이 당신의 걱정을 데려가고,",
+"햇살이 당신의 마음을 포근하게 감싸주기를 바랍니다.",
+"언제나 당신의 이야기를 응원합니다.",
+"오늘도 행복이 당신 곁에 오래 머물기를 바랍니다."
+];
 
-      img.style.width = `${size}px`;
-      img.style.top = `${top}%`;
-      img.style.opacity = opacity.toFixed(2);
-      img.style.animationDuration = `${duration}s`;
-      img.style.animationDelay = `${delay}s`;
-      img.style.transform = `scale(${random(0.8, 1.2)}, ${scaleY})`;
-      img.style.zIndex = String(5 + Math.floor(random(0, 4)));
+const envBtn=document.getElementById("envBtn");
+const openEnv=document.getElementById("openEnv");
+const letter=document.getElementById("letter");
+const content=document.getElementById("content");
+const endBtn=document.getElementById("endingBtn");
 
-      scene.appendChild(img);
-    }
-  }
+envBtn.onclick=()=>{
+envBtn.style.display="none";
+openEnv.style.display="block";
+letter.classList.add("show");
 
-  function buildHandwrittenText() {
-    letterContent.innerHTML = '';
-    LETTER_LINES.forEach((line, lineIndex) => {
-      const p = document.createElement('p');
-      p.className = 'line';
-      if (line === '') {
-        p.innerHTML = '&nbsp;';
-        letterContent.appendChild(p);
-        return;
-      }
-      [...line].forEach((ch, charIndex) => {
-        const span = document.createElement('span');
-        span.className = 'char';
-        span.textContent = ch;
-        span.style.animationDelay = `${(lineIndex * 0.36) + (charIndex * 0.09)}s`;
-        span.style.fontWeight = 400;
-        p.appendChild(span);
-      });
-      letterContent.appendChild(p);
-    });
-  }
+let delay=800;
 
-  function spawnButterflies() {
-    for (let i = 0; i < 5; i++) {
-      const b = document.createElement('img');
-      b.src = 'images/butterfly.png';
-      b.className = 'butterfly';
-      b.alt = '';
-      b.style.bottom = `${random(18, 30)}vh`;
-      b.style.left = '50%';
-      document.body.appendChild(b);
+lines.forEach((t)=>{
+ const p=document.createElement("div");
+ p.className="sentence";
+ p.textContent=t;
+ content.appendChild(p);
 
-      setTimeout(() => { b.style.opacity = 1; }, 40);
+ setTimeout(()=>p.classList.add("show"),delay);
+ delay+=900; // 한 문장씩
+});
 
-      const x = random(-240, 240);
-      const y = -random(170, 360);
-      const rot = random(90, 340);
+setTimeout(()=>endBtn.style.display="block",delay+300);
+};
 
-      b.animate(
-        [
-          { transform: 'translate(0,0) rotate(0deg)' },
-          { transform: `translate(${x}px, ${y}px) rotate(${rot}deg)` }
-        ],
-        {
-          duration: 2600 + random(0, 1400),
-          fill: 'forwards',
-          easing: 'ease-out'
-        }
-      );
-
-      setTimeout(() => b.remove(), 5000);
-    }
-  }
-
-  function spawnFeathers() {
-    for (let i = 0; i < 7; i++) {
-      const f = document.createElement('img');
-      f.src = 'images/feather.png';
-      f.className = 'feather';
-      f.alt = '';
-      f.style.bottom = `${random(16, 25)}vh`;
-      f.style.left = '50%';
-      document.body.appendChild(f);
-
-      setTimeout(() => { f.style.opacity = 1; }, 40);
-
-      const x = random(-180, 180);
-      const y1 = random(220, 420);
-      const y2 = random(180, 520);
-      const rot1 = random(180, 520);
-      const rot2 = random(360, 860);
-
-      f.animate(
-        [
-          { transform: 'translate(0,0) rotate(0deg)' },
-          { transform: `translate(${x}px, -${y1}px) rotate(${rot1}deg)` },
-          { transform: `translate(${x + 40}px, ${y2}px) rotate(${rot2}deg)` }
-        ],
-        {
-          duration: 5000 + random(0, 1500),
-          fill: 'forwards',
-          easing: 'ease-in-out'
-        }
-      );
-
-      setTimeout(() => f.remove(), 5600);
-    }
-  }
-
-  function openLetterSequence() {
-    if (opened) return;
-    opened = true;
-
-    closeBtn.style.pointerEvents = 'none';
-    closeBtn.style.opacity = '0';
-
-    closeImg.style.opacity = '0';
-    openEnvelope.style.display = 'block';
-    openEnvelope.animate([
-      { opacity: 0, transform: 'translateX(-50%) translateY(6px) scale(0.99)' },
-      { opacity: 1, transform: 'translateX(-50%) translateY(0) scale(1)' }
-    ], { duration: 420, fill: 'forwards', easing: 'ease-out' });
-
-    spawnButterflies();
-    spawnFeathers();
-
-    setTimeout(() => {
-      letter.classList.add('active');
-      letter.setAttribute('aria-hidden', 'false');
-    }, 420);
-
-    setTimeout(() => {
-      buildHandwrittenText();
-    }, 1250);
-
-    setTimeout(() => {
-      paperCloud.classList.add('pass');
-      paperCloud.style.opacity = '.85';
-    }, 6900);
-
-    setTimeout(() => {
-      endingButton.classList.add('show');
-    }, 9200);
-  }
-
-  closeBtn.addEventListener('click', openLetterSequence);
-  closeBtn.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      openLetterSequence();
-    }
-  });
-
-  endingButton.addEventListener('click', () => {
-    endingOverlay.classList.add('show');
-    endingOverlay.setAttribute('aria-hidden', 'false');
-  });
-
-  endingOverlay.addEventListener('click', () => {
-    endingOverlay.classList.remove('show');
-    endingOverlay.setAttribute('aria-hidden', 'true');
-  });
-
-  addClouds();
+endBtn.onclick=()=>document.getElementById("ending").style.display="flex";
 </script>
 </body>
 </html>
