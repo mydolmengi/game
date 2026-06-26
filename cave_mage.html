@@ -452,26 +452,80 @@ function openTalkMenu(){
     );
 }
 
+
+const talk1Steps = [
+    { text: "너 뭐야??, 왜 들어왔어?", src: "images/cave_mage_witch.png" },
+    { text: "뭐? 누굴 구하러 왔다고? 흠...", src: "images/cave_mage_hint.png" },
+    { text: "누군지 모르겠지만 부럽네", src: "images/cave_mage_witch.png" }
+];
+
+const talk2Steps = [
+    { text: "뭐...? 왜 부럽냐고?", src: "images/cave_mage_hint.png" },
+    { text: "그냥.", src: "images/cave_mage_witch.png" },
+    { text: "나도 내가 왜 여기 있는지 몰라", src: "images/cave_mage_hint.png" }
+];
+
+const talk3Steps = [
+    { text: "뭐, 왜 어쩔티비", src: "images/cave_mage_witch.png" }
+];
+
+const talk4Steps = [
+    { text: "이상형?", src: "images/cave_mage_hint.png" },
+    { text: ".....설거지 잘하는 사람이 좋더라 ㅋㅋ", src: "images/cave_mage_witch.png" }
+];
+
+const cauldronReplySteps = [
+    { text: "이야~ 개 뻔뻔하네. 그냥알려달라고 하고", src: "images/cave_mage_hint.png" },
+    { text: "참놰~ 그냥 알려줄 수는 없지", src: "images/cave_mage_witch.png" },
+    { text: "난 설거지가 제일 싫으니까. 설거지 다 하면 알려주지", src: "images/cave_mage_hint.png" }
+];
+
+let talk1Step = 0;
+let talk2Step = 0;
+let talk3Step = 0;
+let talk4Step = 0;
+let cauldronReplyStep = 0;
+
+function renderDialogStep(title, steps, index, nextOnClick, endButtonsHtml=""){
+    const step = steps[index];
+    const img = step.src ? `<img class="popup-img" src="${step.src}" alt="${title}">` : "";
+    const body = `${img}<div>${String(step.text || "").replace(/\n/g, "<br>")}</div>`;
+
+    const btns = index < steps.length - 1
+        ? `<button class="choice-btn" onclick="${nextOnClick}()">다음</button>`
+        : endButtonsHtml;
+
+    openPopup(title, body, btns);
+}
+
+
 function startTalk1(){
-    openPopup(
+    talk1Step = 0;
+    renderDialogStep(
         "마녀",
-        "너 뭐야??, 왜 들어왔어?",
-        `<button class="choice-btn" onclick="nextTalk1()">다음</button>`
+        talk1Steps,
+        talk1Step,
+        "nextTalk1"
     );
 }
 
 function nextTalk1(){
-    openPopup(
+    talk1Step++;
+    renderDialogStep(
         "마녀",
-        "뭐? 누굴 구하러 왔다고? 흠...",
-        `<button class="choice-btn" onclick="nextTalk2()">다음</button>`
+        talk1Steps,
+        talk1Step,
+        "nextTalk2"
     );
 }
 
 function nextTalk2(){
-    openPopup(
+    talk1Step++;
+    renderDialogStep(
         "마녀",
-        "누군지 모르겠지만 부럽네",
+        talk1Steps,
+        talk1Step,
+        "showCauldronPasswordReply",
         `
             <button class="choice-btn" onclick="showCauldronPasswordReply()">가마솥 비밀번호 알려줘</button>
             <button class="choice-btn blue" onclick="openTalkMenu()">돌아가기</button>
@@ -480,13 +534,23 @@ function nextTalk2(){
 }
 
 function showCauldronPasswordReply(){
-    openPopup(
+    cauldronReplyStep = 0;
+    renderDialogStep(
         "마녀",
-        `
-            이야~ 개 뻔뻔하네. 그냥알려달라고 하고
-            참놰~ 그냥 알려줄 수는 없지
-            난 설거지가 제일 싫으니까. 설거지 다 하면 알려주지
-        `,
+        cauldronReplySteps,
+        cauldronReplyStep,
+        "nextCauldronPasswordReply",
+        `<button class="choice-btn blue" onclick="unlockTalk()">확인</button>`
+    );
+}
+
+function nextCauldronPasswordReply(){
+    cauldronReplyStep++;
+    renderDialogStep(
+        "마녀",
+        cauldronReplySteps,
+        cauldronReplyStep,
+        "nextCauldronPasswordReply",
         `<button class="choice-btn blue" onclick="unlockTalk()">확인</button>`
     );
 }
@@ -497,21 +561,87 @@ function unlockTalk(){
 }
 
 function startTalk2(){
-    openPopup("마녀", "뭐...? 왜 부럽냐고?\n그냥.\n나도 내가 왜 여기 있는지 몰라", `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`);
+    talk2Step = 0;
+    renderDialogStep(
+        "마녀",
+        talk2Steps,
+        talk2Step,
+        "nextTalk2_2",
+        `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`
+    );
     localStorage.setItem(FLAG_TALK_UNLOCKED, "true");
+}
+
+function nextTalk2_2(){
+    talk2Step++;
+    renderDialogStep(
+        "마녀",
+        talk2Steps,
+        talk2Step,
+        "nextTalk2_3",
+        `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`
+    );
+}
+
+function nextTalk2_3(){
+    talk2Step++;
+    renderDialogStep(
+        "마녀",
+        talk2Steps,
+        talk2Step,
+        "nextTalk2_3",
+        `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`
+    );
 }
 
 function startTalk3(){
-    openPopup("마녀", "뭐, 왜 어쩔티비", `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`);
+    talk3Step = 0;
+    renderDialogStep(
+        "마녀",
+        talk3Steps,
+        talk3Step,
+        "nextTalk3",
+        `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`
+    );
     localStorage.setItem(FLAG_TALK_UNLOCKED, "true");
+}
+
+function nextTalk3(){
+    talk3Step++;
+    renderDialogStep(
+        "마녀",
+        talk3Steps,
+        talk3Step,
+        "nextTalk3",
+        `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`
+    );
 }
 
 function startTalk4(){
-    openPopup("마녀", "이상형?\n.....설거지 잘하는 사람이 좋더라 ㅋㅋ", `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`);
+    talk4Step = 0;
+    renderDialogStep(
+        "마녀",
+        talk4Steps,
+        talk4Step,
+        "nextTalk4",
+        `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`
+    );
     localStorage.setItem(FLAG_TALK_UNLOCKED, "true");
 }
 
+function nextTalk4(){
+    talk4Step++;
+    renderDialogStep(
+        "마녀",
+        talk4Steps,
+        talk4Step,
+        "nextTalk4",
+        `<button class="choice-btn blue" onclick="openTalkMenu()">확인</button>`
+    );
+}
+
 function openGiftMenu(){
+
     openPopup(
         "선물주기",
         `
