@@ -1,157 +1,785 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RPG MAP EDITOR PRO</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#111;font-family:sans-serif;display:flex;justify-content:center}
-#panel{position:fixed;left:20px;top:20px;width:520px;background:#fff;padding:15px;border-radius:12px;z-index:9999}
-textarea{width:100%;height:220px}
-button{width:100%;margin-top:6px;padding:10px}
-.wrapper{position:relative;width:900px;margin-top:20px}
-.wrapper img{width:100%;display:block;pointer-events:none;user-select:none}
-.box{position:absolute;width:120px;height:120px;background:rgba(255,0,0,.25);border:2px dashed red;resize:both;overflow:hidden;cursor:move;transform-origin:center}
-.box.selected{border-color:#00e5ff}
-.rotate{position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:34px;height:34px;border-radius:50%;background:#fff;border:2px solid #333;display:flex;align-items:center;justify-content:center;cursor:grab}
-.rotate:after{content:"⟳"}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RPG MAP EDITOR FINAL PRO</title>
+  <style>
+    :root{
+      --panel-w: min(560px, calc(100vw - 24px));
+      --accent: #222;
+      --danger: #c62828;
+      --ok: #1565c0;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      overflow-x: hidden;
+      color: #222;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .panel {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      width: var(--panel-w);
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+      background: #fff;
+      padding: 14px;
+      border-radius: 14px;
+      z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .title b {
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .title small {
+      color: #666;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-row.three {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    button {
+      padding: 10px 12px;
+      cursor: pointer;
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform .05s ease, opacity .15s ease, background .15s ease;
+    }
+
+    button:hover { opacity: .95; }
+    button:active { transform: translateY(1px); }
+
+    button.secondary { background: #555; }
+    button.blue { background: var(--ok); }
+    button.red { background: var(--danger); }
+
+    textarea {
+      width: 100%;
+      height: 220px;
+      margin-top: 10px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      color: #111;
+      background: #fafafa;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #666;
+      line-height: 1.55;
+    }
+
+    .wrapper {
+      position: relative;
+      width: min(900px, 100vw);
+      margin-top: 20px;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .wrapper img {
+      width: 100%;
+      display: block;
+      pointer-events: none;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    .box {
+      position: absolute;
+      min-width: 30px;
+      min-height: 30px;
+      width: 120px;
+      height: 120px;
+      background: rgba(255, 0, 0, 0.22);
+      border: 2px dashed rgba(255, 0, 0, 0.95);
+      transform-origin: center center;
+      z-index: 10;
+      touch-action: none;
+      cursor: grab;
+      overflow: visible;
+    }
+
+    .box.dragging {
+      cursor: grabbing;
+    }
+
+    .box.selected {
+      outline: 3px solid rgba(21,101,192,.95);
+      outline-offset: 2px;
+    }
+
+    .label {
+      position: absolute;
+      left: 0;
+      top: -24px;
+      padding: 3px 8px;
+      background: rgba(0,0,0,.75);
+      color: #fff;
+      font-size: 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .rotate-handle,
+    .resize-handle {
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #333;
+      box-shadow: 0 2px 8px rgba(0,0,0,.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .rotate-handle {
+      top: -42px;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: grab;
+    }
+
+    .resize-handle {
+      right: -18px;
+      bottom: -18px;
+      cursor: nwse-resize;
+      font-size: 14px;
+    }
+
+    .rotate-handle::after { content: "⟲"; }
+    .resize-handle::after { content: "↘"; }
+
+    .footer-note {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #888;
+      line-height: 1.4;
+    }
+
+    code {
+      background: #f2f2f2;
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
+
+    @media (max-width: 720px) {
+      .panel {
+        left: 8px;
+        top: 8px;
+        width: calc(100vw - 16px);
+      }
+      .btn-row.three {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      textarea { height: 180px; }
+    }
+  </style>
 </head>
 <body>
-<div id="panel">
-<b>RPG MAP EDITOR PRO</b>
-<textarea id="out"></textarea>
-<button onclick="addBox()">➕ 오브젝트 추가</button>
-<button onclick="copyCss()">📋 복사</button>
-</div>
+  <div class="panel">
+    <div class="title">
+      <b>🎮 RPG MAP EDITOR FINAL PRO</b>
+      <small>드래그 · 크기조절 · 회전 · 삭제 · 실행취소/다시실행 · 레이어 정렬 · 퍼센트 저장</small>
+    </div>
 
-<div class="wrapper" id="map">
-<img src="images/cave_mage_bg.png">
-</div>
+    <div class="btn-row">
+      <button id="addBtn">➕ 오브젝트 추가</button>
+      <button id="copyBtn" class="blue">📋 복사</button>
+    </div>
 
-<script>
-const map=document.getElementById("map");
-const out=document.getElementById("out");
+    <div class="btn-row three">
+      <button id="undoBtn" class="secondary">↩ Undo</button>
+      <button id="redoBtn" class="secondary">↪ Redo</button>
+      <button id="dupBtn" class="secondary">⧉ 복제</button>
+    </div>
 
-let drag=null,rot=null,ox=0,oy=0,startA=0,startR=0;
-let selected=null;
-let clipboard=null;
+    <div class="btn-row three">
+      <button id="frontBtn">⤴ 맨앞</button>
+      <button id="backBtn">⤓ 맨뒤</button>
+      <button id="deleteBtn" class="red">🗑 삭제</button>
+    </div>
 
-function addBox(copy){
- let b=document.createElement("div");
- b.className="box";
- b.style.left=(copy?.left||100)+"px";
- b.style.top=(copy?.top||100)+"px";
- b.style.width=(copy?.w||120)+"px";
- b.style.height=(copy?.h||120)+"px";
- b.dataset.rotate=copy?.r||0;
- b.style.transform=`rotate(${b.dataset.rotate}deg)`;
- b.dataset.name=copy?.name||prompt("이름")||"object";
- let r=document.createElement("div");
- r.className="rotate";
- b.appendChild(r);
- map.appendChild(b);
- select(b);
+    <textarea id="output" placeholder="여기에 오브젝트 CSS가 출력됩니다."></textarea>
 
- new ResizeObserver(update).observe(b);
+    <div class="hint">
+      배경 이미지: <code>images/cave_mage_bg.png</code><br>
+      저장값: <b>퍼센트(%)</b> + 회전각도(deg)<br>
+      조작: 박스 클릭 선택 → 드래그 / 모서리 ↘로 크기조절 / ⟲로 회전 / Delete 삭제
+    </div>
+    <div class="footer-note">
+      모바일에서는 터치로도 동일하게 동작합니다. 선택된 박스는 파란 테두리로 표시됩니다.
+    </div>
+  </div>
 
- b.onmousedown=e=>{
-   if(e.target===r)return;
-   e.preventDefault();
-   select(b);
-   drag=b;
-   let rc=b.getBoundingClientRect();
-   ox=e.clientX-rc.left;
-   oy=e.clientY-rc.top;
- };
+  <div class="wrapper" id="map">
+    <img src="images/cave_mage_bg.png" alt="map background" />
+  </div>
 
- r.onmousedown=e=>{
-   e.preventDefault();e.stopPropagation();
-   select(b);
-   rot=b;
-   let rc=b.getBoundingClientRect();
-   let cx=rc.left+rc.width/2;
-   let cy=rc.top+rc.height/2;
-   startA=Math.atan2(e.clientY-cy,e.clientX-cx);
-   startR=parseFloat(b.dataset.rotate);
- };
- update();
-}
+  <script>
+    const map = document.getElementById("map");
+    const output = document.getElementById("output");
 
-function select(b){
- document.querySelectorAll(".box").forEach(x=>x.classList.remove("selected"));
- selected=b;
- if(b)b.classList.add("selected");
-}
+    const historyStack = [];
+    const redoStack = [];
+    const MAX_HISTORY = 80;
 
-document.onmousemove=e=>{
- let rc=map.getBoundingClientRect();
- if(drag){
-  drag.style.left=(e.clientX-rc.left-ox)+"px";
-  drag.style.top=(e.clientY-rc.top-oy)+"px";
-  update();
- }
- if(rot){
-  let r=rot.getBoundingClientRect();
-  let cx=r.left+r.width/2;
-  let cy=r.top+r.height/2;
-  let ang=Math.atan2(e.clientY-cy,e.clientX-cx);
-  let deg=startR+(ang-startA)*180/Math.PI;
-  rot.dataset.rotate=deg;
-  rot.style.transform=`rotate(${deg}deg)`;
-  update();
- }
-};
-document.onmouseup=()=>{drag=null;rot=null;}
+    let selectedBox = null;
 
-function pct(v,t){return (v/t*100).toFixed(2)}
+    let dragState = null;
+    let rotateState = null;
+    let resizeState = null;
 
-function update(){
- let mw=map.clientWidth,mh=map.clientHeight,s="";
- document.querySelectorAll(".box").forEach(b=>{
-  s+=`/* ${b.dataset.name} */\n.${b.dataset.name}{\n`;
-  s+=` left:${pct(parseFloat(b.style.left),mw)}%;\n`;
-  s+=` top:${pct(parseFloat(b.style.top),mh)}%;\n`;
-  s+=` width:${pct(b.offsetWidth,mw)}%;\n`;
-  s+=` height:${pct(b.offsetHeight,mh)}%;\n`;
-  s+=` transform:rotate(${parseFloat(b.dataset.rotate).toFixed(2)}deg);\n}\n\n`;
- });
- out.value=s;
-}
+    let idSeq = 1;
 
-async function copyCss(){
- try{await navigator.clipboard.writeText(out.value);}
- catch{out.select();document.execCommand("copy");}
- alert("복사 완료");
-}
+    function uid() {
+      return "obj_" + (Date.now().toString(36) + "_" + (idSeq++)).toLowerCase();
+    }
 
-document.onkeydown=e=>{
- if(!selected)return;
- if(e.key==="Delete"){
-   selected.remove();selected=null;update();
- }
- if(e.ctrlKey&&e.key.toLowerCase()==="c"){
-   clipboard={
-    left:parseFloat(selected.style.left),
-    top:parseFloat(selected.style.top),
-    w:selected.offsetWidth,
-    h:selected.offsetHeight,
-    r:parseFloat(selected.dataset.rotate),
-    name:selected.dataset.name+"_copy"
-   };
-   e.preventDefault();
- }
- if(e.ctrlKey&&e.key.toLowerCase()==="v"&&clipboard){
-   let c={...clipboard,left:clipboard.left+20,top:clipboard.top+20};
-   addBox(c);
-   e.preventDefault();
- }
- if(e.key==="]"){selected.style.zIndex=(+selected.style.zIndex||1)+1;}
- if(e.key==="["){selected.style.zIndex=(+selected.style.zIndex||1)-1;}
-};
+    function getMapSize() {
+      return {
+        w: map.clientWidth || 1,
+        h: map.clientHeight || 1
+      };
+    }
 
-window.onresize=update;
-</script>
+    function pxToPercent(px, total) {
+      return total ? (px / total) * 100 : 0;
+    }
+
+    function percentToPx(percent, total) {
+      return (percent / 100) * total;
+    }
+
+    function round2(n) {
+      return Math.round(n * 100) / 100;
+    }
+
+    function saveHistory() {
+      const state = serializeState();
+      const last = historyStack[historyStack.length - 1];
+      const current = JSON.stringify(state);
+      if (last && JSON.stringify(last) === current) return;
+      historyStack.push(state);
+      if (historyStack.length > MAX_HISTORY) historyStack.shift();
+      redoStack.length = 0;
+    }
+
+    function serializeState() {
+      const boxes = [...map.querySelectorAll(".box")];
+      return boxes.map(b => ({
+        id: b.dataset.id,
+        name: b.dataset.name,
+        left: b.dataset.left,
+        top: b.dataset.top,
+        width: b.dataset.width,
+        height: b.dataset.height,
+        rotate: b.dataset.rotate,
+        z: b.dataset.z
+      }));
+    }
+
+    function applyState(state, { keepSelection = false } = {}) {
+      const existing = new Map();
+      [...map.querySelectorAll(".box")].forEach(b => existing.set(b.dataset.id, b));
+
+      existing.forEach(b => b.remove());
+
+      state.forEach(item => {
+        const box = createBoxElement(item);
+        map.appendChild(box);
+      });
+
+      if (!keepSelection) clearSelection();
+      updateOutput();
+    }
+
+    function undo() {
+      if (historyStack.length <= 1) return;
+      const current = historyStack.pop();
+      redoStack.push(current);
+      const prev = historyStack[historyStack.length - 1];
+      applyState(prev);
+    }
+
+    function redo() {
+      if (redoStack.length === 0) return;
+      const state = redoStack.pop();
+      historyStack.push(state);
+      applyState(state);
+    }
+
+    function clearSelection() {
+      if (selectedBox) selectedBox.classList.remove("selected");
+      selectedBox = null;
+    }
+
+    function selectBox(box) {
+      if (selectedBox && selectedBox !== box) {
+        selectedBox.classList.remove("selected");
+      }
+      selectedBox = box;
+      if (selectedBox) selectedBox.classList.add("selected");
+    }
+
+    function createBoxElement(data) {
+      const box = document.createElement("div");
+      box.className = "box";
+      box.dataset.id = data?.id || uid();
+      box.dataset.name = data?.name || "object";
+      box.dataset.left = data?.left ?? "10";
+      box.dataset.top = data?.top ?? "10";
+      box.dataset.width = data?.width ?? "13.33";
+      box.dataset.height = data?.height ?? "13.33";
+      box.dataset.rotate = data?.rotate ?? "0";
+      box.dataset.z = data?.z ?? "10";
+
+      const { w, h } = getMapSize();
+
+      const leftPx = percentToPx(parseFloat(box.dataset.left), w);
+      const topPx = percentToPx(parseFloat(box.dataset.top), h);
+      const widthPx = percentToPx(parseFloat(box.dataset.width), w);
+      const heightPx = percentToPx(parseFloat(box.dataset.height), h);
+
+      box.style.left = leftPx + "px";
+      box.style.top = topPx + "px";
+      box.style.width = Math.max(30, widthPx) + "px";
+      box.style.height = Math.max(30, heightPx) + "px";
+      box.style.transform = `rotate(${parseFloat(box.dataset.rotate || "0")}deg)`;
+      box.style.zIndex = box.dataset.z || "10";
+
+      const label = document.createElement("div");
+      label.className = "label";
+      label.textContent = box.dataset.name;
+      box.appendChild(label);
+
+      const rotateHandle = document.createElement("div");
+      rotateHandle.className = "rotate-handle";
+      box.appendChild(rotateHandle);
+
+      const resizeHandle = document.createElement("div");
+      resizeHandle.className = "resize-handle";
+      box.appendChild(resizeHandle);
+
+      bindBoxEvents(box, rotateHandle, resizeHandle);
+      return box;
+    }
+
+    function addBox() {
+      const box = createBoxElement({
+        id: uid(),
+        name: prompt("이름 입력") || "object",
+        left: "10",
+        top: "10",
+        width: "13.33",
+        height: "13.33",
+        rotate: "0",
+        z: String(getTopZ() + 1)
+      });
+
+      map.appendChild(box);
+      selectBox(box);
+      saveHistory();
+      updateOutput();
+    }
+
+    function getTopZ() {
+      const boxes = [...map.querySelectorAll(".box")];
+      let maxZ = 10;
+      boxes.forEach(b => {
+        const z = parseInt(b.dataset.z || "10", 10);
+        if (z > maxZ) maxZ = z;
+      });
+      return maxZ;
+    }
+
+    function bringToFront() {
+      if (!selectedBox) return;
+      selectedBox.dataset.z = String(getTopZ() + 1);
+      selectedBox.style.zIndex = selectedBox.dataset.z;
+      saveHistory();
+      updateOutput();
+    }
+
+    function sendToBack() {
+      if (!selectedBox) return;
+      const boxes = [...map.querySelectorAll(".box")];
+      const minZ = Math.min(...boxes.map(b => parseInt(b.dataset.z || "10", 10)));
+      selectedBox.dataset.z = String(minZ - 1);
+      selectedBox.style.zIndex = selectedBox.dataset.z;
+      saveHistory();
+      updateOutput();
+    }
+
+    function duplicateSelected() {
+      if (!selectedBox) return;
+      const data = getBoxData(selectedBox);
+      data.id = uid();
+      data.name = data.name + "_copy";
+      data.left = String(Math.min(90, parseFloat(data.left) + 3));
+      data.top = String(Math.min(90, parseFloat(data.top) + 3));
+      data.z = String(getTopZ() + 1);
+
+      const box = createBoxElement(data);
+      map.appendChild(box);
+      selectBox(box);
+      saveHistory();
+      updateOutput();
+    }
+
+    function deleteSelected() {
+      if (!selectedBox) return;
+      selectedBox.remove();
+      clearSelection();
+      saveHistory();
+      updateOutput();
+    }
+
+    function getBoxData(box) {
+      return {
+        id: box.dataset.id,
+        name: box.dataset.name,
+        left: box.dataset.left,
+        top: box.dataset.top,
+        width: box.dataset.width,
+        height: box.dataset.height,
+        rotate: box.dataset.rotate,
+        z: box.dataset.z
+      };
+    }
+
+    function bindBoxEvents(box, rotateHandle, resizeHandle) {
+      box.addEventListener("pointerdown", (e) => {
+        if (e.target === rotateHandle || e.target === resizeHandle) return;
+        e.preventDefault();
+        selectBox(box);
+        box.classList.add("dragging");
+        box.setPointerCapture(e.pointerId);
+
+        const startLeft = parseFloat(box.style.left);
+        const startTop = parseFloat(box.style.top);
+
+        dragState = {
+          box,
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          startLeft,
+          startTop
+        };
+      });
+
+      rotateHandle.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        selectBox(box);
+        rotateHandle.setPointerCapture(e.pointerId);
+
+        const rect = box.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+
+        rotateState = {
+          box,
+          pointerId: e.pointerId,
+          centerX: cx,
+          centerY: cy,
+          startAngle: Math.atan2(e.clientY - cy, e.clientX - cx),
+          startRotate: parseFloat(box.dataset.rotate || "0")
+        };
+      });
+
+      resizeHandle.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        selectBox(box);
+        resizeHandle.setPointerCapture(e.pointerId);
+
+        const rect = box.getBoundingClientRect();
+        resizeState = {
+          box,
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          startWidth: rect.width,
+          startHeight: rect.height
+        };
+      });
+
+      box.addEventListener("click", (e) => {
+        if (e.target === rotateHandle || e.target === resizeHandle) return;
+        selectBox(box);
+      });
+    }
+
+    document.addEventListener("pointermove", (e) => {
+      const { w: mapW, h: mapH } = getMapSize();
+
+      if (dragState && dragState.pointerId === e.pointerId) {
+        const dx = e.clientX - dragState.startX;
+        const dy = e.clientY - dragState.startY;
+
+        const newLeft = dragState.startLeft + dx;
+        const newTop = dragState.startTop + dy;
+
+        dragState.box.style.left = newLeft + "px";
+        dragState.box.style.top = newTop + "px";
+
+        dragState.box.dataset.left = String(round2(pxToPercent(newLeft, mapW)));
+        dragState.box.dataset.top = String(round2(pxToPercent(newTop, mapH)));
+
+        updateOutput();
+      }
+
+      if (rotateState && rotateState.pointerId === e.pointerId) {
+        const currentAngle = Math.atan2(e.clientY - rotateState.centerY, e.clientX - rotateState.centerX);
+        const delta = currentAngle - rotateState.startAngle;
+        const finalAngle = rotateState.startRotate + delta * (180 / Math.PI);
+
+        rotateState.box.style.transform = `rotate(${finalAngle}deg)`;
+        rotateState.box.dataset.rotate = String(round2(finalAngle));
+
+        updateOutput();
+      }
+
+      if (resizeState && resizeState.pointerId === e.pointerId) {
+        const dx = e.clientX - resizeState.startX;
+        const dy = e.clientY - resizeState.startY;
+
+        let newWidth = resizeState.startWidth + dx;
+        let newHeight = resizeState.startHeight + dy;
+
+        newWidth = Math.max(30, newWidth);
+        newHeight = Math.max(30, newHeight);
+
+        resizeState.box.style.width = newWidth + "px";
+        resizeState.box.style.height = newHeight + "px";
+
+        resizeState.box.dataset.width = String(round2(pxToPercent(newWidth, mapW)));
+        resizeState.box.dataset.height = String(round2(pxToPercent(newHeight, mapH)));
+
+        updateOutput();
+      }
+    });
+
+    document.addEventListener("pointerup", (e) => {
+      if (dragState && dragState.pointerId === e.pointerId) {
+        dragState.box.classList.remove("dragging");
+        dragState = null;
+        saveHistory();
+        updateOutput();
+      }
+
+      if (rotateState && rotateState.pointerId === e.pointerId) {
+        rotateState = null;
+        saveHistory();
+        updateOutput();
+      }
+
+      if (resizeState && resizeState.pointerId === e.pointerId) {
+        resizeState = null;
+        saveHistory();
+        updateOutput();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      const isMac = navigator.platform.toUpperCase().includes("MAC");
+      const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (selectedBox) {
+          e.preventDefault();
+          deleteSelected();
+        }
+      }
+
+      if (ctrlOrCmd && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        if (e.shiftKey) redo();
+        else undo();
+      }
+
+      if (ctrlOrCmd && e.key.toLowerCase() === "y") {
+        e.preventDefault();
+        redo();
+      }
+
+      if (ctrlOrCmd && e.key.toLowerCase() === "d") {
+        if (selectedBox) {
+          e.preventDefault();
+          duplicateSelected();
+        }
+      }
+
+      if (e.key === "Escape") {
+        clearSelection();
+        updateOutput();
+      }
+
+      if (ctrlOrCmd && e.key === "[" && selectedBox) {
+        e.preventDefault();
+        sendToBack();
+      }
+
+      if (ctrlOrCmd && e.key === "]" && selectedBox) {
+        e.preventDefault();
+        bringToFront();
+      }
+    });
+
+    function updateOutput() {
+      const boxes = [...map.querySelectorAll(".box")];
+      boxes.sort((a, b) => (parseInt(a.dataset.z || "10", 10) - parseInt(b.dataset.z || "10", 10)));
+
+      let result = "";
+      boxes.forEach((b) => {
+        const name = b.dataset.name || "object";
+        const left = b.dataset.left ?? "0";
+        const top = b.dataset.top ?? "0";
+        const width = b.dataset.width ?? "0";
+        const height = b.dataset.height ?? "0";
+        const rot = b.dataset.rotate ?? "0";
+
+        result += `/* ${name} */\n`;
+        result += `.${name}{\n`;
+        result += `  left:${left}%;\n`;
+        result += `  top:${top}%;\n`;
+        result += `  width:${width}%;\n`;
+        result += `  height:${height}%;\n`;
+        result += `  transform:rotate(${rot}deg);\n`;
+        result += `}\n\n`;
+      });
+
+      output.value = result.trimEnd();
+    }
+
+    async function copyCode() {
+      try {
+        await navigator.clipboard.writeText(output.value);
+        alert("복사 완료!");
+      } catch {
+        output.select();
+        document.execCommand("copy");
+        alert("복사 완료!");
+      }
+    }
+
+    function fitAllBoxesToMap() {
+      [...map.querySelectorAll(".box")].forEach(box => {
+        const { w, h } = getMapSize();
+        const left = percentToPx(parseFloat(box.dataset.left || "0"), w);
+        const top = percentToPx(parseFloat(box.dataset.top || "0"), h);
+        const width = percentToPx(parseFloat(box.dataset.width || "0"), w);
+        const height = percentToPx(parseFloat(box.dataset.height || "0"), h);
+
+        box.style.left = left + "px";
+        box.style.top = top + "px";
+        box.style.width = Math.max(30, width) + "px";
+        box.style.height = Math.max(30, height) + "px";
+      });
+      updateOutput();
+    }
+
+    function loadSavedStateIfAny() {
+      const saved = localStorage.getItem("rpg_map_editor_state");
+      if (!saved) return;
+      try {
+        const state = JSON.parse(saved);
+        if (Array.isArray(state) && state.length) {
+          applyState(state);
+          historyStack.length = 0;
+          historyStack.push(JSON.parse(JSON.stringify(state)));
+        }
+      } catch (e) {}
+    }
+
+    function persistState() {
+      localStorage.setItem("rpg_map_editor_state", JSON.stringify(serializeState()));
+    }
+
+    document.getElementById("addBtn").addEventListener("click", addBox);
+    document.getElementById("copyBtn").addEventListener("click", copyCode);
+    document.getElementById("undoBtn").addEventListener("click", undo);
+    document.getElementById("redoBtn").addEventListener("click", redo);
+    document.getElementById("dupBtn").addEventListener("click", duplicateSelected);
+    document.getElementById("frontBtn").addEventListener("click", bringToFront);
+    document.getElementById("backBtn").addEventListener("click", sendToBack);
+    document.getElementById("deleteBtn").addEventListener("click", deleteSelected);
+
+    map.addEventListener("pointerdown", (e) => {
+      if (e.target === map || e.target.tagName === "IMG") {
+        clearSelection();
+        updateOutput();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      fitAllBoxesToMap();
+      persistState();
+    });
+
+    window.addEventListener("beforeunload", persistState);
+
+    // 초기 상태
+    loadSavedStateIfAny();
+    if (historyStack.length === 0) {
+      historyStack.push(serializeState());
+    }
+    fitAllBoxesToMap();
+    updateOutput();
+  </script>
 </body>
 </html>
