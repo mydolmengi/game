@@ -1,126 +1,631 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>애기미를 구해라!</title>
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>RPG MAP EDITOR FINAL PRO</title>
+
+​
 
 <style>
-@font-face {
-    font-family: 'GmarketSans';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
 
 body{
-    background:#ffd6e7;
+
+    margin:0;
+
+    background:#111;
+
     display:flex;
+
     justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    font-family:'GmarketSans', sans-serif;
+
+    font-family:sans-serif;
+
 }
 
-.cover-container{
+​
+
+/* ======================
+
+   MAP
+
+====================== */
+
+.wrapper{
+
     position:relative;
-    width:100%;
-    max-width:700px;
+
+    width:900px;
+
+    margin-top:20px;
+
 }
 
-.cover{
+​
+
+.wrapper img{
+
     width:100%;
+
     display:block;
-    border-radius:20px;
+
 }
 
-.start-btn{
+​
+
+/* ======================
+
+   BOX (PX 안정 버전)
+
+====================== */
+
+.box{
+
     position:absolute;
-    bottom:105px;
+
+​
+
+    width:120px;
+
+    height:120px;
+
+​
+
+    background:rgba(255,0,0,0.25);
+
+    border:2px dashed red;
+
+​
+
+    cursor:grab;
+
+​
+
+    resize: both;
+
+    overflow: hidden;
+
+​
+
+    min-width:30px;
+
+    min-height:30px;
+
+​
+
+    transform-origin:center;
+
+​
+
+    will-change: left, top, width, height, transform;
+
+}
+
+​
+
+/* ======================
+
+   🔄 ROTATE ICON (BIG FIX)
+
+====================== */
+
+.rotate-icon{
+
+    position:absolute;
+
+​
+
+    top:-30px;
+
     left:50%;
+
     transform:translateX(-50%);
-    background:linear-gradient(180deg, #ff9fd2, #ff6fb5);
-    color:white;
-    border:4px solid white;
-    border-radius:999px;
-    padding:12px 35px;
-    font-size:20px;
-    font-weight:bold;
+
+​
+
+    width:36px;
+
+    height:36px;
+
+​
+
+    background:white;
+
+    border:2px solid #333;
+
+    border-radius:50%;
+
+​
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+​
+
+    font-size:22px;
+
+    cursor:grab;
+
+​
+
+    box-shadow:0 2px 8px rgba(0,0,0,0.4);
+
+    user-select:none;
+
+}
+
+​
+
+.rotate-icon::after{
+
+    content:"🔄";
+
+}
+
+​
+
+/* ======================
+
+   PANEL
+
+====================== */
+
+#panel{
+
+    position:fixed;
+
+    top:20px;
+
+    left:20px;
+
+​
+
+    width:520px;
+
+    background:white;
+
+    padding:18px;
+
+    border-radius:12px;
+
+    z-index:999;
+
+}
+
+​
+
+textarea{
+
+    width:100%;
+
+    height:240px;
+
+    margin-top:10px;
+
+}
+
+​
+
+button{
+
+    width:100%;
+
+    padding:10px;
+
+    margin-top:8px;
+
     cursor:pointer;
-    box-shadow:0 0 20px rgba(255,105,180,0.8);
-    transition:0.2s;
+
 }
 
-.start-btn:hover{
-    transform:translateX(-50%) scale(1.05);
-}
-
-.start-btn:active{
-    transform:translateX(-50%) scale(0.95);
-}
-
-@media (max-width: 600px){
-    .title{
-        font-size:30px;
-    }
-
-    .story{
-        font-size:18px;
-        line-height:1.8;
-    }
-
-    .story-box{
-        padding:25px 20px;
-    }
-
-    .start-btn{
-        padding:12px 30px;
-        font-size:18px;
-    }
-}
 </style>
+
 </head>
+
+​
+
 <body>
 
-<div class="cover-container">
-    <img src="images/cover.png" class="cover" alt="애기미를 구해라!">
+​
 
-    <button class="start-btn" onclick="location.href='story.html'">
-        💖 시작하기
-    </button>
+<!-- ======================
+
+   PANEL
+
+====================== -->
+
+<div id="panel">
+
+<b>🎮 RPG MAP EDITOR FINAL PRO</b>
+
+​
+
+<textarea id="output"></textarea>
+
+​
+
+<button onclick="addBox()">➕ 오브젝트 추가</button>
+
+<button onclick="copyCode()">📋 복사</button>
+
 </div>
 
+​
+
+<!-- ======================
+
+   MAP
+
+====================== -->
+
+<div class="wrapper" id="map">
+
+    <img src="images/cave_mage_bg.png">
+
+</div>
+
+​
+
 <script>
-let clickCount = 0;
-let clickTimer = null;
 
-document.body.addEventListener("click", function (e) {
-    // 시작하기 버튼은 제외
-    if (e.target.closest(".start-btn")) return;
+​
 
-    clickCount++;
+let activeBox = null;
 
-    if (clickCount === 1) {
-        clickTimer = setTimeout(() => {
-            clickCount = 0;
-            clickTimer = null;
-        }, 1500);
+let activeRotateBox = null;
+
+​
+
+let offsetX = 0;
+
+let offsetY = 0;
+
+​
+
+/* ======================
+
+   CREATE
+
+====================== */
+
+function addBox(){
+
+​
+
+    const box = document.createElement("div");
+
+    box.className = "box";
+
+​
+
+    box.style.left = "100px";
+
+    box.style.top = "100px";
+
+​
+
+    box.dataset.name = prompt("이름 입력") || "object";
+
+    box.dataset.rotate = 0;
+
+​
+
+    const icon = document.createElement("div");
+
+    icon.className = "rotate-icon";
+
+​
+
+    box.appendChild(icon);
+
+    document.getElementById("map").appendChild(box);
+
+​
+
+    enableDrag(box);
+
+    enableRotate(icon, box);
+
+}
+
+​
+
+/* ======================
+
+   DRAG (PX FIX)
+
+====================== */
+
+function enableDrag(box){
+
+​
+
+    box.addEventListener("mousedown",(e)=>{
+
+​
+
+        if(e.target.classList.contains("rotate-icon")) return;
+
+​
+
+        activeBox = box;
+
+​
+
+        const rect = box.getBoundingClientRect();
+
+​
+
+        offsetX = e.clientX - rect.left;
+
+        offsetY = e.clientY - rect.top;
+
+    });
+
+}
+
+​
+
+/* ======================
+
+   ROTATE (STABLE FIX)
+
+====================== */
+
+let startAngle = 0;
+
+let startRotate = 0;
+
+​
+
+function enableRotate(icon, box){
+
+​
+
+    icon.addEventListener("mousedown",(e)=>{
+
+​
+
+        activeRotateBox = box;
+
+​
+
+        const r = box.getBoundingClientRect();
+
+​
+
+        const cx = r.left + r.width / 2;
+
+        const cy = r.top + r.height / 2;
+
+​
+
+        startAngle =
+
+        Math.atan2(e.clientY - cy, e.clientX - cx);
+
+​
+
+        startRotate =
+
+        parseFloat(box.dataset.rotate || 0);
+
+​
+
+        e.stopPropagation();
+
+    });
+
+}
+
+​
+
+/* ======================
+
+   MOVE + ROTATE
+
+====================== */
+
+document.addEventListener("mousemove",(e)=>{
+
+​
+
+    const map = document.getElementById("map");
+
+    const rect = map.getBoundingClientRect();
+
+​
+
+    /* DRAG */
+
+    if(activeBox){
+
+​
+
+        let x = e.clientX - rect.left - offsetX;
+
+        let y = e.clientY - rect.top - offsetY;
+
+​
+
+        activeBox.style.left = x + "px";
+
+        activeBox.style.top = y + "px";
+
+​
+
+        updateOutput();
+
     }
 
-    if (clickCount >= 7) {
-        clearTimeout(clickTimer);
-        clickCount = 0;
-        clickTimer = null;
-        localStorage.clear();
-        alert("게임 진행 상태를 초기화했어!");
+​
+
+    /* ROTATE */
+
+    if(activeRotateBox){
+
+​
+
+        const r = activeRotateBox.getBoundingClientRect();
+
+​
+
+        const cx = r.left + r.width / 2;
+
+        const cy = r.top + r.height / 2;
+
+​
+
+        const currentAngle =
+
+        Math.atan2(e.clientY - cy, e.clientX - cx);
+
+​
+
+        let delta = currentAngle - startAngle;
+
+​
+
+        let finalAngle =
+
+        startRotate + delta * (180 / Math.PI);
+
+​
+
+        activeRotateBox.style.transform =
+
+        `rotate(${finalAngle}deg)`;
+
+​
+
+        activeRotateBox.dataset.rotate = finalAngle;
+
+​
+
+        updateOutput();
+
     }
+
 });
+
+​
+
+document.addEventListener("mouseup",()=>{
+
+​
+
+    activeBox = null;
+
+    activeRotateBox = null;
+
+});
+
+​
+
+/* ======================
+
+   OUTPUT
+
+====================== */
+
+function updateOutput(){
+
+​
+
+    const boxes = document.querySelectorAll(".box");
+
+    const map = document.getElementById("map").getBoundingClientRect();
+
+​
+
+    let result = "";
+
+​
+
+    boxes.forEach((b)=>{
+
+​
+
+        const rect = b.getBoundingClientRect();
+
+​
+
+        let x = rect.left - map.left;
+
+        let y = rect.top - map.top;
+
+        let w = rect.width;
+
+        let h = rect.height;
+
+​
+
+        let rot = b.dataset.rotate || 0;
+
+        let name = b.dataset.name;
+
+​
+
+        result += `/* ${name} */\n`;
+
+        result += `.${name}{
+
+  left:${x}px;
+
+  top:${y}px;
+
+  width:${w}px;
+
+  height:${h}px;
+
+  transform:rotate(${rot}deg);
+
+}\n\n`;
+
+    });
+
+​
+
+    document.getElementById("output").value = result;
+
+}
+
+​
+
+/* ======================
+
+   COPY
+
+====================== */
+
+function copyCode(){
+
+​
+
+    const t = document.getElementById("output");
+
+    t.select();
+
+    document.execCommand("copy");
+
+​
+
+    alert("복사 완료!");
+
+}
+
+​
+
 </script>
 
+​
+
 </body>
+
 </html>
