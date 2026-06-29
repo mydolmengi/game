@@ -1,307 +1,157 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RPG MAP EDITOR FINAL PRO</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: #111;
-      color: #222;
-      display: flex;
-      justify-content: center;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    }
-
-    .panel {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      width: min(520px, calc(100vw - 40px));
-      background: #fff;
-      padding: 18px;
-      border-radius: 12px;
-      z-index: 9999;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-
-    .panel b {
-      display: inline-block;
-      margin-bottom: 10px;
-    }
-
-    textarea {
-      width: 100%;
-      height: 240px;
-      margin-top: 10px;
-      resize: vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 13px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      cursor: pointer;
-      border: 0;
-      border-radius: 8px;
-      background: #222;
-      color: #fff;
-      font-size: 14px;
-    }
-
-    button:hover { background: #000; }
-
-    .wrapper {
-      position: relative;
-      width: min(900px, 100vw);
-      margin-top: 20px;
-      user-select: none;
-    }
-
-    .wrapper img {
-      width: 100%;
-      display: block;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .box {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      background: rgba(255, 0, 0, 0.25);
-      border: 2px dashed red;
-      cursor: grab;
-      resize: both;
-      overflow: hidden;
-      min-width: 30px;
-      min-height: 30px;
-      transform-origin: center center;
-      z-index: 10;
-      touch-action: none;
-    }
-
-    .box:active { cursor: grabbing; }
-
-    .rotate-icon {
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 36px;
-      height: 36px;
-      background: white;
-      border: 2px solid #333;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      cursor: grab;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      user-select: none;
-      touch-action: none;
-    }
-
-    .rotate-icon::after { content: "⟲"; }
-
-    .hint {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #555;
-      line-height: 1.5;
-    }
-
-    .small {
-      color: #777;
-      font-size: 12px;
-      margin-top: 6px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RPG MAP EDITOR PRO</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#111;font-family:sans-serif;display:flex;justify-content:center}
+#panel{position:fixed;left:20px;top:20px;width:520px;background:#fff;padding:15px;border-radius:12px;z-index:9999}
+textarea{width:100%;height:220px}
+button{width:100%;margin-top:6px;padding:10px}
+.wrapper{position:relative;width:900px;margin-top:20px}
+.wrapper img{width:100%;display:block;pointer-events:none;user-select:none}
+.box{position:absolute;width:120px;height:120px;background:rgba(255,0,0,.25);border:2px dashed red;resize:both;overflow:hidden;cursor:move;transform-origin:center}
+.box.selected{border-color:#00e5ff}
+.rotate{position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:34px;height:34px;border-radius:50%;background:#fff;border:2px solid #333;display:flex;align-items:center;justify-content:center;cursor:grab}
+.rotate:after{content:"⟳"}
+</style>
 </head>
 <body>
+<div id="panel">
+<b>RPG MAP EDITOR PRO</b>
+<textarea id="out"></textarea>
+<button onclick="addBox()">➕ 오브젝트 추가</button>
+<button onclick="copyCss()">📋 복사</button>
+</div>
 
-  <div class="panel">
-    <b>🎮 RPG MAP EDITOR FINAL PRO</b>
-    <textarea id="output" placeholder="여기에 오브젝트 CSS가 출력됩니다."></textarea>
-    <button id="addBtn">➕ 오브젝트 추가</button>
-    <button id="copyBtn">📋 복사</button>
-    <div class="hint">
-      배경 이미지: <code>images/cave_mage_bg.png</code><br>
-      출력값은 <b>퍼센트(%)</b> 기준입니다.
-    </div>
-    <div class="small">모바일 플레이용으로 위치/크기 저장이 더 안정적입니다.</div>
-  </div>
+<div class="wrapper" id="map">
+<img src="images/cave_mage_bg.png">
+</div>
 
-  <div class="wrapper" id="map">
-    <img src="images/cave_mage_bg.png" alt="map background" />
-  </div>
+<script>
+const map=document.getElementById("map");
+const out=document.getElementById("out");
 
-  <script>
-    let activeBox = null;
-    let activeRotateBox = null;
-    let offsetX = 0;
-    let offsetY = 0;
-    let startAngle = 0;
-    let startRotate = 0;
+let drag=null,rot=null,ox=0,oy=0,startA=0,startR=0;
+let selected=null;
+let clipboard=null;
 
-    const map = document.getElementById("map");
-    const output = document.getElementById("output");
+function addBox(copy){
+ let b=document.createElement("div");
+ b.className="box";
+ b.style.left=(copy?.left||100)+"px";
+ b.style.top=(copy?.top||100)+"px";
+ b.style.width=(copy?.w||120)+"px";
+ b.style.height=(copy?.h||120)+"px";
+ b.dataset.rotate=copy?.r||0;
+ b.style.transform=`rotate(${b.dataset.rotate}deg)`;
+ b.dataset.name=copy?.name||prompt("이름")||"object";
+ let r=document.createElement("div");
+ r.className="rotate";
+ b.appendChild(r);
+ map.appendChild(b);
+ select(b);
 
-    document.getElementById("addBtn").addEventListener("click", addBox);
-    document.getElementById("copyBtn").addEventListener("click", copyCode);
+ new ResizeObserver(update).observe(b);
 
-    function addBox() {
-      const box = document.createElement("div");
-      box.className = "box";
-      box.style.left = "100px";
-      box.style.top = "100px";
-      box.dataset.name = prompt("이름 입력") || "object";
-      box.dataset.rotate = "0";
+ b.onmousedown=e=>{
+   if(e.target===r)return;
+   e.preventDefault();
+   select(b);
+   drag=b;
+   let rc=b.getBoundingClientRect();
+   ox=e.clientX-rc.left;
+   oy=e.clientY-rc.top;
+ };
 
-      const icon = document.createElement("div");
-      icon.className = "rotate-icon";
-      box.appendChild(icon);
+ r.onmousedown=e=>{
+   e.preventDefault();e.stopPropagation();
+   select(b);
+   rot=b;
+   let rc=b.getBoundingClientRect();
+   let cx=rc.left+rc.width/2;
+   let cy=rc.top+rc.height/2;
+   startA=Math.atan2(e.clientY-cy,e.clientX-cx);
+   startR=parseFloat(b.dataset.rotate);
+ };
+ update();
+}
 
-      map.appendChild(box);
+function select(b){
+ document.querySelectorAll(".box").forEach(x=>x.classList.remove("selected"));
+ selected=b;
+ if(b)b.classList.add("selected");
+}
 
-      enableDrag(box);
-      enableRotate(icon, box);
-      observeResize(box);
-      updateOutput();
-    }
+document.onmousemove=e=>{
+ let rc=map.getBoundingClientRect();
+ if(drag){
+  drag.style.left=(e.clientX-rc.left-ox)+"px";
+  drag.style.top=(e.clientY-rc.top-oy)+"px";
+  update();
+ }
+ if(rot){
+  let r=rot.getBoundingClientRect();
+  let cx=r.left+r.width/2;
+  let cy=r.top+r.height/2;
+  let ang=Math.atan2(e.clientY-cy,e.clientX-cx);
+  let deg=startR+(ang-startA)*180/Math.PI;
+  rot.dataset.rotate=deg;
+  rot.style.transform=`rotate(${deg}deg)`;
+  update();
+ }
+};
+document.onmouseup=()=>{drag=null;rot=null;}
 
-    function enableDrag(box) {
-      box.addEventListener("mousedown", (e) => {
-        if (e.target.classList.contains("rotate-icon")) return;
-        e.preventDefault();
+function pct(v,t){return (v/t*100).toFixed(2)}
 
-        activeBox = box;
-        const rect = box.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        box.style.zIndex = 9999;
-      });
-    }
+function update(){
+ let mw=map.clientWidth,mh=map.clientHeight,s="";
+ document.querySelectorAll(".box").forEach(b=>{
+  s+=`/* ${b.dataset.name} */\n.${b.dataset.name}{\n`;
+  s+=` left:${pct(parseFloat(b.style.left),mw)}%;\n`;
+  s+=` top:${pct(parseFloat(b.style.top),mh)}%;\n`;
+  s+=` width:${pct(b.offsetWidth,mw)}%;\n`;
+  s+=` height:${pct(b.offsetHeight,mh)}%;\n`;
+  s+=` transform:rotate(${parseFloat(b.dataset.rotate).toFixed(2)}deg);\n}\n\n`;
+ });
+ out.value=s;
+}
 
-    function enableRotate(icon, box) {
-      icon.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+async function copyCss(){
+ try{await navigator.clipboard.writeText(out.value);}
+ catch{out.select();document.execCommand("copy");}
+ alert("복사 완료");
+}
 
-        activeRotateBox = box;
+document.onkeydown=e=>{
+ if(!selected)return;
+ if(e.key==="Delete"){
+   selected.remove();selected=null;update();
+ }
+ if(e.ctrlKey&&e.key.toLowerCase()==="c"){
+   clipboard={
+    left:parseFloat(selected.style.left),
+    top:parseFloat(selected.style.top),
+    w:selected.offsetWidth,
+    h:selected.offsetHeight,
+    r:parseFloat(selected.dataset.rotate),
+    name:selected.dataset.name+"_copy"
+   };
+   e.preventDefault();
+ }
+ if(e.ctrlKey&&e.key.toLowerCase()==="v"&&clipboard){
+   let c={...clipboard,left:clipboard.left+20,top:clipboard.top+20};
+   addBox(c);
+   e.preventDefault();
+ }
+ if(e.key==="]"){selected.style.zIndex=(+selected.style.zIndex||1)+1;}
+ if(e.key==="["){selected.style.zIndex=(+selected.style.zIndex||1)-1;}
+};
 
-        const r = box.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-
-        startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
-        startRotate = parseFloat(box.dataset.rotate || "0");
-        box.style.zIndex = 9999;
-      });
-    }
-
-    function observeResize(box) {
-      const ro = new ResizeObserver(() => {
-        updateOutput();
-      });
-      ro.observe(box);
-    }
-
-    document.addEventListener("mousemove", (e) => {
-      const rect = map.getBoundingClientRect();
-
-      if (activeBox) {
-        let x = e.clientX - rect.left - offsetX;
-        let y = e.clientY - rect.top - offsetY;
-
-        activeBox.style.left = x + "px";
-        activeBox.style.top = y + "px";
-        updateOutput();
-      }
-
-      if (activeRotateBox) {
-        const r = activeRotateBox.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-
-        const currentAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
-        const delta = currentAngle - startAngle;
-        const finalAngle = startRotate + delta * (180 / Math.PI);
-
-        activeRotateBox.style.transform = `rotate(${finalAngle}deg)`;
-        activeRotateBox.dataset.rotate = String(finalAngle);
-        updateOutput();
-      }
-    });
-
-    document.addEventListener("mouseup", () => {
-      activeBox = null;
-      activeRotateBox = null;
-    });
-
-    function pxToPercent(value, total) {
-      if (!total) return 0;
-      return (value / total) * 100;
-    }
-
-    function round2(n) {
-      return Math.round(n * 100) / 100;
-    }
-
-    function updateOutput() {
-      const boxes = document.querySelectorAll(".box");
-      const mapWidth = map.clientWidth;
-      const mapHeight = map.clientHeight;
-
-      let result = "";
-
-      boxes.forEach((b) => {
-        const leftPx = parseFloat(b.style.left || "0");
-        const topPx = parseFloat(b.style.top || "0");
-        const widthPx = b.offsetWidth;
-        const heightPx = b.offsetHeight;
-        const rot = b.dataset.rotate || "0";
-        const name = b.dataset.name || "object";
-
-        const left = round2(pxToPercent(leftPx, mapWidth));
-        const top = round2(pxToPercent(topPx, mapHeight));
-        const width = round2(pxToPercent(widthPx, mapWidth));
-        const height = round2(pxToPercent(heightPx, mapHeight));
-
-        result += `/* ${name} */\n`;
-        result += `.${name}{\n`;
-        result += `  left:${left}%;\n`;
-        result += `  top:${top}%;\n`;
-        result += `  width:${width}%;\n`;
-        result += `  height:${height}%;\n`;
-        result += `  transform:rotate(${rot}deg);\n`;
-        result += `}\n\n`;
-      });
-
-      output.value = result;
-    }
-
-    async function copyCode() {
-      const text = output.value;
-
-      try {
-        await navigator.clipboard.writeText(text);
-        alert("복사 완료!");
-      } catch (err) {
-        output.select();
-        document.execCommand("copy");
-        alert("복사 완료!");
-      }
-    }
-
-    window.addEventListener("resize", updateOutput);
-    updateOutput();
-  </script>
+window.onresize=update;
+</script>
 </body>
 </html>
