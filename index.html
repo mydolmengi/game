@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RPG MAP EDITOR FINAL PRO - Percent</title>
+  <title>RPG MAP EDITOR FINAL PRO</title>
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       background: #111;
@@ -19,7 +20,7 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      width: 520px;
+      width: min(520px, calc(100vw - 40px));
       background: #fff;
       padding: 18px;
       border-radius: 12px;
@@ -115,6 +116,12 @@
       color: #555;
       line-height: 1.5;
     }
+
+    .small {
+      color: #777;
+      font-size: 12px;
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body>
@@ -128,6 +135,7 @@
       배경 이미지: <code>images/cave_mage_bg.png</code><br>
       출력값은 <b>퍼센트(%)</b> 기준입니다.
     </div>
+    <div class="small">모바일 플레이용으로 위치/크기 저장이 더 안정적입니다.</div>
   </div>
 
   <div class="wrapper" id="map">
@@ -158,12 +166,13 @@
 
       const icon = document.createElement("div");
       icon.className = "rotate-icon";
-
       box.appendChild(icon);
+
       map.appendChild(box);
 
       enableDrag(box);
       enableRotate(icon, box);
+      observeResize(box);
       updateOutput();
     }
 
@@ -195,6 +204,13 @@
         startRotate = parseFloat(box.dataset.rotate || "0");
         box.style.zIndex = 9999;
       });
+    }
+
+    function observeResize(box) {
+      const ro = new ResizeObserver(() => {
+        updateOutput();
+      });
+      ro.observe(box);
     }
 
     document.addEventListener("mousemove", (e) => {
@@ -229,40 +245,41 @@
       activeRotateBox = null;
     });
 
-    function toPercentX(px, mapWidth) {
-      return (px / mapWidth) * 100;
+    function pxToPercent(value, total) {
+      if (!total) return 0;
+      return (value / total) * 100;
     }
 
-    function toPercentY(px, mapHeight) {
-      return (px / mapHeight) * 100;
+    function round2(n) {
+      return Math.round(n * 100) / 100;
     }
 
     function updateOutput() {
       const boxes = document.querySelectorAll(".box");
-      const mapRect = map.getBoundingClientRect();
+      const mapWidth = map.clientWidth;
+      const mapHeight = map.clientHeight;
 
       let result = "";
 
       boxes.forEach((b) => {
-        const rect = b.getBoundingClientRect();
-        const xPx = rect.left - mapRect.left;
-        const yPx = rect.top - mapRect.top;
-        const wPx = rect.width;
-        const hPx = rect.height;
+        const leftPx = parseFloat(b.style.left || "0");
+        const topPx = parseFloat(b.style.top || "0");
+        const widthPx = b.offsetWidth;
+        const heightPx = b.offsetHeight;
         const rot = b.dataset.rotate || "0";
         const name = b.dataset.name || "object";
 
-        const x = toPercentX(xPx, mapRect.width).toFixed(4);
-        const y = toPercentY(yPx, mapRect.height).toFixed(4);
-        const w = toPercentX(wPx, mapRect.width).toFixed(4);
-        const h = toPercentY(hPx, mapRect.height).toFixed(4);
+        const left = round2(pxToPercent(leftPx, mapWidth));
+        const top = round2(pxToPercent(topPx, mapHeight));
+        const width = round2(pxToPercent(widthPx, mapWidth));
+        const height = round2(pxToPercent(heightPx, mapHeight));
 
         result += `/* ${name} */\n`;
         result += `.${name}{\n`;
-        result += `  left:${x}%;\n`;
-        result += `  top:${y}%;\n`;
-        result += `  width:${w}%;\n`;
-        result += `  height:${h}%;\n`;
+        result += `  left:${left}%;\n`;
+        result += `  top:${top}%;\n`;
+        result += `  width:${width}%;\n`;
+        result += `  height:${height}%;\n`;
         result += `  transform:rotate(${rot}deg);\n`;
         result += `}\n\n`;
       });
@@ -270,10 +287,17 @@
       output.value = result;
     }
 
-    function copyCode() {
-      output.select();
-      document.execCommand("copy");
-      alert("복사 완료!");
+    async function copyCode() {
+      const text = output.value;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("복사 완료!");
+      } catch (err) {
+        output.select();
+        document.execCommand("copy");
+        alert("복사 완료!");
+      }
     }
 
     window.addEventListener("resize", updateOutput);
